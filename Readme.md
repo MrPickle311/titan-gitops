@@ -14,3 +14,12 @@ kubectl label namespace databases pod-security.kubernetes.io/enforce=privileged 
 kubectl label namespace databases pod-security.kubernetes.io/warn=privileged --overwrite
 ```
 
+kubectl create secret generic redis-cluster-credentials \
+  --namespace databases \
+  --from-literal=redis-password="PASSWORD"
+
+kubectl create secret generic postgres-credentials \
+  --namespace databases \
+  --from-literal=postgres-password="PASSWORD"
+
+

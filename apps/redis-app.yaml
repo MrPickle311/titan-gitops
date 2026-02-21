@@ -1,0 +1,44 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: redis-cluster
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: 'https://charts.bitnami.com/bitnami'
+    targetRevision: 10.3.5
+    chart: redis-cluster
+    helm:
+      values: |
+        global:
+          redis:
+            existingSecret: "redis-cluster-credentials"
+            existingSecretPasswordKey: "redis-password"
+        
+        cluster:
+          nodes: 6
+          replicas: 1
+
+        persistence:
+          enabled: true
+          storageClass: "openebs-hostpath"
+          size: 5Gi
+
+        redis:
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: databases
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
