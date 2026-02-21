@@ -21,6 +21,9 @@ spec:
                 adminPasswordKey: "postgres-password"
               database: "titan_db"
         primary:
+          service:
+            type: LoadBalancer
+            loadBalancerIP: "10.0.0.20" 
           persistence:
             enabled: true
             storageClass: "openebs-hostpath"
