@@ -13,8 +13,10 @@ spec:
     chart: localstack
     helm:
       values: |
-        localstack:
-          pro: true
+        image:
+          repository: localstack/localstack-pro
+          tag: "latest"
+          pullPolicy: IfNotPresent
         persistence:
           enabled: true
           storageClass: "openebs-hostpath"
