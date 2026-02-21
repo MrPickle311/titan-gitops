@@ -5,12 +5,12 @@ metadata:
   namespace: metallb-system
 spec:
   addresses:
-  - 192.168.1.240-192.168.1.250 # Zmień na zakres pasujący do Twojej sieci
+  - 10.0.0.200-10.0.0.210
 ---
 apiVersion: metallb.io/v1beta1
 kind: L2Advertisement
 metadata:
-  name: l2-adv
+  name: example
   namespace: metallb-system
 spec:
   ipAddressPools:
