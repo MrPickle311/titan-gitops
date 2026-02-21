@@ -23,7 +23,7 @@ spec:
         primary:
           service:
             type: LoadBalancer
-            loadBalancerIP: "10.0.0.20" 
+            loadBalancerIP: "10.0.0.201" 
           persistence:
             enabled: true
             storageClass: "openebs-hostpath"
