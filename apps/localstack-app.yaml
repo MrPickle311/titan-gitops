@@ -1,0 +1,48 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: localstack
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: 'https://localstack.github.io/helm-charts'
+    targetRevision: 0.6.27
+    chart: localstack
+    helm:
+      values: |
+        localstack:
+          pro: true
+        persistence:
+          enabled: true
+          storageClass: "openebs-hostpath"
+          size: 20Gi
+        extraEnvVars:
+          - name: PERSISTENCE
+            value: "1"
+          - name: LOCALSTACK_AUTH_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: localstack-pro-token
+                key: token
+        ingress:
+          enabled: true
+          className: "nginx"
+          annotations:
+            nginx.ingress.kubernetes.io/proxy-body-size: "0"
+          hosts:
+            - host: localstack.homelab
+              paths:
+                - path: /
+                  pathType: Prefix
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: localstack
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
