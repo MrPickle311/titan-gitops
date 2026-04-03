@@ -18,7 +18,7 @@ spec:
           replicas: 1
         
         usePassword: true
-        existingSecret: "redis-credentials"
+        existingSecret: "redis-cluster-credentials"
         existingSecretPasswordKey: "redis-password"
 
         service:
