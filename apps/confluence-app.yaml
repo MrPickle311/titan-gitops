@@ -39,8 +39,8 @@ spec:
             url: "jdbc:postgresql://confluence-db-postgresql.databases.svc.cluster.local:5432/confluence"
             credentials:
               secretName: confluence-db-credentials
-              usernameKey: postgresql-username
-              passwordKey: postgresql-password
+              usernameKey: username
+              passwordKey: password
         
         ingress:
           create: true

@@ -16,12 +16,12 @@ spec:
         image:
           repository: bitnamilegacy/postgresql
           tag: 17.6.0-debian-12-r0
-        global:
-          postgresql:
-            auth:
-              database: confluence
-              username: confluence
-              existingSecret: confluence-db-credentials
+        auth:
+          database: confluence
+          existingSecret: confluence-db-credentials
+          secretKeys:
+            userPasswordKey: password
+            adminPasswordKey: password
         
         primary:
           persistence:
