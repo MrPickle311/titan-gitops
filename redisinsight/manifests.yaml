@@ -17,7 +17,7 @@ spec:
       - name: redisinsight
         image: redis/redisinsight:2.60.0
         ports:
-        - containerPort: 8001
+        - containerPort: 5540
         resources:
           requests:
             cpu: 100m
