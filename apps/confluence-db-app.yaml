@@ -1,0 +1,43 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: confluence-db
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: 'https://charts.bitnami.com/bitnami'
+    targetRevision: 15.5.x # Adjusting to a stable 15.x version as Confluence prefers Postgres 15
+    chart: postgresql
+    helm:
+      values: |
+        global:
+          postgresql:
+            auth:
+              database: confluence
+              username: confluence
+              existingSecret: confluence-db-credentials
+        
+        primary:
+          persistence:
+            enabled: true
+            storageClass: "openebs-hostpath"
+            size: 10Gi
+          resources:
+            requests:
+              cpu: 250m
+              memory: 256Mi
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: databases
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
