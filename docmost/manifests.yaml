@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: docmost
+  namespace: collaboration
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: docmost
+  template:
+    metadata:
+      labels:
+        app: docmost
+    spec:
+      containers:
+      - name: docmost
+        image: docmost/docmost:latest
+        ports:
+        - containerPort: 3000
+        env:
+        - name: APP_URL
+          value: "http://docmost.homelab"
+        - name: APP_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: docmost-secrets
+              key: app-secret
+        - name: DATABASE_URL
+          value: "postgresql://docmost:docmost123@docmost-db-postgresql.databases.svc.cluster.local:5432/docmost"
+        - name: REDIS_URL
+          value: "redis://:abc123@redis-redis-cluster.databases.svc.cluster.local:6379/0"
+        resources:
+          requests:
+            cpu: 200m
+            memory: 512Mi
+          limits:
+            cpu: 1000m
+            memory: 2Gi
+        volumeMounts:
+        - name: storage
+          mountPath: /app/storage
+      volumes:
+      - name: storage
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: docmost
+  namespace: collaboration
+spec:
+  ports:
+  - port: 80
+    targetPort: 3000
+  selector:
+    app: docmost
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: docmost
+  namespace: collaboration
+  annotations:
+    kubernetes.io/ingress.class: nginx
+spec:
+  rules:
+  - host: docmost.homelab
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: docmost
+            port:
+              number: 80
