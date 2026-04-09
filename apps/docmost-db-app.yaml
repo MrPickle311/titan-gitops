@@ -18,6 +18,7 @@ spec:
           tag: 17.6.0-debian-12-r0
         auth:
           database: docmost
+          username: docmost
           existingSecret: docmost-db-credentials
           secretKeys:
             userPasswordKey: password
