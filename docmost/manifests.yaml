@@ -29,7 +29,7 @@ spec:
         - name: DATABASE_URL
           value: "postgresql://docmost:docmost123@docmost-db-postgresql.databases.svc.cluster.local:5432/docmost"
         - name: REDIS_URL
-          value: "redis://:abc123@redis-redis-cluster.databases.svc.cluster.local:6379/0"
+          value: "redis://:abc123@docmost-redis-master.databases.svc.cluster.local:6379/0"
         resources:
           requests:
             cpu: 200m
