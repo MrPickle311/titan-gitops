@@ -13,9 +13,6 @@ spec:
     chart: redis-cluster
     helm:
       values: |
-        image:
-          tag: 7.2.4-debian-12
-
         cluster:
           nodes: 6
           replicas: 1
