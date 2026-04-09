@@ -43,7 +43,7 @@ spec:
   type: LoadBalancer
   ports:
   - port: 80
-    targetPort: 8001
+    targetPort: 5540
   selector:
     app: redisinsight
 ---
