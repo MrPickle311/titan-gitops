@@ -23,9 +23,9 @@ spec:
         env:
         - name: SCHEMA_REGISTRY_HOST_NAME
           value: "schema-registry"
-        # Schema Registry wymaga prefiksu PLAINTEXT://
+        # FIX: Wskazujemy na główny serwis brokerów Kafki
         - name: SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS
-          value: "PLAINTEXT://kafka-controller-headless.messaging.svc.cluster.local:9092"
+          value: "PLAINTEXT://kafka.messaging.svc.cluster.local:9092"
         - name: SCHEMA_REGISTRY_LISTENERS
           value: "http://0.0.0.0:8081"
         resources:
@@ -71,8 +71,9 @@ spec:
         ports:
         - containerPort: 9021
         env:
+        # FIX: Wskazujemy na główny serwis brokerów Kafki
         - name: CONTROL_CENTER_BOOTSTRAP_SERVERS
-          value: "kafka-controller-headless.messaging.svc.cluster.local:9092"
+          value: "kafka.messaging.svc.cluster.local:9092"
         - name: CONTROL_CENTER_SCHEMA_REGISTRY_URL
           value: "http://schema-registry.messaging.svc.cluster.local:8081"
         # Kluczowe dla homelabów: nadpisujemy domyślną replikację C3 (3) na 1, 
@@ -85,7 +86,6 @@ spec:
           value: "1"
         - name: CONFLUENT_METRICS_TOPIC_REPLICATION
           value: "1"
-        # USUNIĘTO zmienną PORT, która powodowała błąd skryptu startowego Confluent
         resources:
           # UWAGA: C3 jest bardzo "ciężkie", wymaga sporo RAM-u
           requests:
