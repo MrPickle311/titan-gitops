@@ -1,65 +1,129 @@
+# --- 1. SCHEMA REGISTRY ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: kafka-ui
+  name: schema-registry
   namespace: messaging
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: kafka-ui
+      app: schema-registry
   template:
     metadata:
       labels:
-        app: kafka-ui
+        app: schema-registry
     spec:
       containers:
-      - name: kafka-ui
-        image: provectuslabs/kafka-ui:latest
+      - name: schema-registry
+        # Używamy oficjalnego obrazu Confluent
+        image: confluentinc/cp-schema-registry:7.6.0
         ports:
-        - containerPort: 8080
+        - containerPort: 8081
         env:
-        # Konfiguracja połączenia z klastrem Kafka
-        - name: KAFKA_CLUSTERS_0_NAME
-          value: "Titan-Ex-Cluster"
-        - name: KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS
-          # To wewnętrzny adres serwisu, który powoła Bitnami Helm Chart
-          value: "kafka-controller-headless.messaging.svc.cluster.local:9092"
+        - name: SCHEMA_REGISTRY_HOST_NAME
+          value: "schema-registry"
+        # Schema Registry wymaga prefiksu PLAINTEXT://
+        - name: SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS
+          value: "PLAINTEXT://kafka-controller-headless.messaging.svc.cluster.local:9092"
+        - name: SCHEMA_REGISTRY_LISTENERS
+          value: "http://0.0.0.0:8081"
         resources:
           requests:
-            cpu: 100m
-            memory: 256Mi
-          limits:
-            cpu: 500m
+            cpu: 250m
             memory: 512Mi
+          limits:
+            cpu: 1000m
+            memory: 1Gi
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: kafka-ui
+  name: schema-registry
   namespace: messaging
 spec:
   type: ClusterIP
   ports:
-  - port: 80
-    targetPort: 8080
+  - port: 8081
+    targetPort: 8081
   selector:
-    app: kafka-ui
+    app: schema-registry
 ---
+# --- 2. CONFLUENT CONTROL CENTER (C3) ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: control-center
+  namespace: messaging
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: control-center
+  template:
+    metadata:
+      labels:
+        app: control-center
+    spec:
+      containers:
+      - name: control-center
+        image: confluentinc/cp-enterprise-control-center:7.6.0
+        ports:
+        - containerPort: 9021
+        env:
+        - name: CONTROL_CENTER_BOOTSTRAP_SERVERS
+          value: "kafka-controller-headless.messaging.svc.cluster.local:9092"
+        - name: CONTROL_CENTER_SCHEMA_REGISTRY_URL
+          value: "http://schema-registry.messaging.svc.cluster.local:8081"
+        # Kluczowe dla homelabów: nadpisujemy domyślną replikację C3 (3) na 1, 
+        # inaczej C3 nie utworzy swoich wewnętrznych topiców konfiguracyjnych
+        - name: CONTROL_CENTER_REPLICATION_FACTOR
+          value: "1"
+        - name: CONTROL_CENTER_INTERNAL_TOPICS_PARTITIONS
+          value: "1"
+        - name: CONTROL_CENTER_MONITORING_INTERCEPTOR_TOPIC_PARTITIONS
+          value: "1"
+        - name: CONFLUENT_METRICS_TOPIC_REPLICATION
+          value: "1"
+        - name: PORT
+          value: "9021"
+        resources:
+          # UWAGA: C3 jest bardzo "ciężkie", wymaga sporo RAM-u
+          requests:
+            cpu: 500m
+            memory: 1Gi
+          limits:
+            cpu: 2000m
+            memory: 2Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: control-center
+  namespace: messaging
+spec:
+  type: ClusterIP
+  ports:
+  - port: 9021
+    targetPort: 9021
+  selector:
+    app: control-center
+---
+# --- 3. INGRESS DLA CONTROL CENTER (Zastępuje stary Kafka UI) ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: kafka-ui
+  name: control-center-ingress
   namespace: messaging
   annotations:
     kubernetes.io/ingress.class: nginx
-    # Generowanie certyfikatu SSL "w locie"
     cert-manager.io/cluster-issuer: "homelab-ca-issuer"
+    nginx.ingress.kubernetes.io/proxy-buffer-size: "16k"
 spec:
   tls:
     - hosts:
         - kafka.homelab
-      secretName: kafka-ui-tls
+      secretName: control-center-tls
   rules:
   - host: kafka.homelab
     http:
@@ -68,6 +132,32 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: kafka-ui
+            name: control-center
             port:
-              number: 80
+              number: 9021
+---
+# --- 4. INGRESS DLA SCHEMA REGISTRY ---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: schema-registry-ingress
+  namespace: messaging
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: "homelab-ca-issuer"
+spec:
+  tls:
+    - hosts:
+        - schema.homelab
+      secretName: schema-registry-tls
+  rules:
+  - host: schema.homelab
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: schema-registry
+            port:
+              number: 8081
