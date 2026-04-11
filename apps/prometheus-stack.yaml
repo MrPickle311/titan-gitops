@@ -13,7 +13,6 @@ spec:
     chart: kube-prometheus-stack
     helm:
       values: |
-        # --- KONFIGURACJA GRAFANY ---
         grafana:
           admin:
             existingSecret: "grafana-credentials"
@@ -37,7 +36,6 @@ spec:
             storageClassName: "openebs-hostpath"
             size: 5Gi
 
-        # --- KONFIGURACJA PROMETHEUSA ---
         prometheus:
           prometheusSpec:
             storageSpec:
@@ -58,7 +56,6 @@ spec:
                 cpu: 1000m
                 memory: 2048Mi
 
-        # --- FIX 1: Wyłączenie problematycznych webhooków dla ArgoCD ---
         prometheusOperator:
           admissionWebhooks:
             enabled: false
@@ -74,5 +71,4 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
-      # --- FIX 2: Ominięcie limitu wielkości adnotacji dla ogromnych CRD ---
       - ServerSideApply=true
