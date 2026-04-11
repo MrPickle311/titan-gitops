@@ -1,0 +1,78 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kube-prometheus-stack
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: 'https://prometheus-community.github.io/helm-charts'
+    targetRevision: 62.7.0
+    chart: kube-prometheus-stack
+    helm:
+      values: |
+        # --- KONFIGURACJA GRAFANY ---
+        grafana:
+          admin:
+            existingSecret: "grafana-credentials"
+            userKey: admin-user
+            passwordKey: admin-password
+          
+          ingress:
+            enabled: true
+            ingressClassName: "nginx"
+            annotations:
+              cert-manager.io/cluster-issuer: "homelab-ca-issuer"
+            hosts:
+              - grafana.homelab
+            tls:
+              - secretName: grafana-tls-secret
+                hosts:
+                  - grafana.homelab
+          
+          persistence:
+            enabled: true
+            storageClassName: "openebs-hostpath"
+            size: 5Gi
+
+        # --- KONFIGURACJA PROMETHEUSA ---
+        prometheus:
+          prometheusSpec:
+            storageSpec:
+              volumeClaimTemplate:
+                spec:
+                  storageClassName: "openebs-hostpath"
+                  accessModes: ["ReadWriteOnce"]
+                  resources:
+                    requests:
+                      storage: 20Gi
+            
+            retention: 10d
+            resources:
+              requests:
+                cpu: 200m
+                memory: 512Mi
+              limits:
+                cpu: 1000m
+                memory: 2048Mi
+
+        # --- FIX 1: Wyłączenie problematycznych webhooków dla ArgoCD ---
+        prometheusOperator:
+          admissionWebhooks:
+            enabled: false
+          tls:
+            enabled: false
+
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: monitoring
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      # --- FIX 2: Ominięcie limitu wielkości adnotacji dla ogromnych CRD ---
+      - ServerSideApply=true
