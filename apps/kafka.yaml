@@ -16,13 +16,6 @@ spec:
         image:
           repository: bitnamilegacy/kafka
           tag: 4.0.0-debian-12-r10
-  source:
-    repoURL: 'https://charts.bitnami.com/bitnami'
-    # ZAKOMENTOWANE: Bitnami usuwa stare tagi. Brak tej linijki = najnowsza, działająca wersja.
-    # targetRevision: 29.3.0 
-    chart: kafka
-    helm:
-      values: |
         # Włączamy nowoczesny tryb KRaft (bez Zookeepera)
         kraft:
           enabled: true
