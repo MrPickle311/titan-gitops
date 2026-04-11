@@ -14,6 +14,8 @@ spec:
       labels:
         app: schema-registry
     spec:
+      # MAGIC FIX: Wyłącza potajemne wstrzykiwanie zmiennej SCHEMA_REGISTRY_PORT
+      enableServiceLinks: false
       containers:
       - name: schema-registry
         # Używamy oficjalnego obrazu Confluent
@@ -23,7 +25,6 @@ spec:
         env:
         - name: SCHEMA_REGISTRY_HOST_NAME
           value: "schema-registry"
-        # FIX: Wskazujemy na główny serwis brokerów Kafki
         - name: SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS
           value: "PLAINTEXT://kafka.messaging.svc.cluster.local:9092"
         - name: SCHEMA_REGISTRY_LISTENERS
@@ -65,13 +66,14 @@ spec:
       labels:
         app: control-center
     spec:
+      # MAGIC FIX: Wyłącza potajemne wstrzykiwanie zmiennej CONTROL_CENTER_PORT
+      enableServiceLinks: false
       containers:
       - name: control-center
         image: confluentinc/cp-enterprise-control-center:7.6.0
         ports:
         - containerPort: 9021
         env:
-        # FIX: Wskazujemy na główny serwis brokerów Kafki
         - name: CONTROL_CENTER_BOOTSTRAP_SERVERS
           value: "kafka.messaging.svc.cluster.local:9092"
         - name: CONTROL_CENTER_SCHEMA_REGISTRY_URL
@@ -108,7 +110,7 @@ spec:
   selector:
     app: control-center
 ---
-# --- 3. INGRESS DLA CONTROL CENTER (Zastępuje stary Kafka UI) ---
+# --- 3. INGRESS DLA CONTROL CENTER ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
