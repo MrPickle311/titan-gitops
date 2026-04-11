@@ -9,8 +9,7 @@ spec:
   project: default
   source:
     repoURL: 'https://charts.bitnami.com/bitnami'
-    # ZAKOMENTOWANE: Bitnami usuwa stare tagi. Brak tej linijki = najnowsza, działająca wersja.
-    # targetRevision: 29.3.0 
+    targetRevision: 32.4.3
     chart: kafka
     helm:
       values: |
