@@ -14,12 +14,11 @@ spec:
       labels:
         app: schema-registry
     spec:
-      # MAGIC FIX: Wyłącza potajemne wstrzykiwanie zmiennej SCHEMA_REGISTRY_PORT
       enableServiceLinks: false
       containers:
       - name: schema-registry
-        # Używamy oficjalnego obrazu Confluent
-        image: confluentinc/cp-schema-registry:7.6.0
+        # FIX: Zmiana na 'latest', aby wspierać Kafkę 4.0+
+        image: confluentinc/cp-schema-registry:latest
         ports:
         - containerPort: 8081
         env:
@@ -66,11 +65,11 @@ spec:
       labels:
         app: control-center
     spec:
-      # MAGIC FIX: Wyłącza potajemne wstrzykiwanie zmiennej CONTROL_CENTER_PORT
       enableServiceLinks: false
       containers:
       - name: control-center
-        image: confluentinc/cp-enterprise-control-center:7.6.0
+        # FIX: Zmiana na 'latest', aby pozbyć się błędu 'message.timestamp' przy tworzeniu topiców
+        image: confluentinc/cp-enterprise-control-center:latest
         ports:
         - containerPort: 9021
         env:
@@ -78,8 +77,6 @@ spec:
           value: "kafka.messaging.svc.cluster.local:9092"
         - name: CONTROL_CENTER_SCHEMA_REGISTRY_URL
           value: "http://schema-registry.messaging.svc.cluster.local:8081"
-        # Kluczowe dla homelabów: nadpisujemy domyślną replikację C3 (3) na 1, 
-        # inaczej C3 nie utworzy swoich wewnętrznych topiców konfiguracyjnych
         - name: CONTROL_CENTER_REPLICATION_FACTOR
           value: "1"
         - name: CONTROL_CENTER_INTERNAL_TOPICS_PARTITIONS
@@ -89,7 +86,6 @@ spec:
         - name: CONFLUENT_METRICS_TOPIC_REPLICATION
           value: "1"
         resources:
-          # UWAGA: C3 jest bardzo "ciężkie", wymaga sporo RAM-u
           requests:
             cpu: 500m
             memory: 1Gi
