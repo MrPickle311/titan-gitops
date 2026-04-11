@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka-ui
+  namespace: messaging
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafka-ui
+  template:
+    metadata:
+      labels:
+        app: kafka-ui
+    spec:
+      containers:
+      - name: kafka-ui
+        image: provectuslabs/kafka-ui:latest
+        ports:
+        - containerPort: 8080
+        env:
+        # Konfiguracja połączenia z klastrem Kafka
+        - name: KAFKA_CLUSTERS_0_NAME
+          value: "Titan-Ex-Cluster"
+        - name: KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS
+          # To wewnętrzny adres serwisu, który powoła Bitnami Helm Chart
+          value: "kafka-controller-headless.messaging.svc.cluster.local:9092"
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka-ui
+  namespace: messaging
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: 8080
+  selector:
+    app: kafka-ui
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: kafka-ui
+  namespace: messaging
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    # Generowanie certyfikatu SSL "w locie"
+    cert-manager.io/cluster-issuer: "homelab-ca-issuer"
+spec:
+  tls:
+    - hosts:
+        - kafka.homelab
+      secretName: kafka-ui-tls
+  rules:
+  - host: kafka.homelab
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: kafka-ui
+            port:
+              number: 80
