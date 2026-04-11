@@ -55,6 +55,12 @@ spec:
               limits:
                 cpu: 1000m
                 memory: 2048Mi
+                
+        prometheusOperator:
+          admissionWebhooks:
+            enabled: false
+          tls:
+            enabled: false
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: monitoring
