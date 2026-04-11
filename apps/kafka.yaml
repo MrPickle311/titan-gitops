@@ -1,0 +1,52 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kafka
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: 'https://charts.bitnami.com/bitnami'
+    targetRevision: 29.3.0
+    chart: kafka
+    helm:
+      values: |
+        kraft:
+          enabled: true
+        zookeeper:
+          enabled: false
+        
+        # Węzeł zarządczy klastrem (wymaga mało zasobów)
+        controller:
+          replicaCount: 1
+          persistence:
+            enabled: true
+            storageClass: "openebs-hostpath"
+            size: 5Gi
+
+        # Węzły robocze (Brokery trzymające faktyczne wiadomości)
+        broker:
+          replicaCount: 3
+          persistence:
+            enabled: true
+            storageClass: "openebs-hostpath"
+            size: 10Gi
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: 1000m
+              memory: 1024Mi
+
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: messaging
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
