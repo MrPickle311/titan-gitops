@@ -20,9 +20,18 @@ spec:
               secretKeys:
                 adminPasswordKey: "postgres-password"
               database: "titan_db"
+        
+        # KLUCZOWY FIX 1: Wyłączenie ścisłej zapory sieciowej blokującej ruch spoza klastra
+        networkPolicy:
+          enabled: false
+
         primary:
           service:
             type: LoadBalancer
+            # KLUCZOWY FIX 2: Nowoczesny sposób przypisania IP przez adnotację MetalLB
+            annotations:
+              metallb.universe.tf/loadBalancerIPs: "10.0.0.201"
+            # Zostawiamy dla kompatybilności wstecznej
             loadBalancerIP: "10.0.0.201" 
           persistence:
             enabled: true
