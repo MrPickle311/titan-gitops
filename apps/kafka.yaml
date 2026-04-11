@@ -9,10 +9,12 @@ spec:
   project: default
   source:
     repoURL: 'https://charts.bitnami.com/bitnami'
-    targetRevision: 29.3.0
+    # ZAKOMENTOWANE: Bitnami usuwa stare tagi. Brak tej linijki = najnowsza, działająca wersja.
+    # targetRevision: 29.3.0 
     chart: kafka
     helm:
       values: |
+        # Włączamy nowoczesny tryb KRaft (bez Zookeepera)
         kraft:
           enabled: true
         zookeeper:
@@ -43,6 +45,7 @@ spec:
 
   destination:
     server: 'https://kubernetes.default.svc'
+    # Tworzymy dedykowany namespace dla systemów kolejkowych
     namespace: messaging
   syncPolicy:
     automated:
