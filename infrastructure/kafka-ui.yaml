@@ -85,8 +85,7 @@ spec:
           value: "1"
         - name: CONFLUENT_METRICS_TOPIC_REPLICATION
           value: "1"
-        - name: PORT
-          value: "9021"
+        # USUNIĘTO zmienną PORT, która powodowała błąd skryptu startowego Confluent
         resources:
           # UWAGA: C3 jest bardzo "ciężkie", wymaga sporo RAM-u
           requests:
