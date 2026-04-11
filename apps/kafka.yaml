@@ -59,6 +59,8 @@ spec:
           # Automatyczna integracja z Twoim Prometheus Operatorem
           serviceMonitor:
             enabled: true
+            interval: 30s        # Zbieraj co 30 sekund zamiast co domyślne 15s
+            scrapeTimeout: 30s   # Daj Kafce aż 30 sekund na wysłanie danych
             # Jeśli masz wiele Prometheusów, to pozwala im filtrować co zbierają
             labels:
               release: kube-prometheus-stack
