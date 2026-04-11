@@ -9,21 +9,22 @@ spec:
   project: default
   source:
     repoURL: 'https://charts.bitnami.com/bitnami'
-    targetRevision: 32.4.3
+    # Cofamy chart do linii 31.x, zanim wprowadzono domyślnie Kafkę 4.0
+    targetRevision: 31.0.0
     chart: kafka
     helm:
       values: |
         image:
           repository: bitnamilegacy/kafka
-          tag: 4.0.0-debian-12-r10
+          # Używamy stabilnej Kafki 3.9.0. Confluent nie obsługuje jeszcze 4.0.0!
+          tag: 3.9.0-debian-12-r0
         
         kraft:
           enabled: true
         zookeeper:
           enabled: false
         
-        # --- KLUCZOWY FIX: WYMUSZENIE PLAINTEXT ---
-        # Wyłączamy domyślne uwierzytelnianie SASL, aby Schema Registry i C3 mogły się połączyć
+        # Wymuszenie PLAINTEXT dla kompatybilności ze Schema Registry
         listeners:
           client:
             protocol: PLAINTEXT
