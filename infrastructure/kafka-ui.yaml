@@ -17,7 +17,6 @@ spec:
       enableServiceLinks: false
       containers:
       - name: schema-registry
-        # FIX: Zmiana na 'latest', aby wspierać Kafkę 4.0+
         image: confluentinc/cp-schema-registry:latest
         ports:
         - containerPort: 8081
@@ -68,7 +67,6 @@ spec:
       enableServiceLinks: false
       containers:
       - name: control-center
-        # FIX: Zmiana na 'latest', aby pozbyć się błędu 'message.timestamp' przy tworzeniu topiców
         image: confluentinc/cp-enterprise-control-center:latest
         ports:
         - containerPort: 9021
@@ -106,7 +104,7 @@ spec:
   selector:
     app: control-center
 ---
-# --- 3. INGRESS DLA CONTROL CENTER ---
+# --- 3. INGRESSY ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -133,7 +131,6 @@ spec:
             port:
               number: 9021
 ---
-# --- 4. INGRESS DLA SCHEMA REGISTRY ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -158,3 +155,67 @@ spec:
             name: schema-registry
             port:
               number: 8081
+---
+# --- 5. KAFKA EXPORTER (Brakujący element!) ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka-exporter
+  namespace: messaging
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafka-exporter
+  template:
+    metadata:
+      labels:
+        app: kafka-exporter
+    spec:
+      containers:
+      - name: kafka-exporter
+        # Oficjalny obraz, pod który zrobiony jest Dashboard 7589
+        image: danielqsj/kafka-exporter:v1.7.0
+        args:
+        - "--kafka.server=kafka.messaging.svc.cluster.local:9092"
+        ports:
+        - containerPort: 9308
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 200m
+            memory: 128Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka-exporter
+  namespace: messaging
+  labels:
+    app: kafka-exporter
+spec:
+  type: ClusterIP
+  ports:
+  - port: 9308
+    targetPort: 9308
+    name: metrics
+  selector:
+    app: kafka-exporter
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: kafka-exporter-monitor
+  namespace: messaging
+  labels:
+    # Kluczowe, by Prometheus Operator to zauważył
+    release: kube-prometheus-stack
+spec:
+  selector:
+    matchLabels:
+      app: kafka-exporter
+  endpoints:
+  - port: metrics
+    interval: 15s
