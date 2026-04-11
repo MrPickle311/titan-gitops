@@ -16,13 +16,25 @@ spec:
         image:
           repository: bitnamilegacy/kafka
           tag: 4.0.0-debian-12-r10
-        # Włączamy nowoczesny tryb KRaft (bez Zookeepera)
+        
         kraft:
           enabled: true
         zookeeper:
           enabled: false
         
-        # Węzeł zarządczy klastrem (wymaga mało zasobów)
+        # --- KLUCZOWY FIX: WYMUSZENIE PLAINTEXT ---
+        # Wyłączamy domyślne uwierzytelnianie SASL, aby Schema Registry i C3 mogły się połączyć
+        listeners:
+          client:
+            protocol: PLAINTEXT
+          controller:
+            protocol: PLAINTEXT
+          interbroker:
+            protocol: PLAINTEXT
+        auth:
+          clientProtocol: plaintext
+          interBrokerProtocol: plaintext
+
         controller:
           replicaCount: 1
           persistence:
@@ -30,7 +42,6 @@ spec:
             storageClass: "openebs-hostpath"
             size: 5Gi
 
-        # Węzły robocze (Brokery trzymające faktyczne wiadomości)
         broker:
           replicaCount: 3
           persistence:
@@ -45,29 +56,23 @@ spec:
               cpu: 1000m
               memory: 1024Mi
 
-        # --- MONITORING (PROMETHEUS) ---
         metrics:
-          # Eksportuje metryki wbudowane w silnik Javy (JVM)
           jmx:
             image:
               repository: bitnamilegacy/jmx-exporter
               tag: 1.4.0-debian-12-r0
             enabled: true
-          # Eksportuje logikę Kafki (Topici, opóźnienia konsumentów)
           kafka:
             enabled: true
-          # Automatyczna integracja z Twoim Prometheus Operatorem
           serviceMonitor:
             enabled: true
-            interval: 30s        # Zbieraj co 30 sekund zamiast co domyślne 15s
-            scrapeTimeout: 30s   # Daj Kafce aż 30 sekund na wysłanie danych
-            # Jeśli masz wiele Prometheusów, to pozwala im filtrować co zbierają
+            interval: 30s
+            scrapeTimeout: 30s
             labels:
               release: kube-prometheus-stack
 
   destination:
     server: 'https://kubernetes.default.svc'
-    # Tworzymy dedykowany namespace dla systemów kolejkowych
     namespace: messaging
   syncPolicy:
     automated:
