@@ -51,7 +51,7 @@ metadata:
   namespace: container-registry
 spec:
   type: ClusterIP
-  clusterIP: 10.96.100.1
+  clusterIP: 10.96.100.1 # This must be static. Containerd does not see ingress hostnames.
   ports:
   - port: 80
     targetPort: 5000
