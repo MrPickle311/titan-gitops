@@ -41,6 +41,8 @@ kind: Service
 metadata:
   name: payment-service
   namespace: default
+  labels:
+    app: payment-service
 spec:
   selector:
     app: payment-service
