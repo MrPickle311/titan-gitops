@@ -3,6 +3,8 @@ kind: Deployment
 metadata:
   name: wallet-service
   namespace: default
+  labels:
+    app: wallet-service
 spec:
   replicas: 1
   selector:
@@ -35,6 +37,8 @@ kind: Service
 metadata:
   name: wallet-service
   namespace: default
+  labels:
+    app: wallet-service
 spec:
   selector:
     app: wallet-service

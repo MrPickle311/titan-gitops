@@ -3,6 +3,8 @@ kind: Deployment
 metadata:
   name: ledger-service
   namespace: default
+  labels:
+    app: ledger-service
 spec:
   replicas: 1
   selector:
@@ -37,6 +39,8 @@ kind: Service
 metadata:
   name: ledger-service
   namespace: default
+  labels:
+    app: ledger-service
 spec:
   selector:
     app: ledger-service
