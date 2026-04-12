@@ -1,0 +1,42 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: tempo
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: 'https://grafana.github.io/helm-charts'
+    targetRevision: 1.10.2
+    chart: tempo
+    helm:
+      values: |
+        tempo:
+          # Konfiguracja odbiorników - włączamy OpenTelemetry (OTLP)
+          receivers:
+            otlp:
+              protocols:
+                grpc:
+                  endpoint: "0.0.0.0:4317"
+                http:
+                  endpoint: "0.0.0.0:4318"
+          storage:
+            trace:
+              backend: local
+              local:
+                path: /var/tempo/traces
+          # Wyłączamy niepotrzebne w homelabie komponenty dla oszczędności RAMu
+        search:
+          enabled: true
+  destination:
+    server: 'https://kubernetes.default.svc'
+    # Tempo instalujemy zazwyczaj tam gdzie Prometheusa/Grafanę
+    namespace: monitoring
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
