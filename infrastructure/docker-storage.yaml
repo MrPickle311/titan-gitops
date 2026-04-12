@@ -50,10 +50,11 @@ metadata:
   name: docker-registry
   namespace: container-registry
 spec:
-  type: ClusterIP
+  type: NodePort
   ports:
   - port: 80
     targetPort: 5000
+    nodePort: 30500
   selector:
     app: docker-registry
 ---
