@@ -3,4 +3,4 @@ machine:
     mirrors:
       registry.homelab:
         endpoints:
-          - http://127.0.0.1:30500
+          - http://10.96.100.1
