@@ -55,7 +55,7 @@ spec:
         - name: PYROSCOPE_SERVER_ADDRESS
           value: "http://pyroscope.monitoring.svc.cluster.local:4040"
         - name: PYROSCOPE_FORMAT
-          value: "jfr" # Java Flight Recorder - najwydajniejszy format
+          value: "pprof" # Java Flight Recorder - najwydajniejszy format
         - name: PYROSCOPE_PROFILING_ALLOC
           value: "512k" # Zbiera dane o alokacji pamięci per klasa
         - name: PYROSCOPE_PROFILING_LOCK
