@@ -54,10 +54,16 @@ spec:
           value: "payment-service"
         - name: PYROSCOPE_SERVER_ADDRESS
           value: "http://pyroscope.monitoring.svc.cluster.local:4040"
-        - name: PYROSCOPE_PROFILER_ALLOC
-          value: '512k'
         - name: PYROSCOPE_FORMAT
-          value: "jfr" # Java Flight Recorder - najwydajniejszy format
+          value: "pprof"
+          
+        # FIX 2: Poprawna nazwa zmiennej (PROFILING, a nie PROFILER)
+        - name: PYROSCOPE_PROFILING_ALLOC
+          value: "512k"
+          
+        # FIX 3: Jawnie dodajemy profilowanie CPU
+        - name: PYROSCOPE_PROFILER_EVENT
+          value: "itimer"
         - name: POD_NAME
           valueFrom:
             fieldRef:
