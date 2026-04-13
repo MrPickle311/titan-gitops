@@ -54,6 +54,8 @@ spec:
           value: "payment-service"
         - name: PYROSCOPE_SERVER_ADDRESS
           value: "http://pyroscope.monitoring.svc.cluster.local:4040"
+        - name: PYROSCOPE_PROFILER_ALLOC
+          value: '512k'
         - name: PYROSCOPE_FORMAT
           value: "jfr" # Java Flight Recorder - najwydajniejszy format
         - name: POD_NAME
