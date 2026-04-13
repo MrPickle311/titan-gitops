@@ -56,6 +56,13 @@ spec:
           value: "http://pyroscope.monitoring.svc.cluster.local:4040"
         - name: PYROSCOPE_FORMAT
           value: "jfr" # Java Flight Recorder - najwydajniejszy format
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: PYROSCOPE_LABELS
+          value: "pod=$(POD_NAME)"
+          
           
         # Zależności bazy i Kafki
         - name: SPRING_DATASOURCE_URL
