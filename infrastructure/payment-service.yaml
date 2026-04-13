@@ -54,8 +54,13 @@ spec:
           value: "payment-service"
         - name: PYROSCOPE_SERVER_ADDRESS
           value: "http://pyroscope.monitoring.svc.cluster.local:4040"
-        - name: PYROSCOPE_FORMAT
-          value: "jfr" # Java Flight Recorder - najwydajniejszy format
+        # FIX OSTATECZNY: Jawne wymuszenie profilowania TYLKO procesora (CPU)
+        - name: PYROSCOPE_PROFILER_EVENT
+          value: "itimer"
+        # Jawne wyłączenie pamięci (nadpisanie domyślnego zachowania agenta)
+        - name: PYROSCOPE_PROFILING_ALLOC
+          value: ""
+          
         - name: PYROSCOPE_PROFILING_LOCK
           value: "10ms" # Wykrywa blokady wątków (Thread locking)
           
