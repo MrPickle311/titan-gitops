@@ -55,15 +55,7 @@ spec:
         - name: PYROSCOPE_SERVER_ADDRESS
           value: "http://pyroscope.monitoring.svc.cluster.local:4040"
         - name: PYROSCOPE_FORMAT
-          value: "pprof"
-          
-        # FIX 2: Poprawna nazwa zmiennej (PROFILING, a nie PROFILER)
-        - name: PYROSCOPE_PROFILING_ALLOC
-          value: "512k"
-          
-        # FIX 3: Jawnie dodajemy profilowanie CPU
-        - name: PYROSCOPE_PROFILER_EVENT
-          value: "itimer"
+          value: "jfr"
         - name: POD_NAME
           valueFrom:
             fieldRef:
