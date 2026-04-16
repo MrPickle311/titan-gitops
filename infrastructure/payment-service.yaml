@@ -51,11 +51,19 @@ spec:
           
         # KONFIGURACJA PROFILERA PYROSCOPE
         - name: PYROSCOPE_APPLICATION_NAME
-          value: "payment-service"
+          value: "paymentservice"
         - name: PYROSCOPE_SERVER_ADDRESS
           value: "http://pyroscope.monitoring.svc.cluster.local:4040"
         - name: PYROSCOPE_FORMAT
           value: "jfr"
+        - name: PYROSCOPE_PROFILING_INTERVAL
+          value: "10ms"
+        - name: PYROSCOPE_PROFILER_EVENT
+          value: "itimer"
+        - name: PYROSCOPE_PROFILER_LOCK
+          value: "10ms"
+        - name: PYROSCOPE_PROFILER_ALLOC
+          value: "512k"
         - name: POD_NAME
           valueFrom:
             fieldRef:
