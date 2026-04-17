@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: istio-cni
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  project: default
+  source:
+    repoURL: '[https://istio-release.storage.googleapis.com/charts](https://istio-release.storage.googleapis.com/charts)'
+    targetRevision: 1.21.0
+    chart: cni
+    helm:
+      values: |
+        cni:
+          # Katalogi specyficzne dla ścieżek w Talos OS
+          cniBinDir: /var/lib/cni/bin
+          cniConfDir: /etc/cni/conf.d
+  destination:
+    server: '[https://kubernetes.default.svc](https://kubernetes.default.svc)'
+    namespace: istio-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
