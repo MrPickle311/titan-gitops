@@ -26,6 +26,14 @@ spec:
             in_cluster_url: "http://kube-prometheus-stack-grafana.monitoring.svc.cluster.local:80"
             url: "https://grafana.homelab"
             
+          # DODANE: Podpięcie Grafana Tempo do panelu Kiali
+          tracing:
+            enabled: true
+            provider: "tempo"
+            in_cluster_url: "http://tempo.monitoring.svc.cluster.local:3100"
+            url: "https://grafana.homelab/explore"
+            use_grpc: false
+            
         # Konfiguracja wystawienia panelu na zewnątrz
         server:
           port: 20001
