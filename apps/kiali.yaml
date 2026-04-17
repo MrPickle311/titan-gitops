@@ -26,13 +26,14 @@ spec:
             in_cluster_url: "http://kube-prometheus-stack-grafana.monitoring.svc.cluster.local:80"
             url: "https://grafana.homelab"
             
-          # DODANE: Podpięcie Grafana Tempo do panelu Kiali
+          # FIX: Oszukujemy Kiali. Ustawiamy protokół Jaegera (którego Kiali kocha i rozumie domyślnie), 
+          # ale kierujemy go na port gRPC (9095) należący do Grafana Tempo!
           tracing:
             enabled: true
-            provider: "tempo"
-            in_cluster_url: "http://tempo.monitoring.svc.cluster.local:3100"
+            provider: "jaeger"
+            in_cluster_url: "http://tempo.monitoring.svc.cluster.local:9095"
+            internal_url: "http://tempo.monitoring.svc.cluster.local:9095" # Dla kompatybilności wstecznej Helm Charta
             url: "https://grafana.homelab/explore"
-            use_grpc: false
             
         # Konfiguracja wystawienia panelu na zewnątrz
         server:
@@ -52,7 +53,7 @@ spec:
                 - kiali.homelab
   destination:
     server: 'https://kubernetes.default.svc'
-    namespace: istio-system # Kiali musi działać tam, gdzie Istio!
+    namespace: istio-system
   syncPolicy:
     automated:
       prune: true
