@@ -3,8 +3,6 @@ kind: Deployment
 metadata:
   name: wallet-service
   namespace: default
-  annotations:
-    sidecar.istio.io/inject: "true"
   labels:
     app: wallet-service
 spec:
@@ -14,6 +12,8 @@ spec:
       app: wallet-service
   template:
     metadata:
+      annotations:
+        sidecar.istio.io/inject: "true"
       labels:
         app: wallet-service
     spec:
