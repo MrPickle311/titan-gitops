@@ -39,17 +39,18 @@ spec:
           port: 20001
           web_root: ""
           
-        ingress:
-          enabled: true
-          ingressClassName: "nginx"
-          annotations:
-            cert-manager.io/cluster-issuer: "homelab-ca-issuer"
-          hosts:
-            - kiali.homelab
-          tls:
-            - secretName: kiali-tls-secret
-              hosts:
-                - kiali.homelab
+        deployment:
+          ingress:
+            enabled: true
+            ingressClassName: "nginx"
+            annotations:
+              cert-manager.io/cluster-issuer: "homelab-ca-issuer"
+            hosts:
+              - kiali.homelab
+            tls:
+              - secretName: kiali-tls-secret
+                hosts:
+                  - kiali.homelab
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: istio-system # Kiali musi działać tam, gdzie Istio!
