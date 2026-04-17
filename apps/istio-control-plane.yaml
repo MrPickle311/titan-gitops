@@ -4,7 +4,7 @@ metadata:
   name: istiod
   namespace: argocd
   annotations:
-    argocd.argoproj.io/sync-wave: "2" # Instaluje się po CRD
+    argocd.argoproj.io/sync-wave: "2"
 spec:
   project: default
   source:
@@ -14,7 +14,6 @@ spec:
     helm:
       values: |
         global:
-          # Podpinamy Istio pod nasz system śledzenia (Tempo)
           tracer:
             zipkin:
               address: tempo.monitoring.svc.cluster.local:9411

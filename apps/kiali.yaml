@@ -1,0 +1,51 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kiali
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: 'https://kiali.org/helm-charts'
+    targetRevision: 1.84.0 # Stabilna wersja Kiali
+    chart: kiali-server
+    helm:
+      values: |
+        # Dla homelabu wyłączamy konieczność logowania się tokenami (wygoda!)
+        auth:
+          strategy: anonymous
+          
+        # Kiali potrzebuje Prometheusa, by wiedzieć o ruchu sieciowym
+        external_services:
+          prometheus:
+            url: "http://kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090"
+          grafana:
+            enabled: true
+            in_cluster_url: "http://kube-prometheus-stack-grafana.monitoring.svc.cluster.local:80"
+            url: "https://grafana.homelab"
+            
+        # Konfiguracja wystawienia panelu na zewnątrz
+        server:
+          port: 20001
+          web_root: ""
+          
+        ingress:
+          enabled: true
+          ingressClassName: "nginx"
+          annotations:
+            cert-manager.io/cluster-issuer: "homelab-ca-issuer"
+          hosts:
+            - kiali.homelab
+          tls:
+            - secretName: kiali-tls-secret
+              hosts:
+                - kiali.homelab
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: istio-system # Kiali musi działać tam, gdzie Istio!
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
