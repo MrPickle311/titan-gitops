@@ -1,28 +1,28 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ledger-service
-  namespace: default
+  name: wallet-service
+  namespace: applications
   labels:
-    app: ledger-service
+    app: wallet-service
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: ledger-service
+      app: wallet-service
   template:
     metadata:
       annotations:
         sidecar.istio.io/inject: "true"
       labels:
-        app: ledger-service
+        app: wallet-service
     spec:
       containers:
-      - name: ledger-service
-        image: registry.homelab/ledger-service:latest
+      - name: wallet-service
+        image: registry.homelab/wallet-service:latest
         imagePullPolicy: Always
         ports:
-        - containerPort: 8082
+        - containerPort: 8081
         env:
         - name: SPRING_DATASOURCE_URL
           value: jdbc:postgresql://postgres-postgresql.databases.svc.cluster.local:5432/titan_db
@@ -33,35 +33,33 @@ spec:
             secretKeyRef:
               name: postgres-credentials
               key: postgres-password
-        - name: KAFKA_BOOTSTRAP_SERVERS
-          value: kafka.messaging.svc.cluster.local:9092
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: ledger-service
-  namespace: default
+  name: wallet-service
+  namespace: applications
   labels:
-    app: ledger-service
+    app: wallet-service
 spec:
   selector:
-    app: ledger-service
+    app: wallet-service
   ports:
   - name: http
-    port: 8082
-    targetPort: 8082
+    port: 8081
+    targetPort: 8081
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: ledger-service-monitor
-  namespace: default
+  name: wallet-service-monitor
+  namespace: applications
   labels:
     release: kube-prometheus-stack
 spec:
   selector:
     matchLabels:
-      app: ledger-service
+      app: wallet-service
   endpoints:
   - port: http
     path: /actuator/prometheus
@@ -70,24 +68,24 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: ledger-service-ingress
-  namespace: default
+  name: wallet-service-ingress
+  namespace: applications
   annotations:
     kubernetes.io/ingress.class: nginx
     cert-manager.io/cluster-issuer: "homelab-ca-issuer"
 spec:
   tls:
     - hosts:
-        - ledger.homelab
-      secretName: ledger-tls-secret
+        - wallet.homelab
+      secretName: wallet-tls-secret
   rules:
-  - host: ledger.homelab
+  - host: wallet.homelab
     http:
       paths:
       - path: /
         pathType: Prefix
         backend:
           service:
-            name: ledger-service
+            name: wallet-service
             port:
-              number: 8082
+              number: 8081
