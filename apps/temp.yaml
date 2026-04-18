@@ -14,7 +14,6 @@ spec:
     helm:
       values: |
         tempo:
-          # Konfiguracja odbiorników - włączamy OpenTelemetry (OTLP)
           receivers:
             otlp:
               protocols:
@@ -22,17 +21,18 @@ spec:
                   endpoint: "0.0.0.0:4317"
                 http:
                   endpoint: "0.0.0.0:4318"
+          metricsGenerator:
+            enabled: true
+            remoteWriteUrl: "http://kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090/api/v1/write"
           storage:
             trace:
               backend: local
               local:
                 path: /var/tempo/traces
-          # Wyłączamy niepotrzebne w homelabie komponenty dla oszczędności RAMu
         search:
           enabled: true
   destination:
     server: 'https://kubernetes.default.svc'
-    # Tempo instalujemy zazwyczaj tam gdzie Prometheusa/Grafanę
     namespace: monitoring
   syncPolicy:
     automated:
