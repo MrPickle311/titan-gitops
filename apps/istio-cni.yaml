@@ -16,7 +16,7 @@ spec:
         cni:
           enabled: true
           # Katalogi specyficzne dla ścieżek w Talos OS
-          cniBinDir: /var/lib/cni/bin
+          cniBinDir: /opt/cni/bin
           cniConfDir: /etc/cni/net.d
   destination:
     server: 'https://kubernetes.default.svc'
