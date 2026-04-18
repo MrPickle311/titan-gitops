@@ -17,13 +17,13 @@ spec:
           tracer:
             zipkin:
               address: tempo.monitoring.svc.cluster.local:9411
+          cni:
+            enabled: true
         pilot:
           resources:
             requests:
               cpu: 100m
               memory: 256Mi
-        cni:
-            enabled: true
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: istio-system
