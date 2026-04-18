@@ -27,7 +27,7 @@ spec:
           command:
             - sh
             - -c
-            - "wget -O /agent/opentelemetry-javaagent.jar https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/latest/download/opentelemetry-javaagent.jar && wget -O /agent/pyroscope-otel.jar https://github.com/grafana/otel-profiling-java/releases/latest/download/pyroscope-otel.jar"
+            - "wget -O /agent/opentelemetry-javaagent.jar https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/v1.33.6/opentelemetry-javaagent.jar && wget -O /agent/pyroscope-otel.jar https://github.com/grafana/otel-profiling-java/releases/latest/download/pyroscope-otel.jar"
           volumeMounts:
             - name: pyroscope-agent
               mountPath: /agent
