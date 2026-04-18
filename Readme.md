@@ -22,4 +22,9 @@ kubectl create secret generic postgres-credentials \
   --namespace databases \
   --from-literal=postgres-password="PASSWORD"
 
+# For applications:
+kubectl create secret generic postgres-credentials \
+  --namespace applications \
+  --from-literal=postgres-password="PASSWORD"
+
 

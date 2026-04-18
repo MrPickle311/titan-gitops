@@ -12,8 +12,6 @@ spec:
       app: wallet-service
   template:
     metadata:
-      annotations:
-        sidecar.istio.io/inject: "true"
       labels:
         app: wallet-service
     spec:

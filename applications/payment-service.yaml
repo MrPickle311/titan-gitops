@@ -3,8 +3,6 @@ kind: Deployment
 metadata:
   name: payment-service
   namespace: applications
-  annotations:
-    sidecar.istio.io/inject: "true"
   labels:
     app: payment-service
 spec:
@@ -14,8 +12,6 @@ spec:
       app: payment-service
   template:
     metadata:
-      annotations:
-        sidecar.istio.io/inject: "true"
       labels:
         app: payment-service
     spec:
