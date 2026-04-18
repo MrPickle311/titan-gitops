@@ -17,7 +17,7 @@ spec:
           enabled: true
           # Katalogi specyficzne dla ścieżek w Talos OS
           cniBinDir: /var/lib/cni/bin
-          cniConfDir: /etc/cni/conf.d
+          cniConfDir: /etc/cni/net.d
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: istio-system
