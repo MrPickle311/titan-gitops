@@ -19,6 +19,8 @@ spec:
               address: tempo.monitoring.svc.cluster.local:9411
           cni:
             enabled: true
+        istio_cni:
+          enabled: true
         pilot:
           resources:
             requests:
