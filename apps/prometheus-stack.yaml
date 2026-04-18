@@ -37,6 +37,13 @@ spec:
             size: 5Gi
 
           additionalDataSources:
+            - name: Pyroscope
+              type: pyroscope
+              uid: pyroscope
+              url: http://pyroscope.monitoring.svc.cluster.local:4040
+              access: proxy
+
+            # 2. Deklarujemy Tempo i podpinamy do niego Service Graph oraz Span Profiles
             - name: Tempo
               type: tempo
               uid: tempo
@@ -45,6 +52,11 @@ spec:
               jsonData:
                 serviceMap:
                   datasourceUid: prometheus
+                tracesToProfiles:
+                  datasourceUid: pyroscope
+                  tags:
+                    - key: 'service.name'
+                      value: 'service_name'
 
         prometheus:
           prometheusSpec:
