@@ -36,6 +36,16 @@ spec:
             storageClassName: "openebs-hostpath"
             size: 5Gi
 
+          additionalDataSources:
+            - name: Tempo
+              type: tempo
+              uid: tempo
+              url: http://tempo.monitoring.svc.cluster.local:3100
+              access: proxy
+              jsonData:
+                serviceMap:
+                  datasourceUid: prometheus
+
         prometheus:
           prometheusSpec:
             enableRemoteWriteReceiver: true
