@@ -58,6 +58,10 @@ spec:
           value: "wallet-service"
         - name: OTEL_EXPORTER_OTLP_ENDPOINT
           value: "http://tempo.monitoring.svc.cluster.local:4318"
+        - name: OTEL_METRICS_EXPORTER
+          value: "none"
+        - name: OTEL_LOGS_EXPORTER
+          value: "none"
           
         # KONFIGURACJA PROFILERA PYROSCOPE
         - name: PYROSCOPE_APPLICATION_NAME
@@ -79,7 +83,7 @@ spec:
             fieldRef:
               fieldPath: metadata.name
         - name: PYROSCOPE_LABELS
-          value: "pod=$(POD_NAME)"
+          value: "pod=$(POD_NAME),service_name=$(OTEL_SERVICE_NAME)"
           
         - name: SPRING_DATASOURCE_URL
           value: jdbc:postgresql://postgres-postgresql.databases.svc.cluster.local:5432/titan_db
