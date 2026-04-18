@@ -15,13 +15,72 @@ spec:
       labels:
         app: wallet-service
     spec:
+      # WSPÓŁDZIELONY WOLUMEN W PAMIĘCI
+      volumes:
+        - name: pyroscope-agent
+          emptyDir: {}
+          
+      # INIT CONTAINER: Pobiera agenta OTel i rozszerzenie Pyroscope
+      initContainers:
+        - name: fetch-otel-pyroscope
+          image: busybox:latest
+          command:
+            - sh
+            - -c
+            - "wget -O /agent/opentelemetry-javaagent.jar https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/latest/download/opentelemetry-javaagent.jar && wget -O /agent/pyroscope-otel.jar https://github.com/grafana/otel-profiling-java/releases/latest/download/pyroscope-otel.jar"
+          volumeMounts:
+            - name: pyroscope-agent
+              mountPath: /agent
+
       containers:
       - name: wallet-service
         image: registry.homelab/wallet-service:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 8081
+        
+        # PODPIĘCIE AGENTA DO GŁÓWNEGO KONTENERA
+        volumeMounts:
+          - name: pyroscope-agent
+            mountPath: /agent
+            
         env:
+        # MAGICZNA FLAGA JAVY: Automatycznie podpina agenta OpenTelemetry przy starcie
+        - name: JAVA_TOOL_OPTIONS
+          value: "-javaagent:/agent/opentelemetry-javaagent.jar"
+          
+        # ROZSZERZENIE PYROSCOPE DLA OPENTELEMETRY I KONFIGURACJA
+        - name: OTEL_JAVAAGENT_EXTENSIONS
+          value: "/agent/pyroscope-otel.jar"
+        - name: OTEL_PYROSCOPE_START_PROFILING
+          value: "true"
+        - name: OTEL_SERVICE_NAME
+          value: "wallet-service"
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: "http://tempo.monitoring.svc.cluster.local:4318"
+          
+        # KONFIGURACJA PROFILERA PYROSCOPE
+        - name: PYROSCOPE_APPLICATION_NAME
+          value: "wallet-service"
+        - name: PYROSCOPE_SERVER_ADDRESS
+          value: "http://pyroscope.monitoring.svc.cluster.local:4040"
+        - name: PYROSCOPE_FORMAT
+          value: "jfr"
+        - name: PYROSCOPE_PROFILING_INTERVAL
+          value: "10ms"
+        - name: PYROSCOPE_PROFILER_EVENT
+          value: "itimer"
+        - name: PYROSCOPE_PROFILER_LOCK
+          value: "10ms"
+        - name: PYROSCOPE_PROFILER_ALLOC
+          value: "512k"
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: PYROSCOPE_LABELS
+          value: "pod=$(POD_NAME)"
+          
         - name: SPRING_DATASOURCE_URL
           value: jdbc:postgresql://postgres-postgresql.databases.svc.cluster.local:5432/titan_db
         - name: SPRING_DATASOURCE_USERNAME

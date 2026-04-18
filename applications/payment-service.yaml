@@ -20,14 +20,14 @@ spec:
         - name: pyroscope-agent
           emptyDir: {}
           
-      # INIT CONTAINER: Pobiera agenta zanim wystartuje Spring
+      # INIT CONTAINER: Pobiera agenta OTel i rozszerzenie Pyroscope
       initContainers:
-        - name: fetch-pyroscope-agent
+        - name: fetch-otel-pyroscope
           image: busybox:latest
           command:
             - sh
             - -c
-            - "wget -O /agent/pyroscope.jar https://github.com/grafana/pyroscope-java/releases/latest/download/pyroscope.jar"
+            - "wget -O /agent/opentelemetry-javaagent.jar https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/latest/download/opentelemetry-javaagent.jar && wget -O /agent/pyroscope-otel.jar https://github.com/grafana/otel-profiling-java/releases/latest/download/pyroscope-otel.jar"
           volumeMounts:
             - name: pyroscope-agent
               mountPath: /agent
@@ -45,13 +45,23 @@ spec:
             mountPath: /agent
             
         env:
-        # MAGICZNA FLAGA JAVY: Automatycznie podpina agenta przy starcie (bez zmiany Dockerfile!)
+        # MAGICZNA FLAGA JAVY: Automatycznie podpina agenta OpenTelemetry przy starcie
         - name: JAVA_TOOL_OPTIONS
-          value: "-javaagent:/agent/pyroscope.jar"
+          value: "-javaagent:/agent/opentelemetry-javaagent.jar"
+          
+        # ROZSZERZENIE PYROSCOPE DLA OPENTELEMETRY I KONFIGURACJA
+        - name: OTEL_JAVAAGENT_EXTENSIONS
+          value: "/agent/pyroscope-otel.jar"
+        - name: OTEL_PYROSCOPE_START_PROFILING
+          value: "true"
+        - name: OTEL_SERVICE_NAME
+          value: "payment-service"
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: "http://tempo.monitoring.svc.cluster.local:4318"
           
         # KONFIGURACJA PROFILERA PYROSCOPE
         - name: PYROSCOPE_APPLICATION_NAME
-          value: "paymentservice"
+          value: "payment-service"
         - name: PYROSCOPE_SERVER_ADDRESS
           value: "http://pyroscope.monitoring.svc.cluster.local:4040"
         - name: PYROSCOPE_FORMAT
@@ -70,7 +80,6 @@ spec:
               fieldPath: metadata.name
         - name: PYROSCOPE_LABELS
           value: "pod=$(POD_NAME)"
-          
           
         # Zależności bazy i Kafki
         - name: SPRING_DATASOURCE_URL
