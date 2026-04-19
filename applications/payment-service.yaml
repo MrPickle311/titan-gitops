@@ -66,8 +66,6 @@ spec:
           value: "none"
         - name: OTEL_METRICS_EXPORTER
           value: "none"
-        - name: OTEL_JAVAAGENT_DEBUG
-          value: "true"
           
         # KONFIGURACJA PROFILERA PYROSCOPE
         - name: PYROSCOPE_APPLICATION_NAME
@@ -85,13 +83,13 @@ spec:
         - name: PYROSCOPE_PROFILER_ALLOC
           value: "512k"
         - name: PYROSCOPE_LOG_LEVEL
-          value: "debug"
+          value: "info"
         - name: POD_NAME
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
         - name: PYROSCOPE_LABELS
-          value: "pod=$(POD_NAME)"
+          value: "pod=$(POD_NAME),service_name=payment-service"
           
         # Zależności bazy i Kafki
         - name: SPRING_DATASOURCE_URL

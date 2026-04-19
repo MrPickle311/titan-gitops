@@ -83,13 +83,13 @@ spec:
         - name: PYROSCOPE_PROFILER_ALLOC
           value: "512k"
         - name: PYROSCOPE_LOG_LEVEL
-          value: "debug"
+          value: "info"
         - name: POD_NAME
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
         - name: PYROSCOPE_LABELS
-          value: "pod=$(POD_NAME)"
+          value: "pod=$(POD_NAME),service_name=wallet-service"
           
         - name: SPRING_DATASOURCE_URL
           value: jdbc:postgresql://postgres-postgresql.databases.svc.cluster.local:5432/titan_db
