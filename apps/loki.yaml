@@ -18,16 +18,9 @@ spec:
             enabled: true
             storageClassName: "openebs-hostpath"
             size: 10Gi
-            
-          # ROZWIĄZANIE: Usuwamy initContainer z rootem. 
-          # Zamiast tego używamy natywnego Kubernetesowego 'fsGroup', 
-          # który jest bezpieczny i przepuszczany przez Talos OS.
-          securityContext:
-            fsGroup: 10001
-            runAsUser: 10001
-            runAsGroup: 10001
-            runAsNonRoot: true
-                  
+        
+        # Promtail będzie miał pełne prawo dostępu do logów węzła
+        # dzięki etykietom 'privileged' nadanym na przestrzeń nazw 'monitoring'
         promtail:
           enabled: true
   destination:
