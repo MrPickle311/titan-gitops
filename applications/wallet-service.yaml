@@ -27,7 +27,7 @@ spec:
           command:
             - sh
             - -c
-            - "wget -O /agent/opentelemetry-javaagent.jar https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/latest/download/opentelemetry-javaagent.jar && wget -O /agent/pyroscope-otel.jar https://github.com/grafana/otel-profiling-java/releases/latest/download/pyroscope-otel.jar"
+            - "wget -O /agent/opentelemetry-javaagent.jar https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/latest/download/opentelemetry-javaagent.jar && wget -O /agent/pyroscope-otel.jar https://github.com/grafana/otel-profiling-java/releases/latest/download/pyroscope-otel.jar && wget -O /agent/pyroscope.jar https://github.com/grafana/pyroscope-java/releases/latest/download/pyroscope.jar"
           volumeMounts:
             - name: pyroscope-agent
               mountPath: /agent
@@ -47,13 +47,17 @@ spec:
         env:
         # MAGICZNA FLAGA JAVY: Automatycznie podpina agenta OpenTelemetry przy starcie
         - name: JAVA_TOOL_OPTIONS
-          value: "-javaagent:/agent/opentelemetry-javaagent.jar"
+          value: "-javaagent:/agent/pyroscope.jar -javaagent:/agent/opentelemetry-javaagent.jar"
           
         # ROZSZERZENIE PYROSCOPE DLA OPENTELEMETRY I KONFIGURACJA
         - name: OTEL_JAVAAGENT_EXTENSIONS
           value: "/agent/pyroscope-otel.jar"
         - name: OTEL_PYROSCOPE_START_PROFILING
           value: "true"
+        - name: OTEL_PYROSCOPE_ADD_PROFILE_URL
+          value: "false"
+        - name: OTEL_PYROSCOPE_ADD_PROFILE_BASELINE_URL
+          value: "false"
         - name: OTEL_SERVICE_NAME
           value: "wallet-service"
         - name: OTEL_EXPORTER_OTLP_ENDPOINT
@@ -74,6 +78,8 @@ spec:
           value: "10ms"
         - name: PYROSCOPE_PROFILER_ALLOC
           value: "512k"
+        - name: PYROSCOPE_LOG_LEVEL
+          value: "debug"
         - name: POD_NAME
           valueFrom:
             fieldRef:
