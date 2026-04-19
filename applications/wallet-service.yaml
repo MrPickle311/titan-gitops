@@ -77,7 +77,7 @@ spec:
         - name: PYROSCOPE_PROFILING_INTERVAL
           value: "10ms"
         - name: PYROSCOPE_PROFILER_EVENT
-          value: "itimer"
+          value: "wall"
         - name: PYROSCOPE_PROFILER_LOCK
           value: "10ms"
         - name: PYROSCOPE_PROFILER_ALLOC
