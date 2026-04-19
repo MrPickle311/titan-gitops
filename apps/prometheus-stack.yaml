@@ -42,6 +42,12 @@ spec:
               uid: pyroscope
               url: http://pyroscope.monitoring.svc.cluster.local:4040
               access: proxy
+            
+            - name: Loki
+              type: loki
+              uid: loki
+              url: http://loki.monitoring.svc.cluster.local:3100
+              access: proxy
 
             # 2. Deklarujemy Tempo i podpinamy do niego Service Graph oraz Span Profiles
             - name: Tempo
