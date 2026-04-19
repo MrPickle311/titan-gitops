@@ -47,7 +47,7 @@ spec:
         env:
         # MAGICZNA FLAGA JAVY: Automatycznie podpina agenta OpenTelemetry przy starcie
         - name: JAVA_TOOL_OPTIONS
-          value: "-javaagent:/agent/opentelemetry-javaagent.jar"
+          value: "-javaagent:/agent/pyroscope.jar -javaagent:/agent/opentelemetry-javaagent.jar"
           
         # ROZSZERZENIE PYROSCOPE DLA OPENTELEMETRY I KONFIGURACJA
         - name: OTEL_JAVAAGENT_EXTENSIONS
@@ -74,6 +74,8 @@ spec:
           value: "10ms"
         - name: PYROSCOPE_PROFILER_ALLOC
           value: "512k"
+        - name: PYROSCOPE_LOG_LEVEL
+          value: "debug"
         - name: POD_NAME
           valueFrom:
             fieldRef:
