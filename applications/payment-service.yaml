@@ -66,6 +66,12 @@ spec:
           value: "none"
         - name: OTEL_METRICS_EXPORTER
           value: "none"
+        - name: OTEL_INSTRUMENTATION_KAFKA_ENABLED
+          value: "true"
+        - name: SPRING_KAFKA_LISTENER_OBSERVATION_ENABLED
+          value: "true"
+        - name: SPRING_KAFKA_TEMPLATE_OBSERVATION_ENABLED
+          value: "true"
           
         # KONFIGURACJA PROFILERA PYROSCOPE
         - name: PYROSCOPE_APPLICATION_NAME
