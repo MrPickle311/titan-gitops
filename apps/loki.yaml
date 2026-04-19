@@ -19,12 +19,17 @@ spec:
             storageClassName: "openebs-hostpath"
             size: 10Gi
             
+          # ROZWIĄZANIE: Usuwamy initContainer z rootem. 
+          # Zamiast tego używamy natywnego Kubernetesowego 'fsGroup', 
+          # który jest bezpieczny i przepuszczany przez Talos OS.
+          securityContext:
+            fsGroup: 10001
+            runAsUser: 10001
+            runAsGroup: 10001
+            runAsNonRoot: true
+                  
         promtail:
           enabled: true
-          # Promtail musi mieć dostęp do logów na węźle, więc wymaga podniesionych uprawnień
-          config:
-            clients:
-              - url: http://loki.monitoring.svc.cluster.local:3100/loki/api/v1/push
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: monitoring
