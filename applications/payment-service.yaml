@@ -75,13 +75,13 @@ spec:
         - name: PYROSCOPE_FORMAT
           value: "jfr"
         - name: PYROSCOPE_PROFILING_INTERVAL
-          value: "10ms"
+          value: "1ms"
         - name: PYROSCOPE_PROFILER_EVENT
           value: "wall"
         - name: PYROSCOPE_PROFILER_LOCK
           value: "10ms"
         - name: PYROSCOPE_PROFILER_ALLOC
-          value: "512k"
+          value: "128k"
         - name: PYROSCOPE_LOG_LEVEL
           value: "info"
         - name: POD_NAME
