@@ -4,6 +4,10 @@
 # Target namespace: scdf
 # ─────────────────────────────────────────────────────────────────────────────
 
+global:
+  security:
+    allowInsecureImages: true
+
 # ── Messaging Backend ────────────────────────────────────────────────────────
 kafka:
   enabled: false
