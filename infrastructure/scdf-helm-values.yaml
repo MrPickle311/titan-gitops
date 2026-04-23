@@ -21,17 +21,22 @@ rabbitmq:
 
 # ── Metadata Store ───────────────────────────────────────────────────────────
 mariadb:
-  enabled: true
-  image:
-    repository: bitnamilegacy/mariadb
-    tag: 10.11.11-debian-12-r7
-  auth:
-    rootPassword: "scdf-root-secret"   # change via sealed-secret/external-secrets in prod
-    database: dataflow
-  primary:
-    persistence:
-      enabled: true
-      size: 4Gi
+  enabled: false
+
+externalDatabase:
+  host: postgres-postgresql.databases.svc.cluster.local
+  port: 5432
+  type: postgresql
+  dataflow:
+    database: titan_db
+    username: postgres
+    existingSecret: postgres-credentials
+    existingSecretPasswordKey: postgres-password
+  skipper:
+    database: titan_db
+    username: postgres
+    existingSecret: postgres-credentials
+    existingSecretPasswordKey: postgres-password
 
 # ── SCDF Server ──────────────────────────────────────────────────────────────
 server:
