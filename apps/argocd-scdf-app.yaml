@@ -20,7 +20,7 @@ spec:
       helm:
         valueFiles:
           - $values/infrastructure/scdf-helm-values.yaml
-    - repoURL: git@github.com:MrPickle311/titan-gitops.git
+    - repoURL: https://github.com/MrPickle311/titan-gitops.git
       targetRevision: HEAD
       ref: values
 
