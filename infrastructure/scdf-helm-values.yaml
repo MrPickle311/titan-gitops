@@ -1,7 +1,7 @@
 # ─────────────────────────────────────────────────────────────────────────────
 # Helm values for Bitnami Spring Cloud Data Flow chart
 # Chart: spring-cloud-dataflow  (bitnami)
-# Target namespace: scdf
+# Target namespace: applications
 # ─────────────────────────────────────────────────────────────────────────────
 
 global:
@@ -61,7 +61,7 @@ server:
     enabled: true
     serviceMonitor:
       enabled: true
-      namespace: scdf
+      namespace: applications
       labels:
         release: kube-prometheus-stack
 
@@ -92,7 +92,7 @@ skipper:
     enabled: true
     serviceMonitor:
       enabled: true
-      namespace: scdf
+      namespace: applications
       labels:
         release: kube-prometheus-stack
 
