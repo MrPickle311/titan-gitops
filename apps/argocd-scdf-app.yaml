@@ -1,0 +1,50 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: spring-cloud-dataflow
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: spring-cloud-dataflow
+    app.kubernetes.io/part-of: payments-platform
+  annotations:
+    argocd.argoproj.io/sync-wave: "10"  # Deploy after core infra (Kafka, Postgres)
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+
+  sources:
+    - repoURL: https://charts.bitnami.com/bitnami
+      chart: spring-cloud-dataflow
+      targetRevision: "14.1.2"
+      helm:
+        valueFiles:
+          - $values/infrastructure/scdf-helm-values.yaml
+    - repoURL: git@github.com:MrPickle311/titan-gitops.git
+      targetRevision: HEAD
+      ref: values
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: scdf
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+    retry:
+      limit: 3
+      backoff:
+        duration: 10s
+        factor: 2
+        maxDuration: 3m
+
+  # Health checks — SCDF server + Skipper must be Healthy before marking sync OK
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      jsonPointers:
+        - /spec/replicas   # allow manual HPA overrides without ArgoCD reverting
