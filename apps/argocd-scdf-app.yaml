@@ -16,7 +16,7 @@ spec:
   sources:
     - repoURL: https://charts.bitnami.com/bitnami
       chart: spring-cloud-dataflow
-      targetRevision: "14.1.2"
+      targetRevision: "35.0.0"
       helm:
         valueFiles:
           - $values/infrastructure/scdf-helm-values.yaml
