@@ -18,6 +18,9 @@ rabbitmq:
 # ── Metadata Store ───────────────────────────────────────────────────────────
 mariadb:
   enabled: true
+  image:
+    repository: bitnamilegacy/mariadb
+    tag: 10.11.11-debian-12-r7
   auth:
     rootPassword: "scdf-root-secret"   # change via sealed-secret/external-secrets in prod
     database: dataflow
@@ -30,8 +33,8 @@ mariadb:
 server:
   image:
     registry: docker.io
-    repository: bitnami/spring-cloud-dataflow
-    tag: latest
+    repository: bitnamilegacy/spring-cloud-dataflow
+    tag: 2.11.5-debian-12-r1
     pullPolicy: IfNotPresent
 
   replicaCount: 1
@@ -72,6 +75,9 @@ server:
 # ── Skipper (stream deployment orchestrator) ─────────────────────────────────
 skipper:
   enabled: true
+  image:
+    repository: bitnamilegacy/spring-cloud-skipper
+    tag: 2.11.5-debian-12-r1
   replicaCount: 1
   metrics:
     enabled: true
@@ -94,3 +100,9 @@ deployer:
     limits:
       cpu: "1000m"
       memory: "1024Mi"
+
+# ── Init Container Overrides ──────────────────────────────────────────────────
+waitForBackends:
+  image:
+    repository: bitnamilegacy/kubectl
+    tag: 1.32.2-debian-12-r3
