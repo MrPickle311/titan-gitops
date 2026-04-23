@@ -78,11 +78,7 @@ server:
     tls: true
 
   # Extra environment variables forwarded to every managed stream app
-  extraEnvVars:
-    - name: SPRING_CLOUD_DATAFLOW_FEATURES_STREAMS_ENABLED
-      value: "true"
-    - name: SPRING_CLOUD_DATAFLOW_FEATURES_BATCH_ENABLED
-      value: "true"
+  extraEnvVars: []
 
 # ── Skipper (stream deployment orchestrator) ─────────────────────────────────
 skipper:
