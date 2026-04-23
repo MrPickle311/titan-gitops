@@ -27,6 +27,9 @@ externalDatabase:
   host: postgres-postgresql.databases.svc.cluster.local
   port: 5432
   type: postgresql
+  scheme: postgresql
+  driver: org.postgresql.Driver
+  hibernateDialect: org.hibernate.dialect.PostgreSQL95Dialect
   dataflow:
     database: titan_db
     username: postgres
