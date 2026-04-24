@@ -71,12 +71,10 @@ spec:
                       value: 'service_name'
                 tracesToLogs:
                   datasourceUid: loki
-                  tags: ['job', 'pod']
-                  mappedTags:
-                    - key: service.name
-                      value: service_name
-                  filterByTraceId: true
+                  filterByTraceId: false
                   filterBySpanId: false
+                  customQuery: true
+                  query: '{app="$${__span.tags["service.name"]}"} |= "$${__span.traceId}"'
 
         prometheus:
           prometheusSpec:
