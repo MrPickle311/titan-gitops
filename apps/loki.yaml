@@ -26,6 +26,10 @@ spec:
               # Homlab: wyższe limity ingestowania
               ingestion_rate_mb: 32
               ingestion_burst_size_mb: 64
+              retention_period: 24h
+            table_manager:
+              retention_deletes_enabled: true
+              retention_period: 24h
 
         # Promtail będzie miał pełne prawo dostępu do logów węzła
         # dzięki etykietom 'privileged' nadanym na przestrzeń nazw 'monitoring'
