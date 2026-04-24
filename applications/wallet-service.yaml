@@ -66,12 +66,16 @@ spec:
           value: "none"
         - name: OTEL_METRICS_EXPORTER
           value: "none"
+        - name: LOGGING_PATTERN_LEVEL
+          value: "trace_id=%X{trace_id} span_id=%X{span_id} %5p"
         - name: OTEL_INSTRUMENTATION_KAFKA_ENABLED
           value: "true"
         - name: SPRING_KAFKA_LISTENER_OBSERVATION_ENABLED
           value: "true"
         - name: SPRING_KAFKA_TEMPLATE_OBSERVATION_ENABLED
           value: "true"
+        - name: LOGGING_PATTERN_LEVEL
+          value: "trace_id=%X{trace_id} span_id=%X{span_id} %5p"
           
         # KONFIGURACJA PROFILERA PYROSCOPE
         - name: PYROSCOPE_APPLICATION_NAME
