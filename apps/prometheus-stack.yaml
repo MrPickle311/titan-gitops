@@ -42,12 +42,18 @@ spec:
               uid: pyroscope
               url: http://pyroscope.monitoring.svc.cluster.local:4040
               access: proxy
-            
+          
             - name: Loki
               type: loki
               uid: loki
               url: http://loki.monitoring.svc.cluster.local:3100
               access: proxy
+              jsonData:
+                derivedFields:
+                  - datasourceUid: tempo
+                    matcherRegex: "trace_id=([0-9a-fA-F]+)"
+                    name: TraceID
+                    url: "$${__value.raw}"
 
             # 2. Deklarujemy Tempo i podpinamy do niego Service Graph oraz Span Profiles
             - name: Tempo
@@ -63,6 +69,14 @@ spec:
                   tags:
                     - key: 'service.name'
                       value: 'service_name'
+                tracesToLogs:
+                  datasourceUid: loki
+                  tags: ['job', 'pod']
+                  mappedTags:
+                    - key: service.name
+                      value: service_name
+                  filterByTraceId: true
+                  filterBySpanId: false
 
         prometheus:
           prometheusSpec:
