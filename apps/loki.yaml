@@ -9,11 +9,13 @@ spec:
   project: default
   source:
     repoURL: 'https://grafana.github.io/helm-charts'
-    targetRevision: 2.10.2
+    targetRevision: 2.10.3
     chart: loki-stack
     helm:
       values: |
         loki:
+          image:
+            tag: 2.9.3
           persistence:
             enabled: true
             storageClassName: "openebs-hostpath"
