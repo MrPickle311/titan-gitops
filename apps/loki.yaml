@@ -37,12 +37,15 @@ spec:
         # dzięki etykietom 'privileged' nadanym na przestrzeń nazw 'monitoring'
         promtail:
           enabled: true
-          pipelineStages:
-            - cri: {}
-            - regex:
-                expression: "(?i)(?P<level>INFO|WARN|ERROR|DEBUG|TRACE)"
-            - labels:
-                level:
+          config:
+            snippets:
+              pipelineStages:
+                - cri: {}
+                - regex:
+                    expression: "(?i)(?P<level>INFO|WARN|ERROR|DEBUG|TRACE)"
+                - labels:
+                    level:
+
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: monitoring
