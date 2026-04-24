@@ -18,7 +18,15 @@ spec:
             enabled: true
             storageClassName: "openebs-hostpath"
             size: 10Gi
-        
+          config:
+            limits_config:
+              # Zezwalamy na backfill starych logów z rotowanych plików
+              reject_old_samples: true
+              reject_old_samples_max_age: 720h   # 30 dni
+              # Homlab: wyższe limity ingestowania
+              ingestion_rate_mb: 32
+              ingestion_burst_size_mb: 64
+
         # Promtail będzie miał pełne prawo dostępu do logów węzła
         # dzięki etykietom 'privileged' nadanym na przestrzeń nazw 'monitoring'
         promtail:
