@@ -50,6 +50,10 @@ spec:
           value: "http://pyroscope.monitoring.svc.cluster.local:4040"
         - name: OTEL_EXPORTER_OTLP_ENDPOINT
           value: "http://tempo.monitoring.svc.cluster.local:4318"
+        - name: OTEL_LOGS_EXPORTER
+          value: "none"
+        - name: OTEL_METRICS_EXPORTER
+          value: "none"
         - name: SPRING_DATASOURCE_URL
           value: jdbc:postgresql://postgres-postgresql.databases.svc.cluster.local:5432/titan_db
         - name: SPRING_DATASOURCE_USERNAME
@@ -114,6 +118,10 @@ spec:
           value: "http://pyroscope.monitoring.svc.cluster.local:4040"
         - name: OTEL_EXPORTER_OTLP_ENDPOINT
           value: "http://tempo.monitoring.svc.cluster.local:4318"
+        - name: OTEL_LOGS_EXPORTER
+          value: "none"
+        - name: OTEL_METRICS_EXPORTER
+          value: "none"
         - name: SPRING_DATASOURCE_URL
           value: jdbc:postgresql://postgres-postgresql.databases.svc.cluster.local:5432/titan_db
         - name: SPRING_DATASOURCE_USERNAME
