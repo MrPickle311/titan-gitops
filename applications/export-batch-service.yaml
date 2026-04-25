@@ -51,7 +51,7 @@ spec:
         - name: OTEL_EXPORTER_OTLP_ENDPOINT
           value: "http://tempo.monitoring.svc.cluster.local:4318"
         - name: SPRING_DATASOURCE_URL
-          value: jdbc:postgresql://postgres-postgresql.databases.svc.cluster.local:5432/payment_batch_db
+          value: jdbc:postgresql://postgres-postgresql.databases.svc.cluster.local:5432/titan_db
         - name: SPRING_DATASOURCE_USERNAME
           value: postgres
         - name: SPRING_DATASOURCE_PASSWORD
@@ -115,7 +115,7 @@ spec:
         - name: OTEL_EXPORTER_OTLP_ENDPOINT
           value: "http://tempo.monitoring.svc.cluster.local:4318"
         - name: SPRING_DATASOURCE_URL
-          value: jdbc:postgresql://postgres-postgresql.databases.svc.cluster.local:5432/payment_batch_db
+          value: jdbc:postgresql://postgres-postgresql.databases.svc.cluster.local:5432/titan_db
         - name: SPRING_DATASOURCE_USERNAME
           value: postgres
         - name: SPRING_DATASOURCE_PASSWORD
