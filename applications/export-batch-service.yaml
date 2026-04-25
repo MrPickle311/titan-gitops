@@ -1,0 +1,158 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: export-batch-manager
+  namespace: applications
+  labels:
+    app: export-batch-service
+    role: manager
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: export-batch-service
+      role: manager
+  template:
+    metadata:
+      labels:
+        app: export-batch-service
+        role: manager
+    spec:
+      volumes:
+        - name: pyroscope-agent
+          emptyDir: {}
+      initContainers:
+        - name: fetch-otel-pyroscope
+          image: busybox:latest
+          command: ["sh", "-c", "wget -O /agent/opentelemetry-javaagent.jar https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/latest/download/opentelemetry-javaagent.jar && wget -O /agent/pyroscope-otel.jar https://github.com/grafana/otel-profiling-java/releases/latest/download/pyroscope-otel.jar && wget -O /agent/pyroscope.jar https://github.com/grafana/pyroscope-java/releases/latest/download/pyroscope.jar"]
+          volumeMounts:
+            - name: pyroscope-agent
+              mountPath: /agent
+      containers:
+      - name: batch-manager
+        image: registry.homelab/export-batch-service:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8083
+        volumeMounts:
+          - name: pyroscope-agent
+            mountPath: /agent
+        env:
+        - name: SPRING_PROFILES_ACTIVE
+          value: "manager"
+        - name: JAVA_TOOL_OPTIONS
+          value: "-javaagent:/agent/pyroscope.jar -javaagent:/agent/opentelemetry-javaagent.jar"
+        - name: OTEL_SERVICE_NAME
+          value: "export-batch-manager"
+        - name: PYROSCOPE_APPLICATION_NAME
+          value: "export-batch-manager"
+        - name: PYROSCOPE_SERVER_ADDRESS
+          value: "http://pyroscope.monitoring.svc.cluster.local:4040"
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: "http://tempo.monitoring.svc.cluster.local:4318"
+        - name: SPRING_DATASOURCE_URL
+          value: jdbc:postgresql://postgres-postgresql.databases.svc.cluster.local:5432/payment_batch_db
+        - name: SPRING_DATASOURCE_USERNAME
+          value: postgres
+        - name: SPRING_DATASOURCE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-credentials
+              key: postgres-password
+        - name: KAFKA_BOOTSTRAP_SERVERS
+          value: kafka.messaging.svc.cluster.local:9092
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: export-batch-worker
+  namespace: applications
+  labels:
+    app: export-batch-service
+    role: worker
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: export-batch-service
+      role: worker
+  template:
+    metadata:
+      labels:
+        app: export-batch-service
+        role: worker
+    spec:
+      volumes:
+        - name: pyroscope-agent
+          emptyDir: {}
+      initContainers:
+        - name: fetch-otel-pyroscope
+          image: busybox:latest
+          command: ["sh", "-c", "wget -O /agent/opentelemetry-javaagent.jar https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/latest/download/opentelemetry-javaagent.jar && wget -O /agent/pyroscope-otel.jar https://github.com/grafana/otel-profiling-java/releases/latest/download/pyroscope-otel.jar && wget -O /agent/pyroscope.jar https://github.com/grafana/pyroscope-java/releases/latest/download/pyroscope.jar"]
+          volumeMounts:
+            - name: pyroscope-agent
+              mountPath: /agent
+      containers:
+      - name: batch-worker
+        image: registry.homelab/export-batch-service:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8083
+        volumeMounts:
+          - name: pyroscope-agent
+            mountPath: /agent
+        env:
+        - name: SPRING_PROFILES_ACTIVE
+          value: "worker"
+        - name: JAVA_TOOL_OPTIONS
+          value: "-javaagent:/agent/pyroscope.jar -javaagent:/agent/opentelemetry-javaagent.jar"
+        - name: OTEL_SERVICE_NAME
+          value: "export-batch-worker"
+        - name: PYROSCOPE_APPLICATION_NAME
+          value: "export-batch-worker"
+        - name: PYROSCOPE_SERVER_ADDRESS
+          value: "http://pyroscope.monitoring.svc.cluster.local:4040"
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: "http://tempo.monitoring.svc.cluster.local:4318"
+        - name: SPRING_DATASOURCE_URL
+          value: jdbc:postgresql://postgres-postgresql.databases.svc.cluster.local:5432/payment_batch_db
+        - name: SPRING_DATASOURCE_USERNAME
+          value: postgres
+        - name: SPRING_DATASOURCE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-credentials
+              key: postgres-password
+        - name: KAFKA_BOOTSTRAP_SERVERS
+          value: kafka.messaging.svc.cluster.local:9092
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: export-batch-service
+  namespace: applications
+  labels:
+    app: export-batch-service
+spec:
+  selector:
+    app: export-batch-service
+  ports:
+  - name: http
+    port: 8083
+    targetPort: 8083
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: export-batch-monitor
+  namespace: applications
+  labels:
+    release: kube-prometheus-stack
+spec:
+  selector:
+    matchLabels:
+      app: export-batch-service
+  endpoints:
+  - port: http
+    path: /actuator/prometheus
+    interval: 15s
