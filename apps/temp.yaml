@@ -14,6 +14,7 @@ spec:
     helm:
       values: |
         tempo:
+          retention: 24h
           receivers:
             otlp:
               protocols:
