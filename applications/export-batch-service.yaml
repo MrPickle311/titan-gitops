@@ -75,7 +75,7 @@ metadata:
     app: export-batch-service
     role: worker
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: export-batch-service
