@@ -92,3 +92,28 @@ spec:
   - port: http
     path: /actuator/prometheus
     interval: 15s
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: export-batch-service-ingress
+  namespace: applications
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: "homelab-ca-issuer"
+spec:
+  tls:
+    - hosts:
+        - export-batch.homelab
+      secretName: export-batch-tls-secret
+  rules:
+  - host: export-batch.homelab
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: export-batch-service
+            port:
+              number: 8083
