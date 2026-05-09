@@ -120,7 +120,7 @@ spec:
                 - ALL
             seccompProfile:
               type: RuntimeDefault
-          image: quay.io/janus-idp/backstage-showcase:latest
+          image: registry.homelab/backstage:latest
           ports:
             - containerPort: 7007
           env:
