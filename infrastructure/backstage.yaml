@@ -107,8 +107,19 @@ spec:
         app: backstage
     spec:
       serviceAccountName: backstage-k8s-plugin
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        fsGroup: 1001
       containers:
         - name: backstage
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
           image: quay.io/janus-idp/backstage-showcase:latest
           ports:
             - containerPort: 7007
