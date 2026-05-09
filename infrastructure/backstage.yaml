@@ -1,0 +1,165 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: backstage-k8s-plugin
+  namespace: applications
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: backstage-k8s-plugin
+rules:
+  - apiGroups:
+      - '*'
+    resources:
+      - pods
+      - configmaps
+      - services
+      - deployments
+      - replicasets
+      - horizontalpodautoscalers
+      - ingresses
+      - statefulsets
+      - limitranges
+      - daemonsets
+    verbs:
+      - get
+      - list
+      - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: backstage-k8s-plugin
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: backstage-k8s-plugin
+subjects:
+  - kind: ServiceAccount
+    name: backstage-k8s-plugin
+    namespace: applications
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backstage-config
+  namespace: applications
+data:
+  app-config.yaml: |
+    app:
+      title: Titan Developer Portal
+      baseUrl: https://backstage.homelab
+    backend:
+      baseUrl: https://backstage.homelab
+      listen:
+        port: 7007
+      database:
+        client: pg
+        connection:
+          host: postgres-postgresql.databases.svc.cluster.local
+          port: 5432
+          user: postgres
+          password: ${POSTGRES_PASSWORD}
+          database: backstage
+      cors:
+        origin: https://backstage.homelab
+        methods: [GET, HEAD, PATCH, POST, PUT, DELETE]
+        credentials: true
+    kubernetes:
+      serviceLocatorMethod:
+        type: 'multiTenant'
+      clusterLocatorMethods:
+        - type: 'config'
+          clusters:
+            - url: https://kubernetes.default.svc.cluster.local
+              name: homelab-cluster
+              authProvider: 'serviceAccount'
+              skipTLSVerify: true
+              serviceAccountToken: ${K8S_TOKEN}
+    catalog:
+      locations:
+        - type: url
+          target: https://raw.githubusercontent.com/MrPickle311/titan-gitops/main/catalog-info.yaml
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backstage
+  namespace: applications
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backstage
+  template:
+    metadata:
+      labels:
+        app: backstage
+    spec:
+      serviceAccountName: backstage-k8s-plugin
+      containers:
+        - name: backstage
+          image: bitnami/backstage:latest
+          ports:
+            - containerPort: 7007
+          env:
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: postgres-password
+                  optional: true
+            - name: K8S_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: backstage-k8s-plugin-token
+                  key: token
+                  optional: true
+          volumeMounts:
+            - name: app-config
+              mountPath: /app/app-config.yaml
+              subPath: app-config.yaml
+              readOnly: true
+      volumes:
+        - name: app-config
+          configMap:
+            name: backstage-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backstage
+  namespace: applications
+spec:
+  type: ClusterIP
+  ports:
+    - port: 7007
+      targetPort: 7007
+  selector:
+    app: backstage
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: backstage-ingress
+  namespace: applications
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: "homelab-ca-issuer"
+spec:
+  tls:
+    - hosts:
+        - backstage.homelab
+      secretName: backstage-tls
+  rules:
+    - host: backstage.homelab
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: backstage
+                port:
+                  number: 7007
