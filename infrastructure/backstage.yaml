@@ -4,6 +4,15 @@ metadata:
   name: backstage-k8s-plugin
   namespace: applications
 ---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: backstage-k8s-plugin-token
+  namespace: applications
+  annotations:
+    kubernetes.io/service-account.name: backstage-k8s-plugin
+type: kubernetes.io/service-account-token
+---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -100,7 +109,7 @@ spec:
       serviceAccountName: backstage-k8s-plugin
       containers:
         - name: backstage
-          image: bitnami/backstage:latest
+          image: bitnamilegacy/backstage:latest
           ports:
             - containerPort: 7007
           env:
