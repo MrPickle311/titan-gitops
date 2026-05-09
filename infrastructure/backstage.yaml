@@ -109,7 +109,7 @@ spec:
       serviceAccountName: backstage-k8s-plugin
       containers:
         - name: backstage
-          image: bitnamilegacy/backstage:latest
+          image: bitnamilegacy/backstage:1.23.5-debian-11-r25
           ports:
             - containerPort: 7007
           env:
