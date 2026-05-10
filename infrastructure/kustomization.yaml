@@ -9,6 +9,7 @@ resources:
   - kafka-ui.yaml
   - metallb-config.yaml
   - homepage/homepage.yaml
+  - portainer.yaml
 
 configMapGenerator:
   - name: backstage-config
