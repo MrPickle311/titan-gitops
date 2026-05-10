@@ -92,6 +92,10 @@ data:
           target: https://raw.githubusercontent.com/MrPickle311/titan-gitops/main/catalog-info.yaml
     permission:
       enabled: false
+    auth:
+      providers:
+        guest:
+          dangerouslyAllowOutsideDevelopment: true
 ---
 apiVersion: apps/v1
 kind: Deployment
