@@ -49,54 +49,7 @@ subjects:
     name: backstage-k8s-plugin
     namespace: applications
 ---
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: backstage-config
-  namespace: applications
-data:
-  app-config.yaml: |
-    app:
-      title: Titan Developer Portal
-      baseUrl: https://backstage.homelab
-    backend:
-      baseUrl: https://backstage.homelab
-      listen:
-        port: 7007
-      database:
-        client: pg
-        connection:
-          host: postgres-postgresql.databases.svc.cluster.local
-          port: 5432
-          user: postgres
-          password: ${POSTGRES_PASSWORD}
-          database: backstage
-      cors:
-        origin: https://backstage.homelab
-        methods: [GET, HEAD, PATCH, POST, PUT, DELETE]
-        credentials: true
-    kubernetes:
-      serviceLocatorMethod:
-        type: 'multiTenant'
-      clusterLocatorMethods:
-        - type: 'config'
-          clusters:
-            - url: https://kubernetes.default.svc.cluster.local
-              name: homelab-cluster
-              authProvider: 'serviceAccount'
-              skipTLSVerify: true
-              serviceAccountToken: ${K8S_TOKEN}
-    catalog:
-      locations:
-        - type: url
-          target: https://raw.githubusercontent.com/MrPickle311/titan-gitops/master/catalog-info.yaml
-    permission:
-      enabled: false
-    auth:
-      providers:
-        guest:
-          dangerouslyAllowOutsideDevelopment: true
----
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
