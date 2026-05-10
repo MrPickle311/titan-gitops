@@ -48,7 +48,6 @@ spec:
       containers:
         - name: portainer
           image: portainer/portainer-ce:latest
-          args: ["--port", "9000"]
           ports:
             - containerPort: 9000
             - containerPort: 8000
