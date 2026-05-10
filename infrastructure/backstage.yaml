@@ -120,6 +120,7 @@ spec:
                 - ALL
             seccompProfile:
               type: RuntimeDefault
+          imagePullPolicy: Always
           image: registry.homelab/backstage:latest
           ports:
             - containerPort: 7007
@@ -130,6 +131,12 @@ spec:
                   name: postgres-credentials
                   key: postgres-password
                   optional: true
+            - name: POSTGRES_HOST
+              value: postgres-postgresql.databases.svc.cluster.local
+            - name: POSTGRES_PORT
+              value: "5432"
+            - name: POSTGRES_USER
+              value: postgres
             - name: K8S_TOKEN
               valueFrom:
                 secretKeyRef:
