@@ -47,10 +47,8 @@ data:
     cardBlur: sm
     theme: dark
   kubernetes.yaml: |
-    - homelab-cluster:
-        mode: internal
-        show_resources: true
-        show_nodes: true
+    homelab-cluster:
+      mode: cluster
   widgets.yaml: |
     - datetime:
         text_size: xl
@@ -58,8 +56,14 @@ data:
           timeStyle: short
           dateStyle: long
     - kubernetes:
-        cluster: homelab-cluster
-        nodes: true
+        cluster:
+          show: true
+          cpu: true
+          memory: true
+        nodes:
+          show: true
+          cpu: true
+          memory: true
     - resources:
         cpu: true
         memory: true
@@ -68,38 +72,28 @@ data:
         - Payment Service:
             icon: si-googlepay
             href: https://payment.homelab
-            widget:
-              type: kubernetes
-              namespace: applications
-              selector: app=payment-service
+            pod-selector: app=payment-service
+            namespace: applications
         - Wallet Service:
             icon: si-googlewallet
             href: https://wallet.homelab
-            widget:
-              type: kubernetes
-              namespace: applications
-              selector: app=wallet-service
+            pod-selector: app=wallet-service
+            namespace: applications
         - Ledger Service:
             icon: si-bookstack
             href: https://ledger.homelab
-            widget:
-              type: kubernetes
-              namespace: applications
-              selector: app=ledger-service
+            pod-selector: app=ledger-service
+            namespace: applications
         - Export Batch:
             icon: si-export
             href: https://export-batch.homelab
-            widget:
-              type: kubernetes
-              namespace: applications
-              selector: app=export-batch-service
+            pod-selector: app=export-batch-service
+            namespace: applications
         - Regulatory Service:
             icon: si-checkmarx
             href: https://regulatory.homelab
-            widget:
-              type: kubernetes
-              namespace: applications
-              selector: app=mock-regulatory-service
+            pod-selector: app=mock-regulatory-service
+            namespace: applications
     - Infrastructure:
         - ArgoCD:
             icon: argo
