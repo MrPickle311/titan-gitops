@@ -89,7 +89,7 @@ data:
     catalog:
       locations:
         - type: url
-          target: https://raw.githubusercontent.com/MrPickle311/titan-gitops/main/catalog-info.yaml
+          target: https://raw.githubusercontent.com/MrPickle311/titan-gitops/master/catalog-info.yaml
     permission:
       enabled: false
     auth:
