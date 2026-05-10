@@ -8,6 +8,7 @@ resources:
   - docker-storage.yaml
   - kafka-ui.yaml
   - metallb-config.yaml
+  - homepage/homepage.yaml
 
 configMapGenerator:
   - name: backstage-config

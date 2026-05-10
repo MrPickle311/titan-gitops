@@ -1,0 +1,59 @@
+- Titan Services:
+    - Payment Service:
+        icon: si-googlepay
+        href: https://payment.homelab
+        description: Core payment processing service
+        widget:
+          type: kubernetes
+          namespace: applications
+          selector: app=payment-service
+    - Wallet Service:
+        icon: si-googlewallet
+        href: https://wallet.homelab
+        description: User wallet and balance management
+        widget:
+          type: kubernetes
+          namespace: applications
+          selector: app=wallet-service
+    - Ledger Service:
+        icon: si-bookstack
+        href: https://ledger.homelab
+        description: Double-entry accounting ledger
+        widget:
+          type: kubernetes
+          namespace: applications
+          selector: app=ledger-service
+    - Export Batch:
+        icon: si-export
+        href: https://export-batch.homelab
+        description: Batch processing and export jobs
+        widget:
+          type: kubernetes
+          namespace: applications
+          selector: app=export-batch-service
+    - Regulatory Service:
+        icon: si-checkmarx
+        href: https://regulatory.homelab
+        description: Mock regulatory compliance service
+        widget:
+          type: kubernetes
+          namespace: applications
+          selector: app=mock-regulatory-service
+
+- Infrastructure:
+    - ArgoCD:
+        icon: argo
+        href: https://argo.homelab
+        description: GitOps continuous delivery
+    - Grafana:
+        icon: grafana
+        href: https://grafana.homelab
+        description: Monitoring and observability
+    - Prometheus:
+        icon: prometheus
+        href: https://prometheus.homelab
+        description: Metrics collection
+    - Backstage:
+        icon: backstage
+        href: https://backstage.homelab
+        description: Developer Portal (Old)
