@@ -47,8 +47,7 @@ data:
     cardBlur: sm
     theme: dark
   kubernetes.yaml: |
-    homelab-cluster:
-      mode: cluster
+    mode: cluster
   widgets.yaml: |
     - datetime:
         text_size: xl
@@ -72,27 +71,27 @@ data:
         - Payment Service:
             icon: si-googlepay
             href: https://payment.homelab
-            pod-selector: app=payment-service
+            podSelector: app=payment-service
             namespace: applications
         - Wallet Service:
             icon: si-googlewallet
             href: https://wallet.homelab
-            pod-selector: app=wallet-service
+            podSelector: app=wallet-service
             namespace: applications
         - Ledger Service:
             icon: si-bookstack
             href: https://ledger.homelab
-            pod-selector: app=ledger-service
+            podSelector: app=ledger-service
             namespace: applications
         - Export Batch:
             icon: si-export
             href: https://export-batch.homelab
-            pod-selector: app=export-batch-service
+            podSelector: app=export-batch-service
             namespace: applications
         - Regulatory Service:
             icon: si-checkmarx
             href: https://regulatory.homelab
-            pod-selector: app=mock-regulatory-service
+            podSelector: app=mock-regulatory-service
             namespace: applications
     - Infrastructure:
         - ArgoCD:
