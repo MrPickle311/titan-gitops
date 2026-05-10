@@ -1,6 +1,11 @@
 app:
   title: Titan Developer Portal
   baseUrl: https://backstage.homelab
+
+integrations:
+  github:
+    - host: github.com
+      token: ${GITHUB_TOKEN}
 backend:
   baseUrl: https://backstage.homelab
   listen:
