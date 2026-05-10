@@ -90,6 +90,8 @@ data:
       locations:
         - type: url
           target: https://raw.githubusercontent.com/MrPickle311/titan-gitops/main/catalog-info.yaml
+    permission:
+      enabled: false
 ---
 apiVersion: apps/v1
 kind: Deployment
