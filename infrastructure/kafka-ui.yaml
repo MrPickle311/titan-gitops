@@ -73,6 +73,10 @@ spec:
         env:
         - name: CONTROL_CENTER_BOOTSTRAP_SERVERS
           value: "kafka.messaging.svc.cluster.local:9092"
+        - name: BOOTSTRAP_SERVERS
+          value: "kafka.messaging.svc.cluster.local:9092"
+        - name: PORT
+          value: "9021"
         - name: CONTROL_CENTER_SCHEMA_REGISTRY_URL
           value: "http://schema-registry.messaging.svc.cluster.local:8081"
         - name: CONTROL_CENTER_REPLICATION_FACTOR
