@@ -23,17 +23,7 @@ spec:
           value: "randomencryptionkey1234567890"
         - name: RI_ACCEPT_TERMS_AND_CONDITIONS
           value: "true"
-        - name: RI_REDIS_HOST_1
-          value: "redis-redis-cluster.databases.svc.cluster.local"
-        - name: RI_REDIS_PORT_1
-          value: "6379"
-        - name: RI_REDIS_ALIAS_1
-          value: "Titan Redis Cluster"
-        - name: RI_REDIS_PASSWORD_1
-          valueFrom:
-            secretKeyRef:
-              name: redis-cluster-credentials
-              key: redis-password
+
         resources:
           requests:
             cpu: 100m
@@ -46,7 +36,20 @@ spec:
           mountPath: /data
       volumes:
       - name: db
-        emptyDir: {}
+        persistentVolumeClaim:
+          claimName: redisinsight-data
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: redisinsight-data
+  namespace: databases
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
 ---
 apiVersion: v1
 kind: Service
