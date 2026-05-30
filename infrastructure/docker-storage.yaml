@@ -39,14 +39,7 @@ spec:
         env:
         - name: REGISTRY_STORAGE_DELETE_ENABLED
           value: "true"
-        - name: REGISTRY_HTTP_HEADERS_Access-Control-Allow-Origin
-          value: "['*']"
-        - name: REGISTRY_HTTP_HEADERS_Access-Control-Allow-Methods
-          value: "['HEAD', 'GET', 'OPTIONS', 'DELETE']"
-        - name: REGISTRY_HTTP_HEADERS_Access-Control-Allow-Headers
-          value: "['Authorization', 'Accept', 'Cache-Control']"
-        - name: REGISTRY_HTTP_HEADERS_Access-Control-Expose-Headers
-          value: "['Docker-Content-Digest']"
+
         volumeMounts:
         - name: data
           mountPath: /var/lib/registry
@@ -78,6 +71,10 @@ metadata:
     kubernetes.io/ingress.class: nginx
     cert-manager.io/cluster-issuer: "homelab-ca-issuer"
     nginx.ingress.kubernetes.io/proxy-body-size: "0"
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "https://registry-ui.homelab"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "GET, PUT, POST, DELETE, PATCH, OPTIONS"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization"
 spec:
   tls:
     - hosts:
