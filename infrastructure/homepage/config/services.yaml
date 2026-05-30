@@ -4,41 +4,41 @@
         href: https://payment.homelab
         description: Core payment processing service
         widget:
-          type: kubernetes
-          namespace: applications
-          selector: app=payment-service
+          type: iframe
+          url: https://payment.homelab
+          height: 400
     - Wallet Service:
         icon: si-googlewallet
         href: https://wallet.homelab
         description: User wallet and balance management
         widget:
-          type: kubernetes
-          namespace: applications
-          selector: app=wallet-service
+          type: iframe
+          url: https://wallet.homelab
+          height: 400
     - Ledger Service:
         icon: si-bookstack
         href: https://ledger.homelab
         description: Double-entry accounting ledger
         widget:
-          type: kubernetes
-          namespace: applications
-          selector: app=ledger-service
+          type: iframe
+          url: https://ledger.homelab
+          height: 400
     - Export Batch:
         icon: si-export
         href: https://export-batch.homelab
         description: Batch processing and export jobs
         widget:
-          type: kubernetes
-          namespace: applications
-          selector: app=export-batch-service
+          type: iframe
+          url: https://export-batch.homelab
+          height: 400
     - Regulatory Service:
         icon: si-checkmarx
         href: https://regulatory.homelab
         description: Mock regulatory compliance service
         widget:
-          type: kubernetes
-          namespace: applications
-          selector: app=mock-regulatory-service
+          type: iframe
+          url: https://regulatory.homelab
+          height: 400
 
 - Infrastructure:
     - ArgoCD:

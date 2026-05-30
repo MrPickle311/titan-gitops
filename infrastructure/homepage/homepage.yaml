@@ -85,7 +85,7 @@ data:
             namespace: applications
         - Export Batch:
             icon: si-export
-            href: https://export-batch.homelab
+            href: https://export-batch.homelab/batch
             podSelector: app=export-batch-service
             namespace: applications
         - Regulatory Service:
@@ -96,7 +96,7 @@ data:
     - Infrastructure:
         - ArgoCD:
             icon: argo
-            href: https://argo.homelab
+            href: https://argocd.homelab/
         - Grafana:
             icon: grafana
             href: https://grafana.homelab
