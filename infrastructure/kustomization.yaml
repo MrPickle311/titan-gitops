@@ -3,16 +3,9 @@ kind: Kustomization
 
 resources:
   - applications-namespace.yaml
-  - backstage.yaml
   - cluster-config.yaml
   - docker-storage.yaml
   - kafka-ui.yaml
   - metallb-config.yaml
   - homepage/homepage.yaml
-  - portainer.yaml
-
-configMapGenerator:
-  - name: backstage-config
-    namespace: applications
-    files:
-      - app-config.yaml=backstage-config.yaml
+  - rancher.yaml

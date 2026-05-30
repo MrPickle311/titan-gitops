@@ -53,7 +53,3 @@
         icon: prometheus
         href: https://prometheus.homelab
         description: Metrics collection
-    - Backstage:
-        icon: backstage
-        href: https://backstage.homelab
-        description: Developer Portal (Old)
