@@ -23,6 +23,19 @@ spec:
           value: "randomencryptionkey1234567890"
         - name: RI_ACCEPT_TERMS_AND_CONDITIONS
           value: "true"
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: redis-cluster-credentials
+              key: redis-password
+        lifecycle:
+          postStart:
+            exec:
+              command:
+              - /bin/sh
+              - -c
+              - |
+                echo "const http = require('http'); const options = { hostname: '127.0.0.1', port: 5540, path: '/api/databases', method: 'GET' }; const tryAdd = () => { const req = http.request(options, res => { if (res.statusCode !== 200) { setTimeout(tryAdd, 2000); return; } let body = ''; res.on('data', d => body += d); res.on('end', () => { try { const dbs = JSON.parse(body); if (dbs.some(db => db.host === 'redis-redis-cluster.databases.svc.cluster.local')) { process.exit(0); } else { const postData = JSON.stringify({ host: 'redis-redis-cluster.databases.svc.cluster.local', port: 6379, name: 'Titan Redis Cluster', password: process.env.REDIS_PASSWORD }); const postOpt = { ...options, method: 'POST', headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(postData) } }; const postReq = http.request(postOpt, postRes => { if (postRes.statusCode === 201) process.exit(0); else setTimeout(tryAdd, 2000); }); postReq.write(postData); postReq.end(); } } catch (e) { setTimeout(tryAdd, 2000); } }); }); req.on('error', () => setTimeout(tryAdd, 2000)); req.end(); }; tryAdd();" > /tmp/add-db.js && node /tmp/add-db.js
 
         resources:
           requests:
