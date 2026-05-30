@@ -25,7 +25,7 @@ spec:
           value: "redis-redis-cluster.databases.svc.cluster.local"
         - name: RI_REDIS_PORT_1
           value: "6379"
-        - name: RI_REDIS_NAME_1
+        - name: RI_REDIS_ALIAS_1
           value: "Titan Redis Cluster"
         - name: RI_REDIS_PASSWORD_1
           valueFrom:
