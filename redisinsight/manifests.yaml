@@ -18,6 +18,20 @@ spec:
         image: redis/redisinsight:2.60.0
         ports:
         - containerPort: 5540
+        env:
+        - name: RI_ACCEPT_TERMS_AND_CONDITIONS
+          value: "true"
+        - name: RI_REDIS_HOST_1
+          value: "redis-redis-cluster.databases.svc.cluster.local"
+        - name: RI_REDIS_PORT_1
+          value: "6379"
+        - name: RI_REDIS_NAME_1
+          value: "Titan Redis Cluster"
+        - name: RI_REDIS_PASSWORD_1
+          valueFrom:
+            secretKeyRef:
+              name: redis-cluster-credentials
+              key: redis-password
         resources:
           requests:
             cpu: 100m
