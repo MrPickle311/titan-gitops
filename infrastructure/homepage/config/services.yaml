@@ -69,3 +69,7 @@
         icon: redis
         href: https://redis-insight.homelab
         description: Redis GUI client
+    - pgAdmin:
+        icon: postgresql
+        href: https://pgadmin.homelab
+        description: PostgreSQL administration GUI

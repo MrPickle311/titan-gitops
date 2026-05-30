@@ -153,6 +153,11 @@ data:
             href: https://redis-insight.homelab
             podSelector: app=redisinsight
             namespace: databases
+        - pgAdmin:
+            icon: postgresql
+            href: https://pgadmin.homelab
+            podSelector: app=pgadmin
+            namespace: databases
 ---
 apiVersion: apps/v1
 kind: Deployment

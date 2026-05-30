@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pgadmin
+  namespace: databases
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pgadmin
+  template:
+    metadata:
+      labels:
+        app: pgadmin
+    spec:
+      containers:
+      - name: pgadmin
+        image: dpage/pgadmin4:latest
+        ports:
+        - containerPort: 80
+        env:
+        - name: PGADMIN_DEFAULT_EMAIL
+          value: "admin@homelab.local"
+        - name: PGADMIN_DEFAULT_PASSWORD
+          value: "admin"
+        - name: PGADMIN_CONFIG_X_FRAME_OPTIONS
+          value: "''"
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        volumeMounts:
+        - name: data
+          mountPath: /var/lib/pgadmin
+      volumes:
+      - name: data
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pgadmin
+  namespace: databases
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: 80
+  selector:
+    app: pgadmin
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: pgadmin
+  namespace: databases
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: "homelab-ca-issuer"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      proxy_hide_header X-Frame-Options;
+      proxy_hide_header Content-Security-Policy;
+spec:
+  tls:
+    - hosts:
+        - pgadmin.homelab
+      secretName: pgadmin-tls-secret
+  rules:
+  - host: pgadmin.homelab
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: pgadmin
+            port:
+              number: 80
