@@ -133,6 +133,26 @@ data:
             href: https://rancher.homelab/dashboard
             podSelector: app=rancher
             namespace: cattle-system
+        - Docker Registry:
+            icon: docker
+            href: https://registry.homelab
+            podSelector: app=docker-registry
+            namespace: container-registry
+        - Kafka Control Center:
+            icon: apachekafka
+            href: https://kafka.homelab
+            podSelector: app=control-center
+            namespace: messaging
+        - Schema Registry:
+            icon: confluent
+            href: https://schema.homelab
+            podSelector: app=schema-registry
+            namespace: messaging
+        - Redis Insight:
+            icon: redis
+            href: https://redis-insight.homelab
+            podSelector: app=redisinsight
+            namespace: databases
 ---
 apiVersion: apps/v1
 kind: Deployment

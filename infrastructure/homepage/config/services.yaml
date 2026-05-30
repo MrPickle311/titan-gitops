@@ -53,3 +53,19 @@
         icon: prometheus
         href: https://prometheus.homelab
         description: Metrics collection
+    - Docker Registry:
+        icon: docker
+        href: https://registry.homelab
+        description: Local container registry
+    - Kafka Control Center:
+        icon: apachekafka
+        href: https://kafka.homelab
+        description: Kafka cluster management
+    - Schema Registry:
+        icon: confluent
+        href: https://schema.homelab
+        description: Confluent schema registry
+    - Redis Insight:
+        icon: redis
+        href: https://redis-insight.homelab
+        description: Redis GUI client
