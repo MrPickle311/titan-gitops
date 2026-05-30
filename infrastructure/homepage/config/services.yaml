@@ -1,44 +1,24 @@
 - Titan Services:
     - Payment Service:
         icon: si-googlepay
-        href: https://payment.homelab
+        href: https://payment.homelab/swagger-ui.html
         description: Core payment processing service
-        widget:
-          type: iframe
-          url: https://payment.homelab
-          height: 400
     - Wallet Service:
         icon: si-googlewallet
-        href: https://wallet.homelab
+        href: https://wallet.homelab/swagger-ui.html
         description: User wallet and balance management
-        widget:
-          type: iframe
-          url: https://wallet.homelab
-          height: 400
     - Ledger Service:
         icon: si-bookstack
-        href: https://ledger.homelab
+        href: https://ledger.homelab/swagger-ui.html
         description: Double-entry accounting ledger
-        widget:
-          type: iframe
-          url: https://ledger.homelab
-          height: 400
     - Export Batch:
         icon: si-export
-        href: https://export-batch.homelab
+        href: https://export-batch.homelab/swagger-ui.html
         description: Batch processing and export jobs
-        widget:
-          type: iframe
-          url: https://export-batch.homelab
-          height: 400
     - Regulatory Service:
         icon: si-checkmarx
-        href: https://regulatory.homelab
+        href: https://regulatory.homelab/swagger-ui.html
         description: Mock regulatory compliance service
-        widget:
-          type: iframe
-          url: https://regulatory.homelab
-          height: 400
 
 - Infrastructure:
     - ArgoCD:
