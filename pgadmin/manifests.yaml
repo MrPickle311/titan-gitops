@@ -45,6 +45,7 @@ spec:
           echo "postgres-postgresql.databases.svc.cluster.local:5432:*:postgres:${DB_PASSWORD}" > /pgpass/pgpass
           chmod 0600 /pgpass/pgpass
           chown 5050:5050 /pgpass/pgpass
+          chown -R 5050:5050 /var/lib/pgadmin
         env:
         - name: DB_PASSWORD
           valueFrom:
@@ -54,6 +55,8 @@ spec:
         volumeMounts:
         - name: pgpass-vol
           mountPath: /pgpass
+        - name: data
+          mountPath: /var/lib/pgadmin
       containers:
       - name: pgadmin
         image: dpage/pgadmin4:latest
