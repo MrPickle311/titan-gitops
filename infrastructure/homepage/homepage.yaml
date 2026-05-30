@@ -71,26 +71,51 @@ data:
         - Payment Service:
             icon: si-googlepay
             href: https://payment.homelab
+            description: Core payment processing service
+            widget:
+              type: iframe
+              url: https://payment.homelab
+              height: 400
             podSelector: app=payment-service
             namespace: applications
         - Wallet Service:
             icon: si-googlewallet
             href: https://wallet.homelab
+            description: User wallet and balance management
+            widget:
+              type: iframe
+              url: https://wallet.homelab
+              height: 400
             podSelector: app=wallet-service
             namespace: applications
         - Ledger Service:
             icon: si-bookstack
             href: https://ledger.homelab
+            description: Double-entry accounting ledger
+            widget:
+              type: iframe
+              url: https://ledger.homelab
+              height: 400
             podSelector: app=ledger-service
             namespace: applications
         - Export Batch:
             icon: si-export
             href: https://export-batch.homelab/batch
+            description: Batch processing and export jobs
+            widget:
+              type: iframe
+              url: https://export-batch.homelab/batch
+              height: 400
             podSelector: app=export-batch-service
             namespace: applications
         - Regulatory Service:
             icon: si-checkmarx
             href: https://regulatory.homelab
+            description: Mock regulatory compliance service
+            widget:
+              type: iframe
+              url: https://regulatory.homelab
+              height: 400
             podSelector: app=mock-regulatory-service
             namespace: applications
     - Infrastructure:
