@@ -16,6 +16,7 @@ spec:
         hostname: rancher.homelab
         bootstrapPassword: admin
         ingress:
+          ingressClassName: nginx
           tls:
             source: secret
           extraAnnotations:
