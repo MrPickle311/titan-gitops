@@ -8,4 +8,4 @@ resources:
   - kafka-ui.yaml
   - metallb-config.yaml
   - homepage/homepage.yaml
-  - rancher.yaml
+
