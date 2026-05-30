@@ -48,81 +48,69 @@ spec:
   selector:
     app: schema-registry
 ---
-# --- 2. CONFLUENT CONTROL CENTER (C3) ---
+# --- 2. KAFKA UI (Open Source) ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: control-center
+  name: kafka-ui
   namespace: messaging
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: control-center
+      app: kafka-ui
   template:
     metadata:
       labels:
-        app: control-center
+        app: kafka-ui
     spec:
-      enableServiceLinks: false
       containers:
-      - name: control-center
-        image: confluentinc/cp-enterprise-control-center:latest
+      - name: kafka-ui
+        image: provectuslabs/kafka-ui:latest
         ports:
-        - containerPort: 9021
+        - containerPort: 8080
         env:
-        - name: CONTROL_CENTER_BOOTSTRAP_SERVERS
+        - name: KAFKA_CLUSTERS_0_NAME
+          value: "Titan-Cluster"
+        - name: KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS
           value: "kafka.messaging.svc.cluster.local:9092"
-        - name: BOOTSTRAP_SERVERS
-          value: "kafka.messaging.svc.cluster.local:9092"
-        - name: PORT
-          value: "9021"
-        - name: CONTROL_CENTER_SCHEMA_REGISTRY_URL
+        - name: KAFKA_CLUSTERS_0_SCHEMAREGISTRY
           value: "http://schema-registry.messaging.svc.cluster.local:8081"
-        - name: CONTROL_CENTER_REPLICATION_FACTOR
-          value: "1"
-        - name: CONTROL_CENTER_INTERNAL_TOPICS_PARTITIONS
-          value: "1"
-        - name: CONTROL_CENTER_MONITORING_INTERCEPTOR_TOPIC_PARTITIONS
-          value: "1"
-        - name: CONFLUENT_METRICS_TOPIC_REPLICATION
-          value: "1"
         resources:
           requests:
-            cpu: 500m
-            memory: 1Gi
+            cpu: 250m
+            memory: 512Mi
           limits:
-            cpu: 2000m
-            memory: 2Gi
+            cpu: 1000m
+            memory: 1Gi
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: control-center
+  name: kafka-ui
   namespace: messaging
 spec:
   type: ClusterIP
   ports:
-  - port: 9021
-    targetPort: 9021
+  - port: 8080
+    targetPort: 8080
   selector:
-    app: control-center
+    app: kafka-ui
 ---
 # --- 3. INGRESSY ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: control-center-ingress
+  name: kafka-ui-ingress
   namespace: messaging
   annotations:
     kubernetes.io/ingress.class: nginx
     cert-manager.io/cluster-issuer: "homelab-ca-issuer"
-    nginx.ingress.kubernetes.io/proxy-buffer-size: "16k"
 spec:
   tls:
     - hosts:
         - kafka.homelab
-      secretName: control-center-tls
+      secretName: kafka-ui-tls
   rules:
   - host: kafka.homelab
     http:
@@ -131,9 +119,9 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: control-center
+            name: kafka-ui
             port:
-              number: 9021
+              number: 8080
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
