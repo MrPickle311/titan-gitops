@@ -103,18 +103,11 @@ data:
         - Prometheus:
             icon: prometheus
             href: https://prometheus.homelab
-        - Portainer:
-            icon: portainer
-            href: https://portainer.homelab
-            podSelector: app=portainer
-            namespace: applications
-            # Note: For the advanced Portainer widget (showing containers/images), 
-            # you will need to add your API key here:
-            # widget:
-            #   type: portainer
-            #   url: http://portainer.applications.svc.cluster.local:9000
-            #   env: 1
-            #   key: YOUR_API_KEY
+        - Rancher:
+            icon: rancher
+            href: https://rancher.homelab/dashboard
+            podSelector: app=rancher
+            namespace: cattle-system
 ---
 apiVersion: apps/v1
 kind: Deployment
