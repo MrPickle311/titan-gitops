@@ -53,6 +53,8 @@ spec:
           value: jdbc:postgresql://postgres-postgresql.databases.svc.cluster.local:5432/titan_db
         - name: SPRING_DATASOURCE_USERNAME
           value: postgres
+        - name: SPRING_PROFILES_ACTIVE
+          value: "manager"
         - name: SPRING_DATASOURCE_PASSWORD
           valueFrom:
             secretKeyRef:
