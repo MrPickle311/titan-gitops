@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: pgadmin
+  name: kafka-ui
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
@@ -10,10 +10,10 @@ spec:
   source:
     repoURL: 'https://github.com/MrPickle311/titan-gitops.git'
     targetRevision: HEAD
-    path: databases/pgadmin
+    path: databases/kafka-ui
   destination:
     server: 'https://kubernetes.default.svc'
-    namespace: databases
+    namespace: messaging
   syncPolicy:
     automated:
       prune: true

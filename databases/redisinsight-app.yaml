@@ -10,7 +10,7 @@ spec:
   source:
     repoURL: 'https://github.com/MrPickle311/titan-gitops.git'
     targetRevision: HEAD
-    path: redisinsight
+    path: databases/redisinsight
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: databases
