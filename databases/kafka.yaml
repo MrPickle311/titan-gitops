@@ -45,6 +45,9 @@ spec:
 
         broker:
           replicaCount: 3
+          extraConfig: |-
+            log.retention.hours=-1
+            log.retention.bytes=-1
           persistence:
             enabled: true
             storageClass: "openebs-hostpath"
