@@ -18,6 +18,8 @@ spec:
             backend: filesystem
             filesystem:
               directory: /var/lib/pyroscope
+          limits:
+            ingest_max_jfr_decompressed_size: 33554432
           # Ograniczamy zużycie RAMu na potrzeby homelaba
           resources:
             requests:
