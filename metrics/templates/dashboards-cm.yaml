@@ -1,4 +1,5 @@
 {{- range $path, $bytes := .Files.Glob "dashboards/**.json" }}
+{{- $folderName := base (dir $path) }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -7,7 +8,11 @@ metadata:
   labels:
     grafana_dashboard: "1"
   annotations:
-    k8s-sidecar-target-directory: "databases"
+    {{- if ne $folderName "dashboards" }}
+    k8s-sidecar-target-directory: {{ $folderName | quote }}
+    {{- else }}
+    k8s-sidecar-target-directory: "General"
+    {{- end }}
 data:
   {{ base $path }}: |-
 {{ $bytes | toString | indent 4 }}
