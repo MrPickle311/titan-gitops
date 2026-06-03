@@ -41,8 +41,8 @@
           },
           "links": [
             {
-              "title": "",
-              "url": "/d/afnq60u73wr28c/kafka-aggregation?var-partition=${__data.fields[\"Partition\"]}&var-minOffset=${__data.fields[\"Min Offset\"]}&var-maxOffset=${__data.fields[\"Max Offset\"]} \n"
+              "title": "View Kafka Messages",
+              "url": "/d/afnq60u73wr28c/kafka-aggregation?var-stepExecutionId=${__data.fields[\"Step ID\"]}"
             }
           ],
           "mappings": [],

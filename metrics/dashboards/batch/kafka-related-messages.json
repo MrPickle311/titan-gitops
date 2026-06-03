@@ -97,49 +97,29 @@
       "title": "Kafka Batch Related Messages",
       "transformations": [
         {
-          "disabled": true,
-          "id": "filterByValue",
-          "options": {
-            "filters": [
-              {
-                "config": {
-                  "id": "equal",
-                  "options": {
-                    "value": "$partition"
-                  }
-                },
-                "fieldName": "partition"
-              },
-              {
-                "config": {
-                  "id": "greaterOrEqual",
-                  "options": {
-                    "value": "$minOffset"
-                  }
-                },
-                "fieldName": "offset"
-              },
-              {
-                "config": {
-                  "id": "lower",
-                  "options": {
-                    "value": "$maxOffset"
-                  }
-                },
-                "fieldName": "offset"
-              }
-            ],
-            "match": "any",
-            "type": "include"
-          }
-        },
-        {
-          "disabled": true,
           "id": "extractFields",
           "options": {
             "format": "json",
             "jsonPaths": [],
             "source": "paymentId"
+          }
+        },
+        {
+          "id": "filterByValue",
+          "options": {
+            "filters": [
+              {
+                "config": {
+                  "id": "regex",
+                  "options": {
+                    "value": "${paymentIds:regex}"
+                  }
+                },
+                "fieldName": "paymentId"
+              }
+            ],
+            "match": "all",
+            "type": "include"
           }
         }
       ],
@@ -235,42 +215,6 @@
       "title": "Kafka Payments Related with Messages",
       "transformations": [
         {
-          "id": "filterByValue",
-          "options": {
-            "filters": [
-              {
-                "config": {
-                  "id": "equal",
-                  "options": {
-                    "value": "$partition"
-                  }
-                },
-                "fieldName": "partition"
-              },
-              {
-                "config": {
-                  "id": "greaterOrEqual",
-                  "options": {
-                    "value": "$minOffset"
-                  }
-                },
-                "fieldName": "offset"
-              },
-              {
-                "config": {
-                  "id": "lower",
-                  "options": {
-                    "value": "$maxOffset"
-                  }
-                },
-                "fieldName": "offset"
-              }
-            ],
-            "match": "any",
-            "type": "include"
-          }
-        },
-        {
           "id": "extractFields",
           "options": {
             "format": "json",
@@ -278,6 +222,24 @@
             "keepTime": false,
             "replace": false,
             "source": "paymentId"
+          }
+        },
+        {
+          "id": "filterByValue",
+          "options": {
+            "filters": [
+              {
+                "config": {
+                  "id": "regex",
+                  "options": {
+                    "value": "${paymentIds:regex}"
+                  }
+                },
+                "fieldName": "paymentId"
+              }
+            ],
+            "match": "all",
+            "type": "include"
           }
         },
         {
@@ -311,53 +273,44 @@
       {
         "current": {
           "selected": false,
-          "text": "1",
-          "value": "1"
+          "text": "",
+          "value": ""
         },
         "hide": 0,
-        "name": "partition",
+        "name": "stepExecutionId",
+        "options": [
+          {
+            "selected": true,
+            "text": "",
+            "value": ""
+          }
+        ],
+        "query": "",
+        "skipUrlSync": false,
+        "type": "textbox"
+      },
+      {
+        "current": {
+          "selected": false,
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "grafana-postgresql-datasource",
+          "uid": "ffnpozixx84xsb"
+        },
+        "definition": "SELECT json_array_elements_text(EXECUTION_CONTEXT::json->'processedPaymentIds') FROM BATCH_STEP_EXECUTION_CONTEXT WHERE STEP_EXECUTION_ID = $stepExecutionId",
+        "hide": 2,
+        "includeAll": true,
+        "multi": true,
+        "name": "paymentIds",
         "options": [],
-        "query": "1",
+        "query": "SELECT json_array_elements_text(EXECUTION_CONTEXT::json->'processedPaymentIds') FROM BATCH_STEP_EXECUTION_CONTEXT WHERE STEP_EXECUTION_ID = $stepExecutionId",
+        "refresh": 1,
+        "regex": "",
         "skipUrlSync": false,
-        "type": "textbox"
-      },
-      {
-        "current": {
-          "selected": true,
-          "text": "",
-          "value": ""
-        },
-        "hide": 0,
-        "name": "minOffset",
-        "options": [
-          {
-            "selected": true,
-            "text": "",
-            "value": ""
-          }
-        ],
-        "query": "",
-        "skipUrlSync": false,
-        "type": "textbox"
-      },
-      {
-        "current": {
-          "selected": true,
-          "text": "",
-          "value": ""
-        },
-        "hide": 0,
-        "name": "maxOffset",
-        "options": [
-          {
-            "selected": true,
-            "text": "",
-            "value": ""
-          }
-        ],
-        "query": "",
-        "skipUrlSync": false,
-        "type": "textbox"
+        "sort": 0,
+        "type": "query"
       }
     ]
   },
