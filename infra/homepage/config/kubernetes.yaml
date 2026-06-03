@@ -1,0 +1,9 @@
+- homelab-cluster:
+    mode: internal
+    show_resources: true
+    show_nodes: true
+    namespaces:
+      - applications
+      - databases
+      - messaging
+      - monitoring
