@@ -36,6 +36,11 @@ spec:
             storageClassName: "openebs-hostpath"
             size: 5Gi
 
+          sidecar:
+            dashboards:
+              provider:
+                foldersFromFilesStructure: true
+
           additionalDataSources:
             - name: Pyroscope
               type: pyroscope
