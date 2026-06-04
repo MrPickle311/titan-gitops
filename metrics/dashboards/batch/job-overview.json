@@ -223,7 +223,7 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
-      "description": "This tracks exactly how many jobs are actively executing right now in the background. ",
+      "description": "This tracks how many jobs completed per minute.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -321,7 +321,7 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
-      "description": "This tracks how many steps are actively executing.",
+      "description": "This tracks how many steps completed per minute.",
       "fieldConfig": {
         "defaults": {
           "color": {
