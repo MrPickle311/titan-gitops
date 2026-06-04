@@ -1,0 +1,83 @@
+{
+  "title": "Payment Browser",
+  "uid": "payment-browser-1",
+  "timezone": "browser",
+  "schemaVersion": 38,
+  "refresh": "",
+  "templating": {
+    "list": [
+      {
+        "name": "paymentId",
+        "type": "query",
+        "datasource": {"type": "grafana-postgresql-datasource", "uid": "ffnpozixx84xsb"},
+        "query": "SELECT id FROM payments ORDER BY created_at DESC LIMIT 100",
+        "refresh": 1,
+        "sort": 1,
+        "hide": 0
+      }
+    ]
+  },
+  "panels": [
+    {
+      "type": "table",
+      "title": "List of Payments (Click ID to filter below)",
+      "datasource": {"type": "grafana-postgresql-datasource", "uid": "ffnpozixx84xsb"},
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "rawSql": "SELECT id, transaction_id, amount, currency, state, created_at FROM payments ORDER BY created_at DESC LIMIT 50",
+          "format": "table"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "id" },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "title": "View Payment Details",
+                    "url": "?var-paymentId=${__data.fields.id}"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "type": "table",
+      "title": "State Transition History",
+      "datasource": {"type": "grafana-postgresql-datasource", "uid": "ffnpozixx84xsb"},
+      "gridPos": { "h": 10, "w": 12, "x": 0, "y": 10 },
+      "targets": [
+        {
+          "rawSql": "SELECT timestamp as \"Time\", event as \"Event\", from_state as \"From State\", to_state as \"To State\" FROM payment_history WHERE payment_id = ${paymentId} ORDER BY timestamp ASC",
+          "format": "table"
+        }
+      ]
+    },
+    {
+      "type": "nodeGraph",
+      "title": "State Transition Graph",
+      "datasource": {"type": "grafana-postgresql-datasource", "uid": "ffnpozixx84xsb"},
+      "gridPos": { "h": 10, "w": 12, "x": 12, "y": 10 },
+      "targets": [
+        {
+          "rawSql": "SELECT DISTINCT state as id, state as title FROM (SELECT from_state as state FROM payment_history WHERE payment_id = ${paymentId} UNION SELECT to_state FROM payment_history WHERE payment_id = ${paymentId}) as nodes",
+          "format": "table",
+          "refId": "nodes"
+        },
+        {
+          "rawSql": "SELECT id, from_state as source, to_state as target, event as mainStat FROM payment_history WHERE payment_id = ${paymentId}",
+          "format": "table",
+          "refId": "edges"
+        }
+      ]
+    }
+  ]
+}
