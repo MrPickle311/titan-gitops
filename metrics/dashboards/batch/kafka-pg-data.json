@@ -112,7 +112,7 @@
           }
         }
       ],
-      "title": "Kafka-Postgres Payments Data",
+      "title": "Postgres Payments Data",
       "type": "table"
     }
   ],
@@ -170,7 +170,7 @@
   },
   "timepicker": {},
   "timezone": "browser",
-  "title": "Kafka-Postgres Payments Data",
+  "title": "Postgres Payments Data",
   "uid": "afnr5i5gpysxsb",
   "version": 7,
   "weekStart": ""
