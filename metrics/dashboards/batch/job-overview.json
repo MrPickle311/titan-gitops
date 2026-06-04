@@ -312,7 +312,7 @@
           "refId": "A"
         }
       ],
-      "title": "Live Running Jobs",
+      "title": "Job Throughput (per min)",
       "type": "timeseries"
     },
     {
@@ -410,7 +410,7 @@
           "refId": "A"
         }
       ],
-      "title": "Live Running Steps",
+      "title": "Step Throughput (per min)",
       "type": "timeseries"
     },
     {
