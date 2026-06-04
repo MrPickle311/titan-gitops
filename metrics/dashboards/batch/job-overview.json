@@ -494,13 +494,13 @@
           "editorMode": "code",
           "expr": "sum by (spring_batch_job_name) (spring_batch_job_seconds_count)",
           "format": "table",
-          "instant": false,
+          "instant": true,
           "legendFormat": "__auto",
-          "range": true,
+          "range": false,
           "refId": "A"
         }
       ],
-      "title": "Panel Title",
+      "title": "Jobs Summary",
       "type": "table"
     }
   ],
