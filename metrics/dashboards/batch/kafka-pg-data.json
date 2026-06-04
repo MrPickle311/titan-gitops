@@ -52,7 +52,13 @@
                 "value": 80
               }
             ]
-          }
+          },
+          "links": [
+            {
+              "title": "View Kafka Messages",
+              "url": "/d/afnq60u73wr28c/kafka-aggregation?var-stepExecutionId=${stepExecutionId}"
+            }
+          ]
         },
         "overrides": []
       },
@@ -115,15 +121,46 @@
   "templating": {
     "list": [
       {
-        "current": {},
+        "current": {
+          "selected": false,
+          "text": "",
+          "value": ""
+        },
         "hide": 0,
-        "includeAll": false,
+        "name": "stepExecutionId",
+        "options": [
+          {
+            "selected": true,
+            "text": "",
+            "value": ""
+          }
+        ],
+        "query": "",
+        "skipUrlSync": false,
+        "type": "textbox"
+      },
+      {
+        "current": {
+          "selected": false,
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "grafana-postgresql-datasource",
+          "uid": "ffnpozixx84xsb"
+        },
+        "definition": "SELECT json_array_elements_text(COALESCE(SERIALIZED_CONTEXT, SHORT_CONTEXT)::json->'processedPaymentIds') FROM BATCH_STEP_EXECUTION_CONTEXT WHERE STEP_EXECUTION_ID = $stepExecutionId",
+        "hide": 2,
+        "includeAll": true,
         "multi": true,
         "name": "paymentIds",
         "options": [],
-        "query": "",
+        "query": "SELECT json_array_elements_text(COALESCE(SERIALIZED_CONTEXT, SHORT_CONTEXT)::json->'processedPaymentIds') FROM BATCH_STEP_EXECUTION_CONTEXT WHERE STEP_EXECUTION_ID = $stepExecutionId",
+        "refresh": 1,
+        "regex": "",
         "skipUrlSync": false,
-        "type": "custom"
+        "sort": 0,
+        "type": "query"
       }
     ]
   },

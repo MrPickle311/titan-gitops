@@ -41,8 +41,8 @@
           },
           "links": [
             {
-              "title": "View Kafka Messages",
-              "url": "/d/afnq60u73wr28c/kafka-aggregation?var-stepExecutionId=${__data.fields[\"Step ID\"]}"
+              "title": "View Payments in DB",
+              "url": "/d/afnr5i5gpysxsb/kafka-postgres-payments-data?var-stepExecutionId=${__data.fields[\"Step ID\"]}"
             }
           ],
           "mappings": [],
