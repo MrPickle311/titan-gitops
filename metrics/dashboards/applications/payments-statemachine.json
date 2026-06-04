@@ -1,0 +1,53 @@
+{
+  "title": "Payment State Machine Metrics",
+  "uid": "payment-sm-1",
+  "timezone": "browser",
+  "schemaVersion": 38,
+  "refresh": "10s",
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "State Transitions (Throughput)",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "sum by (transitionName) (rate(ssm_transition_seconds_count[1m]))",
+          "legendFormat": "{{transitionName}}"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Action Execution Throughput",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "targets": [
+        {
+          "expr": "sum by (actionName) (rate(ssm_action_seconds_count[1m]))",
+          "legendFormat": "{{actionName}}"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Guard Evaluations",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "targets": [
+        {
+          "expr": "sum by (guardName) (rate(ssm_guard_seconds_count[1m]))",
+          "legendFormat": "{{guardName}}"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Average Action Duration (seconds)",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "targets": [
+        {
+          "expr": "sum by (actionName) (rate(ssm_action_seconds_sum[1m])) / sum by (actionName) (rate(ssm_action_seconds_count[1m]))",
+          "legendFormat": "{{actionName}}"
+        }
+      ]
+    }
+  ]
+}
