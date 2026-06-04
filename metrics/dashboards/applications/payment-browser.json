@@ -68,12 +68,12 @@
       "gridPos": { "h": 10, "w": 12, "x": 12, "y": 10 },
       "targets": [
         {
-          "rawSql": "SELECT DISTINCT state::text as id, state::text as title FROM (SELECT COALESCE(from_state, 'START') as state FROM payment_history WHERE payment_id = ${paymentId} UNION SELECT to_state FROM payment_history WHERE payment_id = ${paymentId}) as nodes",
+          "rawSql": "SELECT DISTINCT state::text as id, state::text as title, CASE WHEN state LIKE 'AUTH_%' THEN 'Authorization' WHEN state LIKE 'FRAUD_%' THEN 'FraudCheck' ELSE 'Main' END as \"subTitle\" FROM (SELECT COALESCE(from_state, 'START') as state FROM payment_history WHERE payment_id = ${paymentId} UNION SELECT to_state FROM payment_history WHERE payment_id = ${paymentId}) as nodes",
           "format": "table",
           "refId": "nodes"
         },
         {
-          "rawSql": "SELECT id::text, COALESCE(from_state, 'START') as source, to_state as target, event as mainStat FROM payment_history WHERE payment_id = ${paymentId} UNION ALL SELECT 'fake_auth' as id, 'PROCESSING' as source, 'AUTH_PENDING' as target, 'Start Region' as mainStat WHERE EXISTS (SELECT 1 FROM payment_history WHERE payment_id = ${paymentId} AND from_state = 'AUTH_PENDING') UNION ALL SELECT 'fake_fraud' as id, 'PROCESSING' as source, 'FRAUD_EVALUATING' as target, 'Start Region' as mainStat WHERE EXISTS (SELECT 1 FROM payment_history WHERE payment_id = ${paymentId} AND from_state = 'FRAUD_EVALUATING')",
+          "rawSql": "SELECT id::text, COALESCE(from_state, 'START') as source, to_state as target, event as \"mainStat\" FROM payment_history WHERE payment_id = ${paymentId} UNION ALL SELECT 'fake_auth' as id, 'PROCESSING' as source, 'AUTH_PENDING' as target, 'Start Region' as \"mainStat\" WHERE EXISTS (SELECT 1 FROM payment_history WHERE payment_id = ${paymentId} AND from_state = 'AUTH_PENDING') UNION ALL SELECT 'fake_fraud' as id, 'PROCESSING' as source, 'FRAUD_EVALUATING' as target, 'Start Region' as \"mainStat\" WHERE EXISTS (SELECT 1 FROM payment_history WHERE payment_id = ${paymentId} AND from_state = 'FRAUD_EVALUATING')",
           "format": "table",
           "refId": "edges"
         }
