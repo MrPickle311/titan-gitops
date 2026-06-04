@@ -607,7 +607,7 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
-      "description": "Active thread count from TaskExecutor.",
+      "description": "Average concurrent busy threads based on total execution time.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -685,14 +685,14 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(executor_active_threads{name=\"taskExecutor\"})",
+          "expr": "sum(rate(spring_batch_step_seconds_sum[1m]))",
           "instant": false,
-          "legendFormat": "taskExecutor",
+          "legendFormat": "busy threads",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Active Threads",
+      "title": "Average Busy Threads",
       "type": "timeseries"
     }
   ],
