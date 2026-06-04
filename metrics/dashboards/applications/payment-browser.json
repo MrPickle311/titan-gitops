@@ -73,7 +73,7 @@
           "refId": "nodes"
         },
         {
-          "rawSql": "SELECT id::text, COALESCE(from_state, 'START') as source, to_state as target, event as mainStat FROM payment_history WHERE payment_id = ${paymentId}",
+          "rawSql": "SELECT id::text, COALESCE(from_state, 'START') as source, to_state as target, event as mainStat FROM payment_history WHERE payment_id = ${paymentId} UNION ALL SELECT 'fake_auth' as id, 'PROCESSING' as source, 'AUTH_PENDING' as target, 'Start Region' as mainStat WHERE EXISTS (SELECT 1 FROM payment_history WHERE payment_id = ${paymentId} AND from_state = 'AUTH_PENDING') UNION ALL SELECT 'fake_fraud' as id, 'PROCESSING' as source, 'FRAUD_EVALUATING' as target, 'Start Region' as mainStat WHERE EXISTS (SELECT 1 FROM payment_history WHERE payment_id = ${paymentId} AND from_state = 'FRAUD_EVALUATING')",
           "format": "table",
           "refId": "edges"
         }
