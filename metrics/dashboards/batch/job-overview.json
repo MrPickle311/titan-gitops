@@ -109,9 +109,9 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum by (spring_batch_step_name) (rate(spring_batch_item_read_seconds_count[1m]))",
+          "expr": "sum by (spring_batch_item_read_step_name) (rate(spring_batch_item_read_seconds_count[1m]))",
           "instant": false,
-          "legendFormat": "{{spring_batch_step_name}}",
+          "legendFormat": "{{spring_batch_item_read_step_name}}",
           "range": true,
           "refId": "A"
         }
@@ -305,9 +305,9 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum by (spring_batch_job_name) (spring_batch_job_active_seconds_active_count)",
+          "expr": "sum by (spring_batch_job_active_name) (spring_batch_job_active_seconds_count)",
           "instant": false,
-          "legendFormat": "{{spring_batch_job_name}}",
+          "legendFormat": "{{spring_batch_job_active_name}}",
           "range": true,
           "refId": "A"
         }
