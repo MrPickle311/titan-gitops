@@ -103,7 +103,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT\n    i.JOB_INSTANCE_ID as \"Instance ID\",\n    COALESCE(SUM(s.WRITE_COUNT), 0) as \"Total Processed Payments\"\nFROM BATCH_JOB_INSTANCE i\nLEFT JOIN BATCH_JOB_EXECUTION e ON i.JOB_INSTANCE_ID = e.JOB_INSTANCE_ID\nLEFT JOIN BATCH_STEP_EXECUTION s ON e.JOB_EXECUTION_ID = s.JOB_EXECUTION_ID\nWHERE i.JOB_NAME = '${jobName}'\nGROUP BY i.JOB_INSTANCE_ID\nORDER BY i.JOB_INSTANCE_ID DESC;",
+          "rawSql": "SELECT\n    i.JOB_INSTANCE_ID as \"Instance ID\",\n    COALESCE(SUM(s.WRITE_COUNT), 0) as \"Total Processed Payments\"\nFROM BATCH_JOB_INSTANCE i\nLEFT JOIN BATCH_JOB_EXECUTION e ON i.JOB_INSTANCE_ID = e.JOB_INSTANCE_ID\nLEFT JOIN BATCH_STEP_EXECUTION s ON e.JOB_EXECUTION_ID = s.JOB_EXECUTION_ID AND s.STEP_NAME NOT LIKE '%:%'\nWHERE i.JOB_NAME = '${jobName}'\nGROUP BY i.JOB_INSTANCE_ID\nORDER BY i.JOB_INSTANCE_ID DESC;",
           "refId": "A",
           "sql": {
             "columns": [
