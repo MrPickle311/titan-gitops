@@ -363,7 +363,40 @@
             ]
           }
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Exit Message"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Context JSON"
+            },
+            "properties": [
+              {
+                "id": "custom.inspect",
+                "value": true
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "json-view"
+                }
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 9,
@@ -394,7 +427,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT                                                                                                                                                                                 \n      STATUS as \"Status\",                                                                                                                                                                  \n      EXIT_CODE as \"Exit Code\",                                                                                                                                                            \n      START_TIME as \"Start Time\",                                                                                                                                                          \n      END_TIME as \"End Time\",                                                                                                                                                              \n      EXIT_MESSAGE as \"Exit Message\"                                                                                                                                                       \n    FROM BATCH_JOB_EXECUTION                                                                                                                                                               \n    WHERE JOB_INSTANCE_ID = ${instanceId}                                                                                                                                                  \n    ORDER BY JOB_EXECUTION_ID DESC                                                                                                                                                         \n    LIMIT 1;",
+          "rawSql": "SELECT e.STATUS as \"Status\", e.EXIT_CODE as \"Exit Code\", e.START_TIME as \"Start Time\", e.END_TIME as \"End Time\", e.EXIT_MESSAGE as \"Exit Message\", COALESCE(c.SHORT_CONTEXT, c.SERIALIZED_CONTEXT) as \"Context JSON\" FROM BATCH_JOB_EXECUTION e LEFT JOIN BATCH_JOB_EXECUTION_CONTEXT c ON e.JOB_EXECUTION_ID = c.JOB_EXECUTION_ID WHERE e.JOB_INSTANCE_ID = ${instanceId} ORDER BY e.JOB_EXECUTION_ID DESC LIMIT 1;",
           "refId": "A",
           "sql": {
             "columns": [
