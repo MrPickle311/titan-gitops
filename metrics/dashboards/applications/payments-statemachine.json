@@ -9,7 +9,7 @@
       {
         "name": "paymentId",
         "type": "query",
-        "datasource": "PostgreSQL",
+        "datasource": {"type": "grafana-postgresql-datasource", "uid": "ffnpozixx84xsb"},
         "query": "SELECT id FROM payments ORDER BY created_at DESC LIMIT 100",
         "refresh": 1,
         "sort": 1
@@ -20,7 +20,7 @@
     {
       "type": "table",
       "title": "Payment Details",
-      "datasource": "PostgreSQL",
+      "datasource": {"type": "grafana-postgresql-datasource", "uid": "ffnpozixx84xsb"},
       "gridPos": { "h": 5, "w": 24, "x": 0, "y": 0 },
       "targets": [
         {
@@ -32,7 +32,7 @@
     {
       "type": "table",
       "title": "State Transition History",
-      "datasource": "PostgreSQL",
+      "datasource": {"type": "grafana-postgresql-datasource", "uid": "ffnpozixx84xsb"},
       "gridPos": { "h": 8, "w": 12, "x": 0, "y": 5 },
       "targets": [
         {
@@ -44,7 +44,7 @@
     {
       "type": "nodeGraph",
       "title": "State Transition Graph",
-      "datasource": "PostgreSQL",
+      "datasource": {"type": "grafana-postgresql-datasource", "uid": "ffnpozixx84xsb"},
       "gridPos": { "h": 8, "w": 12, "x": 12, "y": 5 },
       "targets": [
         {
