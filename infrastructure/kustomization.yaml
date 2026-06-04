@@ -1,0 +1,11 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - applications-namespace.yaml
+  - cluster-config.yaml
+  - docker-storage.yaml
+  - kafka-ui.yaml
+  - metallb-config.yaml
+  - homepage/homepage.yaml
+

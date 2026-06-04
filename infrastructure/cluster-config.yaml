@@ -28,10 +28,4 @@ metadata:
   name: homelab-ca-issuer
 spec:
   ca:
-    secretName: homelab-ca-secretapiVersion: v1
-kind: Namespace
-metadata:
-  name: applications
-  labels:
-    pod-security.kubernetes.io/enforce: privileged
-    pod-security.kubernetes.io/warn: privileged
+    secretName: homelab-ca-secret

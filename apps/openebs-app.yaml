@@ -1,0 +1,28 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: openebs
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: 'https://openebs.github.io/charts'
+    targetRevision: 3.9.0
+    chart: openebs
+    helm:
+      values: |
+        localprovisioner:
+          basePath: "/var/openebs"
+          hostpathClass:
+            isDefaultClass: true
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: openebs
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

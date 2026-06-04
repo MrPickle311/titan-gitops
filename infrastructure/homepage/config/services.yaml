@@ -1,0 +1,55 @@
+- Titan Services:
+    - Payment Service:
+        icon: si-googlepay
+        href: https://payment.homelab/swagger-ui.html
+        description: Core payment processing service
+    - Wallet Service:
+        icon: si-googlewallet
+        href: https://wallet.homelab/swagger-ui.html
+        description: User wallet and balance management
+    - Ledger Service:
+        icon: si-bookstack
+        href: https://ledger.homelab/swagger-ui.html
+        description: Double-entry accounting ledger
+    - Export Batch:
+        icon: si-export
+        href: https://export-batch.homelab/swagger-ui.html
+        description: Batch processing and export jobs
+    - Regulatory Service:
+        icon: si-checkmarx
+        href: https://regulatory.homelab/swagger-ui.html
+        description: Mock regulatory compliance service
+
+- Infrastructure:
+    - ArgoCD:
+        icon: argo
+        href: https://argo.homelab
+        description: GitOps continuous delivery
+    - Grafana:
+        icon: grafana
+        href: https://grafana.homelab
+        description: Monitoring and observability
+    - Prometheus:
+        icon: prometheus
+        href: https://prometheus.homelab
+        description: Metrics collection
+    - Docker Registry:
+        icon: docker
+        href: https://registry.homelab
+        description: Local container registry
+    - Kafka Control Center:
+        icon: apachekafka
+        href: https://kafka.homelab
+        description: Kafka cluster management
+    - Schema Registry:
+        icon: confluent
+        href: https://schema.homelab
+        description: Confluent schema registry
+    - Redis Insight:
+        icon: redis
+        href: https://redis-insight.homelab
+        description: Redis GUI client
+    - pgAdmin:
+        icon: postgresql
+        href: https://pgadmin.homelab
+        description: PostgreSQL administration GUI
