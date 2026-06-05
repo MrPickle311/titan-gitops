@@ -64,6 +64,8 @@ spec:
           value: kafka.messaging.svc.cluster.local:9092
         - name: EXPORT_REGULATORY_URL
           value: "http://mock-regulatory-service:8084/api/v1/regulatory/report"
+        - name: MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE
+          value: "*"
 
 ---
 apiVersion: v1
