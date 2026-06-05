@@ -709,11 +709,19 @@
       },
       "targets": [
         {
-          "expr": "sum by (status) (spring_batch_step_seconds_count{spring_batch_step_name=~\".*:partition.*\"})",
+          "expr": "sum by (status) (round(increase(spring_batch_step_seconds_count{spring_batch_step_name=~\".*:partition.*\"}[$__range])))",
           "legendFormat": "{{status}}"
         }
       ],
-      "id": 8
+      "id": 8,
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      }
     },
     {
       "type": "timeseries",
