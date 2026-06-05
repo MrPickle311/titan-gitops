@@ -753,7 +753,7 @@
     },
     {
       "type": "bargauge",
-      "title": "3. Data Skew & Distribution (Items Written)",
+      "title": "3. Data Skew & Distribution (Items Read)",
       "datasource": {
         "uid": "prometheus"
       },
@@ -765,8 +765,8 @@
       },
       "targets": [
         {
-          "expr": "sum by (spring_batch_step_name) (spring_batch_item_write_seconds_count{spring_batch_step_name=~\".*:partition.*\"})",
-          "legendFormat": "{{spring_batch_step_name}}"
+          "expr": "sum by (spring_batch_item_read_step_name) (spring_batch_item_read_seconds_count{spring_batch_item_read_step_name=~\".*:partition.*\"})",
+          "legendFormat": "{{spring_batch_item_read_step_name}}"
         }
       ],
       "options": {
