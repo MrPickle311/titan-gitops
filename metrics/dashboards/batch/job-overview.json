@@ -732,7 +732,7 @@
     },
     {
       "type": "timeseries",
-      "title": "2. Thread Pool / Worker Utilization",
+      "title": "2. Thread Pool / Worker Throughput",
       "datasource": {
         "uid": "prometheus"
       },
@@ -744,15 +744,12 @@
       },
       "targets": [
         {
-          "expr": "executor_active_threads{name=~\".*batch.*|.*partition.*|.*task.*\"}",
-          "legendFormat": "{{name}} (Active)"
-        },
-        {
-          "expr": "executor_queue_size{name=~\".*batch.*|.*partition.*|.*task.*\"}",
-          "legendFormat": "{{name}} (Queue)"
+          "expr": "rate(executor_completed_tasks_total{name=~\"taskExecutor|.*batch.*|.*partition.*\"}[1m])",
+          "legendFormat": "{{name}} (Completed Tasks / sec)"
         }
       ],
-      "id": 9
+      "id": 9,
+      "description": "Plots the rate of tasks completed by the thread pool. Active threads gauge is often 0 because jobs run too fast between Prometheus 30s scrapes."
     },
     {
       "type": "bargauge",
