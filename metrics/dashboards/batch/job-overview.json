@@ -709,11 +709,11 @@
       },
       "targets": [
         {
-          "expr": "sum(spring_batch_step_seconds_count{spring_batch_step_name=~\".*:partition.*\", status=\"COMPLETED\"}) or vector(0)",
+          "expr": "sum(spring_batch_step_seconds_count{spring_batch_step_name=~\".*:partition.*\", spring_batch_step_status=\"COMPLETED\"}) or vector(0)",
           "legendFormat": "COMPLETED"
         },
         {
-          "expr": "sum(spring_batch_step_seconds_count{spring_batch_step_name=~\".*:partition.*\", status=\"FAILED\"}) or vector(0)",
+          "expr": "sum(spring_batch_step_seconds_count{spring_batch_step_name=~\".*:partition.*\", spring_batch_step_status=\"FAILED\"}) or vector(0)",
           "legendFormat": "FAILED"
         }
       ],
