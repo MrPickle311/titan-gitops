@@ -28,7 +28,12 @@
         "type": "yesoreyeram-infinity-datasource",
         "uid": "infinity"
       },
-      "gridPos": { "h": 12, "w": 24, "x": 0, "y": 0 },
+      "gridPos": {
+        "h": 12,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
       "targets": [
         {
           "type": "json",
@@ -37,11 +42,29 @@
           "root_selector": "contexts.application.mappings.dispatcherServlets.dispatcherServlet",
           "format": "table",
           "columns": [
-            { "selector": "predicate", "text": "Route / Predicate", "type": "string" },
-            { "selector": "handler", "text": "Handler", "type": "string" },
-            { "selector": "details.handlerMethod.className", "text": "Class", "type": "string" },
-            { "selector": "details.handlerMethod.name", "text": "Method", "type": "string" }
-          ]
+            {
+              "selector": "predicate",
+              "text": "Route / Predicate",
+              "type": "string"
+            },
+            {
+              "selector": "handler",
+              "text": "Handler",
+              "type": "string"
+            },
+            {
+              "selector": "details.handlerMethod.className",
+              "text": "Class",
+              "type": "string"
+            },
+            {
+              "selector": "details.handlerMethod.name",
+              "text": "Method",
+              "type": "string"
+            }
+          ],
+          "refId": "A",
+          "parser": "backend"
         }
       ]
     },
@@ -52,14 +75,21 @@
         "type": "yesoreyeram-infinity-datasource",
         "uid": "infinity"
       },
-      "gridPos": { "h": 12, "w": 24, "x": 0, "y": 12 },
+      "gridPos": {
+        "h": 12,
+        "w": 24,
+        "x": 0,
+        "y": 12
+      },
       "targets": [
         {
-          "type": "uql",
+          "type": "json",
           "source": "url",
           "url": "$service_url/actuator/beans",
           "format": "table",
-          "uql": "parse-json\n| scope \"contexts.application.beans\"\n| kv\n| project \"Bean Name\"=key, \"Class\"=value.type, \"Scope\"=value.scope, \"Resource\"=value.resource"
+          "uql": "parse-json\n| scope \"contexts.application.beans\"\n| kv\n| project \"Bean Name\"=key, \"Class\"=value.type, \"Scope\"=value.scope, \"Resource\"=value.resource",
+          "refId": "A",
+          "parser": "uql"
         }
       ]
     },
@@ -70,14 +100,21 @@
         "type": "yesoreyeram-infinity-datasource",
         "uid": "infinity"
       },
-      "gridPos": { "h": 12, "w": 24, "x": 0, "y": 24 },
+      "gridPos": {
+        "h": 12,
+        "w": 24,
+        "x": 0,
+        "y": 24
+      },
       "targets": [
         {
-          "type": "uql",
+          "type": "json",
           "source": "url",
           "url": "$service_url/actuator/env",
           "format": "table",
-          "uql": "parse-json\n| scope \"propertySources\"\n| mv-expand \"properties\"\n| project \"Property Source\"=name, \"Properties\"=properties"
+          "uql": "parse-json\n| scope \"propertySources\"\n| mv-expand \"properties\"\n| project \"Property Source\"=name, \"Properties\"=properties",
+          "refId": "A",
+          "parser": "uql"
         }
       ]
     }
