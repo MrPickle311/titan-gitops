@@ -694,6 +694,94 @@
       ],
       "title": "Average Busy Threads",
       "type": "timeseries"
+    },
+    {
+      "type": "stat",
+      "title": "1. Partition Execution Status",
+      "datasource": {
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 45
+      },
+      "targets": [
+        {
+          "expr": "sum by (status) (spring_batch_step_seconds_count{spring_batch_step_name=~\".*:partition.*\"})",
+          "legendFormat": "{{status}}"
+        }
+      ],
+      "id": 8
+    },
+    {
+      "type": "timeseries",
+      "title": "2. Thread Pool / Worker Utilization",
+      "datasource": {
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 18,
+        "x": 6,
+        "y": 45
+      },
+      "targets": [
+        {
+          "expr": "executor_active_threads{name=~\".*batch.*|.*partition.*|.*task.*\"}",
+          "legendFormat": "{{name}} (Active)"
+        },
+        {
+          "expr": "executor_queue_size{name=~\".*batch.*|.*partition.*|.*task.*\"}",
+          "legendFormat": "{{name}} (Queue)"
+        }
+      ],
+      "id": 9
+    },
+    {
+      "type": "bargauge",
+      "title": "3. Data Skew & Distribution (Items Written)",
+      "datasource": {
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 53
+      },
+      "targets": [
+        {
+          "expr": "sum by (spring_batch_step_name) (spring_batch_item_write_seconds_count{spring_batch_step_name=~\".*:partition.*\"})",
+          "legendFormat": "{{spring_batch_step_name}}"
+        }
+      ],
+      "options": {
+        "displayMode": "gradient",
+        "orientation": "horizontal"
+      },
+      "id": 10
+    },
+    {
+      "type": "timeseries",
+      "title": "4. Partition Duration / Latency",
+      "datasource": {
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 53
+      },
+      "targets": [
+        {
+          "expr": "sum by (spring_batch_step_name) (rate(spring_batch_step_seconds_sum{spring_batch_step_name=~\".*:partition.*\"}[5m])) / sum by (spring_batch_step_name) (rate(spring_batch_step_seconds_count{spring_batch_step_name=~\".*:partition.*\"}[5m]))",
+          "legendFormat": "{{spring_batch_step_name}}"
+        }
+      ],
+      "id": 11
     }
   ],
   "schemaVersion": 39,
