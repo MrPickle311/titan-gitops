@@ -1,0 +1,85 @@
+{
+  "title": "Spring Boot Actuator UI",
+  "uid": "actuator-ui-infinity",
+  "timezone": "browser",
+  "schemaVersion": 36,
+  "refresh": "1m",
+  "templating": {
+    "list": [
+      {
+        "name": "service_url",
+        "type": "custom",
+        "query": "http://payment-service.applications.svc.cluster.local:8080,http://ledger-service.applications.svc.cluster.local:8082,http://wallet-service.applications.svc.cluster.local:8081,http://export-batch-service.applications.svc.cluster.local:8083",
+        "current": {
+          "text": "http://payment-service.applications.svc.cluster.local:8080",
+          "value": "http://payment-service.applications.svc.cluster.local:8080"
+        },
+        "hide": 0,
+        "includeAll": false,
+        "multi": false
+      }
+    ]
+  },
+  "panels": [
+    {
+      "type": "table",
+      "title": "API Mappings ($service_url)",
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "infinity"
+      },
+      "gridPos": { "h": 12, "w": 24, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "type": "json",
+          "source": "url",
+          "url": "$service_url/actuator/mappings",
+          "root_selector": "contexts.application.mappings.dispatcherServlets.dispatcherServlet",
+          "format": "table",
+          "columns": [
+            { "selector": "predicate", "text": "Route / Predicate", "type": "string" },
+            { "selector": "handler", "text": "Handler", "type": "string" },
+            { "selector": "details.handlerMethod.className", "text": "Class", "type": "string" },
+            { "selector": "details.handlerMethod.name", "text": "Method", "type": "string" }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "table",
+      "title": "Application Beans ($service_url)",
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "infinity"
+      },
+      "gridPos": { "h": 12, "w": 24, "x": 0, "y": 12 },
+      "targets": [
+        {
+          "type": "uql",
+          "source": "url",
+          "url": "$service_url/actuator/beans",
+          "format": "table",
+          "uql": "parse-json\n| scope \"contexts.application.beans\"\n| kv\n| project \"Bean Name\"=key, \"Class\"=value.type, \"Scope\"=value.scope, \"Resource\"=value.resource"
+        }
+      ]
+    },
+    {
+      "type": "table",
+      "title": "Environment Variables ($service_url)",
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "infinity"
+      },
+      "gridPos": { "h": 12, "w": 24, "x": 0, "y": 24 },
+      "targets": [
+        {
+          "type": "uql",
+          "source": "url",
+          "url": "$service_url/actuator/env",
+          "format": "table",
+          "uql": "parse-json\n| scope \"propertySources\"\n| mv-expand \"properties\"\n| project \"Property Source\"=name, \"Properties\"=properties"
+        }
+      ]
+    }
+  ]
+}
