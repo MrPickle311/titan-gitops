@@ -10,7 +10,7 @@ spec:
   source:
     repoURL: 'https://github.com/MrPickle311/titan-gitops.git'
     targetRevision: HEAD
-    path: infra
+    path: bootstrap
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: argocd
