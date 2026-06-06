@@ -1,32 +1,80 @@
 {
-  "title": "Spring Boot Actuator UI",
-  "uid": "actuator-ui-infinity",
-  "timezone": "browser",
-  "schemaVersion": 36,
-  "refresh": "1m",
-  "templating": {
+  "annotations": {
     "list": [
       {
-        "name": "service_url",
-        "type": "custom",
-        "query": "http://payment-service.applications.svc.cluster.local:8080,http://ledger-service.applications.svc.cluster.local:8082,http://wallet-service.applications.svc.cluster.local:8081,http://export-batch-service.applications.svc.cluster.local:8083",
-        "current": {
-          "text": "http://export-batch-service.applications.svc.cluster.local:8083",
-          "value": "http://export-batch-service.applications.svc.cluster.local:8083"
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
         },
-        "hide": 0,
-        "includeAll": false,
-        "multi": false
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
       }
     ]
   },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 813,
+  "links": [],
   "panels": [
     {
-      "type": "table",
-      "title": "API Mappings ($service_url)",
       "datasource": {
         "type": "yesoreyeram-infinity-datasource",
         "uid": "infinity"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Class"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 173
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Handler"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 606
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 12,
@@ -34,19 +82,23 @@
         "x": 0,
         "y": 0
       },
+      "id": 1,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true,
+        "sortBy": []
+      },
+      "pluginVersion": "11.6.15",
       "targets": [
         {
-          "refId": "A",
-          "datasource": {
-            "type": "yesoreyeram-infinity-datasource",
-            "uid": "infinity"
-          },
-          "type": "json",
-          "parser": "JSONata",
-          "source": "url",
-          "format": "table",
-          "url": "$service_url/actuator/mappings",
-          "root_selector": "contexts.*.mappings.dispatcherServlets.dispatcherServlet",
           "columns": [
             {
               "selector": "predicate",
@@ -63,16 +115,58 @@
               "text": "Class",
               "type": "string"
             }
-          ]
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "infinity"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "backend",
+          "refId": "A",
+          "root_selector": "contexts.*.mappings.dispatcherServlets.dispatcherServlet",
+          "source": "url",
+          "type": "json",
+          "url": "$service_url/actuator/mappings",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
         }
-      ]
+      ],
+      "title": "API Mappings ($service_url)",
+      "type": "table"
     },
     {
-      "type": "table",
-      "title": "Application Beans ($service_url)",
       "datasource": {
         "type": "yesoreyeram-infinity-datasource",
         "uid": "infinity"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
       },
       "gridPos": {
         "h": 12,
@@ -80,19 +174,22 @@
         "x": 0,
         "y": 12
       },
+      "id": 2,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "11.6.15",
       "targets": [
         {
-          "refId": "A",
-          "datasource": {
-            "type": "yesoreyeram-infinity-datasource",
-            "uid": "infinity"
-          },
-          "type": "json",
-          "parser": "JSONata",
-          "source": "url",
-          "format": "table",
-          "url": "$service_url/actuator/beans",
-          "root_selector": "$each(contexts.*.beans, function($v, $k) { { 'Bean Name': $k, 'Class': $v.type, 'Scope': $v.scope, 'Resource': $v.resource } })",
           "columns": [
             {
               "selector": "Bean Name",
@@ -114,16 +211,52 @@
               "text": "Resource",
               "type": "string"
             }
-          ]
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "infinity"
+          },
+          "format": "table",
+          "parser": "JSONata",
+          "refId": "A",
+          "root_selector": "$each(contexts.*.beans, function($v, $k) { { 'Bean Name': $k, 'Class': $v.type, 'Scope': $v.scope, 'Resource': $v.resource } })",
+          "source": "url",
+          "type": "json",
+          "url": "$service_url/actuator/beans"
         }
-      ]
+      ],
+      "title": "Application Beans ($service_url)",
+      "type": "table"
     },
     {
-      "type": "table",
-      "title": "Environment Variables ($service_url)",
       "datasource": {
         "type": "yesoreyeram-infinity-datasource",
         "uid": "infinity"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
       },
       "gridPos": {
         "h": 12,
@@ -131,19 +264,22 @@
         "x": 0,
         "y": 24
       },
+      "id": 3,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "11.6.15",
       "targets": [
         {
-          "refId": "A",
-          "datasource": {
-            "type": "yesoreyeram-infinity-datasource",
-            "uid": "infinity"
-          },
-          "type": "json",
-          "parser": "JSONata",
-          "source": "url",
-          "format": "table",
-          "url": "$service_url/actuator/env",
-          "root_selector": "propertySources.($name := name; $each(properties, function($v, $k) { { 'Property Source': $name, 'Property': $k, 'Value': $v.value } }))",
           "columns": [
             {
               "selector": "Property Source",
@@ -160,9 +296,45 @@
               "text": "Value",
               "type": "string"
             }
-          ]
+          ],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "infinity"
+          },
+          "format": "table",
+          "parser": "JSONata",
+          "refId": "A",
+          "root_selector": "propertySources.($name := name; $each(properties, function($v, $k) { { 'Property Source': $name, 'Property': $k, 'Value': $v.value } }))",
+          "source": "url",
+          "type": "json",
+          "url": "$service_url/actuator/env"
         }
-      ]
+      ],
+      "title": "Environment Variables ($service_url)",
+      "type": "table"
     }
-  ]
+  ],
+  "preload": false,
+  "refresh": "1m",
+  "schemaVersion": 41,
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "text": "http://export-batch-service.applications.svc.cluster.local:8083",
+          "value": "http://export-batch-service.applications.svc.cluster.local:8083"
+        },
+        "includeAll": false,
+        "name": "service_url",
+        "query": "http://payment-service.applications.svc.cluster.local:8080,http://ledger-service.applications.svc.cluster.local:8082,http://wallet-service.applications.svc.cluster.local:8081,http://export-batch-service.applications.svc.cluster.local:8083",
+        "type": "custom"
+      }
+    ]
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Spring Boot Actuator UI",
+  "uid": "actuator-ui-infinity",
+  "version": 7
 }
