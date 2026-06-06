@@ -42,7 +42,7 @@
             "uid": "infinity"
           },
           "type": "json",
-          "parser": "jsonata",
+          "parser": "JSONata",
           "source": "url",
           "format": "table",
           "url": "$service_url/actuator/mappings",
@@ -88,7 +88,7 @@
             "uid": "infinity"
           },
           "type": "json",
-          "parser": "jsonata",
+          "parser": "JSONata",
           "source": "url",
           "format": "table",
           "url": "$service_url/actuator/beans",
@@ -139,7 +139,7 @@
             "uid": "infinity"
           },
           "type": "json",
-          "parser": "jsonata",
+          "parser": "JSONata",
           "source": "url",
           "format": "table",
           "url": "$service_url/actuator/env",
