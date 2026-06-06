@@ -20,7 +20,6 @@ spec:
               directory: /var/lib/pyroscope
           limits:
             ingest_max_jfr_decompressed_size: 33554432
-          # Ograniczamy zużycie RAMu na potrzeby homelaba
           resources:
             requests:
               cpu: 100m
@@ -30,7 +29,6 @@ spec:
               memory: 512Mi
   destination:
     server: 'https://kubernetes.default.svc'
-    # Wdrażamy tam gdzie resztę stosu Grafany
     namespace: monitoring
   syncPolicy:
     automated:
