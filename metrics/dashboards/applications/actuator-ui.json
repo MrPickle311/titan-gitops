@@ -37,12 +37,33 @@
       "targets": [
         {
           "refId": "A",
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "infinity"
+          },
           "type": "json",
-          "parser": "uql",
+          "parser": "jsonata",
           "source": "url",
-          "url": "$service_url/actuator/mappings",
           "format": "table",
-          "uql": "parse-json\n| scope \"contexts.application.mappings.dispatcherServlets.dispatcherServlet\"\n| project \"Route\"=predicate, \"Handler\"=handler, \"Class\"=details.handlerMethod.className"
+          "url": "$service_url/actuator/mappings",
+          "root_selector": "contexts.*.mappings.dispatcherServlets.dispatcherServlet",
+          "columns": [
+            {
+              "selector": "predicate",
+              "text": "Route",
+              "type": "string"
+            },
+            {
+              "selector": "handler",
+              "text": "Handler",
+              "type": "string"
+            },
+            {
+              "selector": "details.handlerMethod.className",
+              "text": "Class",
+              "type": "string"
+            }
+          ]
         }
       ]
     },
@@ -62,12 +83,38 @@
       "targets": [
         {
           "refId": "A",
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "infinity"
+          },
           "type": "json",
-          "parser": "uql",
+          "parser": "jsonata",
           "source": "url",
-          "url": "$service_url/actuator/beans",
           "format": "table",
-          "uql": "parse-json\n| scope \"contexts.application.beans\"\n| kv\n| project \"Bean Name\"=key, \"Class\"=value.type, \"Scope\"=value.scope, \"Resource\"=value.resource"
+          "url": "$service_url/actuator/beans",
+          "root_selector": "$each(contexts.*.beans, function($v, $k) { { 'Bean Name': $k, 'Class': $v.type, 'Scope': $v.scope, 'Resource': $v.resource } })",
+          "columns": [
+            {
+              "selector": "Bean Name",
+              "text": "Bean Name",
+              "type": "string"
+            },
+            {
+              "selector": "Class",
+              "text": "Class",
+              "type": "string"
+            },
+            {
+              "selector": "Scope",
+              "text": "Scope",
+              "type": "string"
+            },
+            {
+              "selector": "Resource",
+              "text": "Resource",
+              "type": "string"
+            }
+          ]
         }
       ]
     },
@@ -87,12 +134,33 @@
       "targets": [
         {
           "refId": "A",
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "infinity"
+          },
           "type": "json",
-          "parser": "uql",
+          "parser": "jsonata",
           "source": "url",
-          "url": "$service_url/actuator/env",
           "format": "table",
-          "uql": "parse-json\n| scope \"propertySources\"\n| mv-expand \"properties\"\n| project \"Property Source\"=name, \"Properties\"=properties"
+          "url": "$service_url/actuator/env",
+          "root_selector": "propertySources.($name := name; $each(properties, function($v, $k) { { 'Property Source': $name, 'Property': $k, 'Value': $v.value } }))",
+          "columns": [
+            {
+              "selector": "Property Source",
+              "text": "Property Source",
+              "type": "string"
+            },
+            {
+              "selector": "Property",
+              "text": "Property",
+              "type": "string"
+            },
+            {
+              "selector": "Value",
+              "text": "Value",
+              "type": "string"
+            }
+          ]
         }
       ]
     }
