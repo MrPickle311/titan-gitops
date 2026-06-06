@@ -70,7 +70,7 @@
             "properties": [
               {
                 "id": "custom.width",
-                "value": 606
+                "value": 392
               }
             ]
           }
@@ -216,13 +216,19 @@
             "type": "yesoreyeram-infinity-datasource",
             "uid": "infinity"
           },
+          "filters": [],
           "format": "table",
-          "parser": "JSONata",
+          "global_query_id": "",
+          "parser": "backend",
           "refId": "A",
           "root_selector": "$each(contexts.*.beans, function($v, $k) { { 'Bean Name': $k, 'Class': $v.type, 'Scope': $v.scope, 'Resource': $v.resource } })",
           "source": "url",
           "type": "json",
-          "url": "$service_url/actuator/beans"
+          "url": "$service_url/actuator/beans",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
         }
       ],
       "title": "Application Beans ($service_url)",
@@ -336,5 +342,5 @@
   "timezone": "browser",
   "title": "Spring Boot Actuator UI",
   "uid": "actuator-ui-infinity",
-  "version": 7
+  "version": 8
 }
