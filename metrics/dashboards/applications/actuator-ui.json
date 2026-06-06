@@ -4,13 +4,29 @@
   "timezone": "browser",
   "schemaVersion": 36,
   "refresh": "1m",
+  "templating": {
+    "list": [
+      {
+        "name": "service_url",
+        "type": "custom",
+        "query": "http://payment-service.applications.svc.cluster.local:8080,http://ledger-service.applications.svc.cluster.local:8082,http://wallet-service.applications.svc.cluster.local:8081,http://export-batch-service.applications.svc.cluster.local:8083",
+        "current": {
+          "text": "http://export-batch-service.applications.svc.cluster.local:8083",
+          "value": "http://export-batch-service.applications.svc.cluster.local:8083"
+        },
+        "hide": 0,
+        "includeAll": false,
+        "multi": false
+      }
+    ]
+  },
   "panels": [
     {
       "type": "table",
-      "title": "API Mappings",
+      "title": "API Mappings ($service_url)",
       "datasource": {
-        "type": "marcusolsson-json-datasource",
-        "uid": "json-api-export-batch"
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "infinity"
       },
       "gridPos": {
         "h": 12,
@@ -21,32 +37,26 @@
       "targets": [
         {
           "refId": "A",
-          "datasource": {
-            "type": "marcusolsson-json-datasource",
-            "uid": "json-api-export-batch"
-          },
-          "urlPath": "/actuator/mappings",
-          "method": "GET",
-          "jsonPath": "$.contexts.application.mappings.dispatcherServlets.dispatcherServlet[*]",
-          "fields": [
+          "type": "json",
+          "parser": "backend",
+          "source": "url",
+          "url": "$service_url/actuator/mappings",
+          "root_selector": "contexts.application.mappings.dispatcherServlets.dispatcherServlet",
+          "format": "table",
+          "columns": [
             {
-              "jsonPath": "$.predicate",
-              "name": "Route",
+              "selector": "predicate",
+              "text": "Route",
               "type": "string"
             },
             {
-              "jsonPath": "$.handler",
-              "name": "Handler",
+              "selector": "handler",
+              "text": "Handler",
               "type": "string"
             },
             {
-              "jsonPath": "$.details.handlerMethod.className",
-              "name": "Class",
-              "type": "string"
-            },
-            {
-              "jsonPath": "$.details.handlerMethod.name",
-              "name": "Method",
+              "selector": "details.handlerMethod.className",
+              "text": "Class",
               "type": "string"
             }
           ]
@@ -55,10 +65,10 @@
     },
     {
       "type": "table",
-      "title": "Application Beans",
+      "title": "Application Beans ($service_url)",
       "datasource": {
-        "type": "marcusolsson-json-datasource",
-        "uid": "json-api-export-batch"
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "infinity"
       },
       "gridPos": {
         "h": 12,
@@ -69,39 +79,21 @@
       "targets": [
         {
           "refId": "A",
-          "datasource": {
-            "type": "marcusolsson-json-datasource",
-            "uid": "json-api-export-batch"
-          },
-          "urlPath": "/actuator/beans",
-          "method": "GET",
-          "jsonPath": "$.contexts.application.beans.*",
-          "fields": [
-            {
-              "jsonPath": "$.type",
-              "name": "Class",
-              "type": "string"
-            },
-            {
-              "jsonPath": "$.scope",
-              "name": "Scope",
-              "type": "string"
-            },
-            {
-              "jsonPath": "$.resource",
-              "name": "Resource",
-              "type": "string"
-            }
-          ]
+          "type": "json",
+          "parser": "uql",
+          "source": "url",
+          "url": "$service_url/actuator/beans",
+          "format": "table",
+          "uql": "parse-json\n| scope \"contexts.application.beans\"\n| kv\n| project \"Bean Name\"=key, \"Class\"=value.type, \"Scope\"=value.scope, \"Resource\"=value.resource"
         }
       ]
     },
     {
       "type": "table",
-      "title": "Environment Variables",
+      "title": "Environment Variables ($service_url)",
       "datasource": {
-        "type": "marcusolsson-json-datasource",
-        "uid": "json-api-export-batch"
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "infinity"
       },
       "gridPos": {
         "h": 12,
@@ -112,20 +104,12 @@
       "targets": [
         {
           "refId": "A",
-          "datasource": {
-            "type": "marcusolsson-json-datasource",
-            "uid": "json-api-export-batch"
-          },
-          "urlPath": "/actuator/env",
-          "method": "GET",
-          "jsonPath": "$.propertySources[*]",
-          "fields": [
-            {
-              "jsonPath": "$.name",
-              "name": "Property Source",
-              "type": "string"
-            }
-          ]
+          "type": "json",
+          "parser": "uql",
+          "source": "url",
+          "url": "$service_url/actuator/env",
+          "format": "table",
+          "uql": "parse-json\n| scope \"propertySources\"\n| mv-expand \"properties\"\n| project \"Property Source\"=name, \"Properties\"=properties"
         }
       ]
     }
