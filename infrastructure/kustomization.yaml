@@ -4,7 +4,4 @@ kind: Kustomization
 resources:
   - applications-namespace.yaml
   - cluster-config.yaml
-  - docker-storage.yaml
-  - metallb-config.yaml
-  - homepage/homepage.yaml
 
