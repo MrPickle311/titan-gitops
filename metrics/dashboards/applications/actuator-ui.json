@@ -38,28 +38,11 @@
         {
           "refId": "A",
           "type": "json",
-          "parser": "backend",
+          "parser": "uql",
           "source": "url",
           "url": "$service_url/actuator/mappings",
-          "root_selector": "contexts.application.mappings.dispatcherServlets.dispatcherServlet",
           "format": "table",
-          "columns": [
-            {
-              "selector": "predicate",
-              "text": "Route",
-              "type": "string"
-            },
-            {
-              "selector": "handler",
-              "text": "Handler",
-              "type": "string"
-            },
-            {
-              "selector": "details.handlerMethod.className",
-              "text": "Class",
-              "type": "string"
-            }
-          ]
+          "uql": "parse-json\n| scope \"contexts.application.mappings.dispatcherServlets.dispatcherServlet\"\n| project \"Route\"=predicate, \"Handler\"=handler, \"Class\"=details.handlerMethod.className"
         }
       ]
     },
