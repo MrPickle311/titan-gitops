@@ -22,6 +22,8 @@ spec:
         ports:
         - containerPort: 8084
         env:
+        - name: MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE
+          value: "*"
         - name: MANAGEMENT_ENDPOINT_ENV_SHOW_VALUES
           value: "ALWAYS"
         - name: SERVER_PORT

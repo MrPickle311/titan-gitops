@@ -45,6 +45,8 @@ spec:
             mountPath: /agent
             
         env:
+        - name: MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE
+          value: "*"
         - name: MANAGEMENT_ENDPOINT_ENV_SHOW_VALUES
           value: "ALWAYS"
         # MAGICZNA FLAGA JAVY: Automatycznie podpina agenta OpenTelemetry przy starcie
