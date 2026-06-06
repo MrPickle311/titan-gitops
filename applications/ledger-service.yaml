@@ -45,6 +45,8 @@ spec:
             mountPath: /agent
             
         env:
+        - name: MANAGEMENT_ENDPOINT_ENV_SHOW_VALUES
+          value: "ALWAYS"
         # MAGICZNA FLAGA JAVY: Automatycznie podpina agenta OpenTelemetry przy starcie
         - name: JAVA_TOOL_OPTIONS
           value: "-javaagent:/agent/pyroscope.jar -javaagent:/agent/opentelemetry-javaagent.jar"

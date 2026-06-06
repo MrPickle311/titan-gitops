@@ -35,6 +35,8 @@ spec:
           - name: pyroscope-agent
             mountPath: /agent
         env:
+        - name: MANAGEMENT_ENDPOINT_ENV_SHOW_VALUES
+          value: "ALWAYS"
         - name: JAVA_TOOL_OPTIONS
           value: "-javaagent:/agent/pyroscope.jar -javaagent:/agent/opentelemetry-javaagent.jar"
         - name: OTEL_SERVICE_NAME
