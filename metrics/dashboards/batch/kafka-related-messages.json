@@ -25,7 +25,7 @@
       "datasource": {
         "default": false,
         "type": "hamedkarbasi93-kafka-datasource",
-        "uid": "cfjgip9wf394wc"
+        "uid": "kafka-datasource"
       },
       "fieldConfig": {
         "defaults": {
@@ -82,7 +82,7 @@
           "avroSchemaSource": "schemaRegistry",
           "datasource": {
             "type": "hamedkarbasi93-kafka-datasource",
-            "uid": "cfjgip9wf394wc"
+            "uid": "kafka-datasource"
           },
           "keyFormat": "string",
           "lastN": 1000,
