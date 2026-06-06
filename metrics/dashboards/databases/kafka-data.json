@@ -18,14 +18,13 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 202,
+  "id": 1016,
   "links": [],
   "panels": [
     {
       "datasource": {
-        "default": false,
         "type": "hamedkarbasi93-kafka-datasource",
-        "uid": "cfjgip9wf394wc"
+        "uid": "kafka-datasource"
       },
       "fieldConfig": {
         "defaults": {
@@ -41,8 +40,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -72,17 +70,17 @@
         },
         "showHeader": true
       },
-      "pluginVersion": "11.2.0",
+      "pluginVersion": "11.6.15",
       "targets": [
         {
           "autoOffsetReset": "lastN",
           "avroSchemaSource": "schemaRegistry",
           "datasource": {
             "type": "hamedkarbasi93-kafka-datasource",
-            "uid": "cfjgip9wf394wc"
+            "uid": "kafka-datasource"
           },
-          "keyFormat": "string",
-          "lastN": 10,
+          "keyFormat": "none",
+          "lastN": 100,
           "messageFormat": "json",
           "partition": "all",
           "protobufSchemaSource": "schemaRegistry",
@@ -95,7 +93,8 @@
       "type": "table"
     }
   ],
-  "schemaVersion": 39,
+  "preload": false,
+  "schemaVersion": 41,
   "tags": [],
   "templating": {
     "list": []
@@ -108,6 +107,5 @@
   "timezone": "browser",
   "title": "Kafka data",
   "uid": "ffjgjd9hju2o0f",
-  "version": 4,
-  "weekStart": ""
+  "version": 1
 }
