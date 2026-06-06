@@ -4,25 +4,13 @@
   "timezone": "browser",
   "schemaVersion": 36,
   "refresh": "1m",
-  "templating": {
-    "list": [
-      {
-        "name": "service_ds",
-        "type": "datasource",
-        "query": "marcusolsson-json-datasource",
-        "regex": "JSON API - .*",
-        "includeAll": false,
-        "multi": false
-      }
-    ]
-  },
   "panels": [
     {
       "type": "table",
-      "title": "API Mappings ($service_ds)",
+      "title": "API Mappings",
       "datasource": {
         "type": "marcusolsson-json-datasource",
-        "uid": "$service_ds"
+        "uid": "json-api-export-batch"
       },
       "gridPos": {
         "h": 12,
@@ -35,7 +23,7 @@
           "refId": "A",
           "datasource": {
             "type": "marcusolsson-json-datasource",
-            "uid": "$service_ds"
+            "uid": "json-api-export-batch"
           },
           "urlPath": "/actuator/mappings",
           "method": "GET",
@@ -67,10 +55,10 @@
     },
     {
       "type": "table",
-      "title": "Application Beans ($service_ds)",
+      "title": "Application Beans",
       "datasource": {
         "type": "marcusolsson-json-datasource",
-        "uid": "$service_ds"
+        "uid": "json-api-export-batch"
       },
       "gridPos": {
         "h": 12,
@@ -83,7 +71,7 @@
           "refId": "A",
           "datasource": {
             "type": "marcusolsson-json-datasource",
-            "uid": "$service_ds"
+            "uid": "json-api-export-batch"
           },
           "urlPath": "/actuator/beans",
           "method": "GET",
@@ -110,10 +98,10 @@
     },
     {
       "type": "table",
-      "title": "Environment Variables ($service_ds)",
+      "title": "Environment Variables",
       "datasource": {
         "type": "marcusolsson-json-datasource",
-        "uid": "$service_ds"
+        "uid": "json-api-export-batch"
       },
       "gridPos": {
         "h": 12,
@@ -126,7 +114,7 @@
           "refId": "A",
           "datasource": {
             "type": "marcusolsson-json-datasource",
-            "uid": "$service_ds"
+            "uid": "json-api-export-batch"
           },
           "urlPath": "/actuator/env",
           "method": "GET",
