@@ -5,7 +5,6 @@ resources:
   - applications-namespace.yaml
   - cluster-config.yaml
   - docker-storage.yaml
-  - kafka-ui.yaml
   - metallb-config.yaml
   - homepage/homepage.yaml
 
