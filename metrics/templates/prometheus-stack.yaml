@@ -14,6 +14,8 @@ spec:
     helm:
       values: |
         grafana:
+          image:
+            tag: 11.1.5
           plugins:
             - marcusolsson-json-datasource
           admin:
