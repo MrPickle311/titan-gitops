@@ -15,7 +15,7 @@ spec:
       values: |
         grafana:
           image:
-            tag: 10.4.5
+            tag: 11.6.15
           plugins:
             - yesoreyeram-infinity-datasource
           admin:
