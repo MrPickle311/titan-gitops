@@ -15,7 +15,7 @@ spec:
       values: |
         grafana:
           plugins:
-            - yesoreyeram-infinity-datasource
+            - marcusolsson-json-datasource
           admin:
             existingSecret: "grafana-credentials"
             userKey: admin-user
@@ -44,9 +44,25 @@ spec:
                 foldersFromFilesStructure: true
 
           additionalDataSources:
-            - name: Infinity
-              type: yesoreyeram-infinity-datasource
-              uid: infinity
+            - name: JSON API - Payment
+              type: marcusolsson-json-datasource
+              uid: json-api-payment
+              url: http://payment-service.applications.svc.cluster.local:8080
+              access: proxy
+            - name: JSON API - Ledger
+              type: marcusolsson-json-datasource
+              uid: json-api-ledger
+              url: http://ledger-service.applications.svc.cluster.local:8082
+              access: proxy
+            - name: JSON API - Wallet
+              type: marcusolsson-json-datasource
+              uid: json-api-wallet
+              url: http://wallet-service.applications.svc.cluster.local:8081
+              access: proxy
+            - name: JSON API - Export Batch
+              type: marcusolsson-json-datasource
+              uid: json-api-export-batch
+              url: http://export-batch-service.applications.svc.cluster.local:8083
               access: proxy
             - name: Pyroscope
               type: pyroscope

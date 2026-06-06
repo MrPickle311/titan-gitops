@@ -1,20 +1,16 @@
 {
   "title": "Spring Boot Actuator UI",
-  "uid": "actuator-ui-infinity",
+  "uid": "actuator-ui",
   "timezone": "browser",
   "schemaVersion": 36,
   "refresh": "1m",
   "templating": {
     "list": [
       {
-        "name": "service_url",
-        "type": "custom",
-        "query": "http://payment-service.applications.svc.cluster.local:8080,http://ledger-service.applications.svc.cluster.local:8082,http://wallet-service.applications.svc.cluster.local:8081,http://export-batch-service.applications.svc.cluster.local:8083",
-        "current": {
-          "text": "http://payment-service.applications.svc.cluster.local:8080",
-          "value": "http://payment-service.applications.svc.cluster.local:8080"
-        },
-        "hide": 0,
+        "name": "service_ds",
+        "type": "datasource",
+        "query": "marcusolsson-json-datasource",
+        "regex": "JSON API - .*",
         "includeAll": false,
         "multi": false
       }
@@ -23,10 +19,10 @@
   "panels": [
     {
       "type": "table",
-      "title": "API Mappings ($service_url)",
+      "title": "API Mappings ($service_ds)",
       "datasource": {
-        "type": "yesoreyeram-infinity-datasource",
-        "uid": "infinity"
+        "type": "marcusolsson-json-datasource",
+        "uid": "$service_ds"
       },
       "gridPos": {
         "h": 12,
@@ -36,44 +32,45 @@
       },
       "targets": [
         {
-          "type": "json",
-          "source": "url",
-          "url": "$service_url/actuator/mappings",
-          "root_selector": "contexts.application.mappings.dispatcherServlets.dispatcherServlet",
-          "format": "table",
-          "columns": [
+          "refId": "A",
+          "datasource": {
+            "type": "marcusolsson-json-datasource",
+            "uid": "$service_ds"
+          },
+          "urlPath": "/actuator/mappings",
+          "method": "GET",
+          "jsonPath": "$.contexts.application.mappings.dispatcherServlets.dispatcherServlet[*]",
+          "fields": [
             {
-              "selector": "predicate",
-              "text": "Route / Predicate",
+              "jsonPath": "$.predicate",
+              "name": "Route",
               "type": "string"
             },
             {
-              "selector": "handler",
-              "text": "Handler",
+              "jsonPath": "$.handler",
+              "name": "Handler",
               "type": "string"
             },
             {
-              "selector": "details.handlerMethod.className",
-              "text": "Class",
+              "jsonPath": "$.details.handlerMethod.className",
+              "name": "Class",
               "type": "string"
             },
             {
-              "selector": "details.handlerMethod.name",
-              "text": "Method",
+              "jsonPath": "$.details.handlerMethod.name",
+              "name": "Method",
               "type": "string"
             }
-          ],
-          "refId": "A",
-          "parser": "backend"
+          ]
         }
       ]
     },
     {
       "type": "table",
-      "title": "Application Beans ($service_url)",
+      "title": "Application Beans ($service_ds)",
       "datasource": {
-        "type": "yesoreyeram-infinity-datasource",
-        "uid": "infinity"
+        "type": "marcusolsson-json-datasource",
+        "uid": "$service_ds"
       },
       "gridPos": {
         "h": 12,
@@ -83,22 +80,40 @@
       },
       "targets": [
         {
-          "type": "json",
-          "source": "url",
-          "url": "$service_url/actuator/beans",
-          "format": "table",
-          "uql": "parse-json\n| scope \"contexts.application.beans\"\n| kv\n| project \"Bean Name\"=key, \"Class\"=value.type, \"Scope\"=value.scope, \"Resource\"=value.resource",
           "refId": "A",
-          "parser": "uql"
+          "datasource": {
+            "type": "marcusolsson-json-datasource",
+            "uid": "$service_ds"
+          },
+          "urlPath": "/actuator/beans",
+          "method": "GET",
+          "jsonPath": "$.contexts.application.beans.*",
+          "fields": [
+            {
+              "jsonPath": "$.type",
+              "name": "Class",
+              "type": "string"
+            },
+            {
+              "jsonPath": "$.scope",
+              "name": "Scope",
+              "type": "string"
+            },
+            {
+              "jsonPath": "$.resource",
+              "name": "Resource",
+              "type": "string"
+            }
+          ]
         }
       ]
     },
     {
       "type": "table",
-      "title": "Environment Variables ($service_url)",
+      "title": "Environment Variables ($service_ds)",
       "datasource": {
-        "type": "yesoreyeram-infinity-datasource",
-        "uid": "infinity"
+        "type": "marcusolsson-json-datasource",
+        "uid": "$service_ds"
       },
       "gridPos": {
         "h": 12,
@@ -108,13 +123,21 @@
       },
       "targets": [
         {
-          "type": "json",
-          "source": "url",
-          "url": "$service_url/actuator/env",
-          "format": "table",
-          "uql": "parse-json\n| scope \"propertySources\"\n| mv-expand \"properties\"\n| project \"Property Source\"=name, \"Properties\"=properties",
           "refId": "A",
-          "parser": "uql"
+          "datasource": {
+            "type": "marcusolsson-json-datasource",
+            "uid": "$service_ds"
+          },
+          "urlPath": "/actuator/env",
+          "method": "GET",
+          "jsonPath": "$.propertySources[*]",
+          "fields": [
+            {
+              "jsonPath": "$.name",
+              "name": "Property Source",
+              "type": "string"
+            }
+          ]
         }
       ]
     }
