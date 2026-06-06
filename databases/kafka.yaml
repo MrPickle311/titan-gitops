@@ -9,14 +9,12 @@ spec:
   project: default
   source:
     repoURL: 'https://charts.bitnami.com/bitnami'
-    # Cofamy chart do linii 31.x, zanim wprowadzono domyślnie Kafkę 4.0
     targetRevision: 31.0.0
     chart: kafka
     helm:
       values: |
         image:
           repository: bitnamilegacy/kafka
-          # Używamy stabilnej Kafki 3.9.0. Confluent nie obsługuje jeszcze 4.0.0!
           tag: 3.9.0-debian-12-r0
         
         kraft:
@@ -24,7 +22,6 @@ spec:
         zookeeper:
           enabled: false
         
-        # Wymuszenie PLAINTEXT dla kompatybilności ze Schema Registry
         listeners:
           client:
             protocol: PLAINTEXT
@@ -63,7 +60,6 @@ spec:
         metrics:
           jmx:
             enabled: true
-            # FIX: Wskazujemy na archiwum Bitnami dla usuniętego tagu r9
             image:
               repository: bitnamilegacy/jmx-exporter
               tag: 1.0.1-debian-12-r9

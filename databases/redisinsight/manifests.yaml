@@ -20,7 +20,10 @@ spec:
         - containerPort: 5540
         env:
         - name: RI_ENCRYPTION_KEY
-          value: "randomencryptionkey1234567890"
+          valueFrom:
+            secretKeyRef:
+              name: redisinsight-credentials
+              key: encryption-key
         - name: RI_ACCEPT_TERMS_AND_CONDITIONS
           value: "true"
         - name: REDIS_PASSWORD

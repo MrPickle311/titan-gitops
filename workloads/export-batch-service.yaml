@@ -68,7 +68,6 @@ spec:
           value: "http://mock-regulatory-service:8084/api/v1/regulatory/report"
         - name: MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE
           value: "*"
-
 ---
 apiVersion: v1
 kind: Service

@@ -15,12 +15,9 @@ spec:
       labels:
         app: wallet-service
     spec:
-      # WSPÓŁDZIELONY WOLUMEN W PAMIĘCI
       volumes:
         - name: pyroscope-agent
           emptyDir: {}
-          
-      # INIT CONTAINER: Pobiera agenta OTel i rozszerzenie Pyroscope
       initContainers:
         - name: fetch-otel-pyroscope
           image: busybox:latest
@@ -31,29 +28,22 @@ spec:
           volumeMounts:
             - name: pyroscope-agent
               mountPath: /agent
-
       containers:
       - name: wallet-service
         image: registry.homelab/wallet-service:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 8081
-        
-        # PODPIĘCIE AGENTA DO GŁÓWNEGO KONTENERA
         volumeMounts:
           - name: pyroscope-agent
             mountPath: /agent
-            
         env:
         - name: MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE
           value: "*"
         - name: MANAGEMENT_ENDPOINT_ENV_SHOW_VALUES
           value: "ALWAYS"
-        # MAGICZNA FLAGA JAVY: Automatycznie podpina agenta OpenTelemetry przy starcie
         - name: JAVA_TOOL_OPTIONS
           value: "-javaagent:/agent/pyroscope.jar -javaagent:/agent/opentelemetry-javaagent.jar"
-          
-        # ROZSZERZENIE PYROSCOPE DLA OPENTELEMETRY I KONFIGURACJA
         - name: OTEL_JAVAAGENT_EXTENSIONS
           value: "/agent/pyroscope-otel.jar"
         - name: OTEL_PYROSCOPE_START_PROFILING
@@ -104,7 +94,6 @@ spec:
               fieldPath: metadata.name
         - name: PYROSCOPE_LABELS
           value: "pod=$(POD_NAME),service_name=wallet-service"
-          
         - name: SPRING_DATASOURCE_URL
           value: jdbc:postgresql://postgres-postgresql.databases.svc.cluster.local:5432/titan_db
         - name: SPRING_DATASOURCE_USERNAME

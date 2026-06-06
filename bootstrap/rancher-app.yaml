@@ -12,9 +12,13 @@ spec:
     targetRevision: 2.14.2
     chart: rancher
     helm:
+      valuesFrom:
+        - kind: Secret
+          name: rancher-credentials
+          valuesKey: bootstrapPassword
+          targetPath: bootstrapPassword
       values: |
         hostname: rancher.homelab
-        bootstrapPassword: admin
         ingress:
           ingressClassName: nginx
           tls:

@@ -64,9 +64,15 @@ spec:
         - containerPort: 80
         env:
         - name: PGADMIN_DEFAULT_EMAIL
-          value: "admin@example.com"
+          valueFrom:
+            secretKeyRef:
+              name: pgadmin-credentials
+              key: admin-email
         - name: PGADMIN_DEFAULT_PASSWORD
-          value: "admin"
+          valueFrom:
+            secretKeyRef:
+              name: pgadmin-credentials
+              key: admin-password
         - name: PGADMIN_CONFIG_X_FRAME_OPTIONS
           value: "''"
         - name: PGADMIN_SERVER_JSON_FILE
