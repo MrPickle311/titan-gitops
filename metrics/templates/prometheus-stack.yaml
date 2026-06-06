@@ -45,6 +45,16 @@ spec:
               provider:
                 foldersFromFilesStructure: true
 
+          deleteDatasources:
+            - name: JSON API - Export Batch
+              orgId: 1
+            - name: JSON API - Ledger
+              orgId: 1
+            - name: JSON API - Payment
+              orgId: 1
+            - name: JSON API - Wallet
+              orgId: 1
+
           additionalDataSources:
             - name: Infinity
               type: yesoreyeram-infinity-datasource
