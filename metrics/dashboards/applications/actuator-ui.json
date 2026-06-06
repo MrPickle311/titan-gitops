@@ -307,13 +307,19 @@
             "type": "yesoreyeram-infinity-datasource",
             "uid": "infinity"
           },
+          "filters": [],
           "format": "table",
-          "parser": "JSONata",
+          "global_query_id": "",
+          "parser": "backend",
           "refId": "A",
           "root_selector": "propertySources.($name := name; $each(properties, function($v, $k) { { 'Property Source': $name, 'Property': $k, 'Value': $v.value } }))",
           "source": "url",
           "type": "json",
-          "url": "$service_url/actuator/env"
+          "url": "$service_url/actuator/env",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
         }
       ],
       "title": "Environment Variables ($service_url)",
@@ -342,5 +348,5 @@
   "timezone": "browser",
   "title": "Spring Boot Actuator UI",
   "uid": "actuator-ui-infinity",
-  "version": 8
+  "version": 9
 }
