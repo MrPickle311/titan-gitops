@@ -18,7 +18,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 560,
+  "id": 1019,
   "links": [],
   "panels": [
     {
@@ -44,8 +44,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -75,17 +74,17 @@
         },
         "showHeader": true
       },
-      "pluginVersion": "11.2.0",
+      "pluginVersion": "11.6.15",
       "targets": [
         {
-          "autoOffsetReset": "earliest",
+          "autoOffsetReset": "lastN",
           "avroSchemaSource": "schemaRegistry",
           "datasource": {
             "type": "hamedkarbasi93-kafka-datasource",
             "uid": "kafka-datasource"
           },
           "keyFormat": "string",
-          "lastN": 1000,
+          "lastN": 100,
           "messageFormat": "json",
           "partition": "all",
           "protobufSchemaSource": "schemaRegistry",
@@ -126,17 +125,16 @@
       "type": "table"
     }
   ],
-  "schemaVersion": 39,
+  "preload": false,
+  "schemaVersion": 41,
   "tags": [],
   "templating": {
     "list": [
       {
         "current": {
-          "selected": false,
           "text": "",
           "value": ""
         },
-        "hide": 0,
         "name": "stepExecutionId",
         "options": [
           {
@@ -145,13 +143,11 @@
             "value": ""
           }
         ],
-        "query": "",
-        "skipUrlSync": false,
+        "query": "16658",
         "type": "textbox"
       },
       {
         "current": {
-          "selected": false,
           "text": "All",
           "value": "$__all"
         },
@@ -168,8 +164,6 @@
         "query": "SELECT json_array_elements_text(COALESCE(SERIALIZED_CONTEXT, SHORT_CONTEXT)::json->'processedPaymentIds') FROM BATCH_STEP_EXECUTION_CONTEXT WHERE STEP_EXECUTION_ID = $stepExecutionId",
         "refresh": 1,
         "regex": "",
-        "skipUrlSync": false,
-        "sort": 0,
         "type": "query"
       }
     ]
@@ -182,6 +176,5 @@
   "timezone": "browser",
   "title": "Kafka Batch Related Messages",
   "uid": "afnq60u73wr28c",
-  "version": 10,
-  "weekStart": ""
+  "version": 2
 }
