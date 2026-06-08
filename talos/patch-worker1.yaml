@@ -1,0 +1,16 @@
+machine:
+  network:
+    interfaces:
+      - interface: eno1  # <--- WPISZ TU NAZWĘ Z KROKU 2 (np. eno1)
+        dhcp: false      # Wyłączamy DHCP, wchodzimy w tryb Static
+        addresses:
+          - 10.0.0.52/24 # To będzie Twój docelowy adres
+        routes:
+          - network: 0.0.0.0/0
+            gateway: 10.0.0.1 # Brama to Mikrotik (wewnętrzny adres)
+    nameservers:
+      - 1.1.1.1
+      - 8.8.8.8
+  install:
+    disk: /dev/nvme0n1   # <--- WPISZ TU DYSK Z KROKU 2
+    wipe: false           # Wymaż wszystko co stare

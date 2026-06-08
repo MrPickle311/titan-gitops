@@ -1,0 +1,10 @@
+machine:
+  kubelet:
+    extraMounts:
+      - destination: /var/openebs
+        type: bind
+        source: /var/openebs
+        options:
+          - rbind
+          - rshared
+          - rw
