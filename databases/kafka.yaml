@@ -28,8 +28,10 @@ spec:
             enabled: false
           controller:
             service:
-              type: ClusterIP
-              domain: controller.homelab
+              type: LoadBalancer
+              containerPorts:
+                external: 9094
+              loadBalancerIPs: ['10.0.0.160']
           broker:
             service:
               type: LoadBalancer
@@ -55,7 +57,6 @@ spec:
 
         controller:
           replicaCount: 1
-          automountServiceAccountToken: true
           persistence:
             enabled: true
             storageClass: "openebs-hostpath"
@@ -63,7 +64,6 @@ spec:
 
         broker:
           replicaCount: 3
-          automountServiceAccountToken: true
           extraConfig: |-
             log.retention.hours=-1
             log.retention.bytes=-1
