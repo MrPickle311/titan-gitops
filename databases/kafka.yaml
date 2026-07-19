@@ -25,19 +25,22 @@ spec:
         externalAccess:
           enabled: true
           autoDiscovery:
-            enabled: true
-            image:
-              tag: latest
+            enabled: false
           controller:
             service:
-              type: NodePort
+              type: ClusterIP
+              domain: controller.homelab
           broker:
             service:
               type: LoadBalancer
               ports:
                 external: 9094
+              loadBalancerIPs:
+                - 10.0.0.204
+                - 10.0.0.203
+                - 10.0.0.205
         rbac:
-          create: true
+          create: false
         
         listeners:
           client:
