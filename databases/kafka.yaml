@@ -30,8 +30,7 @@ spec:
               tag: latest
           controller:
             service:
-              type: ClusterIP
-              domain: controller.homelab
+              type: NodePort
           broker:
             service:
               type: LoadBalancer
