@@ -21,6 +21,13 @@ spec:
           enabled: true
         zookeeper:
           enabled: false
+
+        externalAccess:
+          enabled: true
+          service:
+            type: LoadBalancer
+            port: 9094
+          domain: homelab
         
         listeners:
           client:
