@@ -24,10 +24,18 @@ spec:
 
         externalAccess:
           enabled: true
-          service:
-            type: LoadBalancer
-            port: 9094
-          domain: homelab
+          autoDiscovery:
+            enabled: true
+          controller:
+            service:
+              type: ClusterIP
+          broker:
+            service:
+              type: LoadBalancer
+              ports:
+                external: 9094
+        rbac:
+          create: true
         
         listeners:
           client:
