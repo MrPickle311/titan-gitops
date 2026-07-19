@@ -26,6 +26,8 @@ spec:
           enabled: true
           autoDiscovery:
             enabled: true
+            image:
+              tag: latest
           controller:
             service:
               type: ClusterIP
