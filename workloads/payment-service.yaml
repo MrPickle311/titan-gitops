@@ -103,6 +103,34 @@ spec:
           value: http://wallet-service:8081
         - name: KAFKA_BOOTSTRAP_SERVERS
           value: kafka.messaging.svc.cluster.local:9092
+        - name: GRPC_CLIENT_AUTHORIZATION_SERVICE_ADDRESS
+          value: static://authorization-service:9090
+        - name: GRPC_CLIENT_AUTHORIZATION_SERVICE_NEGOTIATION_TYPE
+          value: plaintext
+        - name: GRPC_CLIENT_FEE_SERVICE_ADDRESS
+          value: static://fee-service:9090
+        - name: GRPC_CLIENT_FEE_SERVICE_NEGOTIATION_TYPE
+          value: plaintext
+        - name: GRPC_CLIENT_FRAUD_SERVICE_ADDRESS
+          value: static://fraud-service:9090
+        - name: GRPC_CLIENT_FRAUD_SERVICE_NEGOTIATION_TYPE
+          value: plaintext
+        - name: GRPC_CLIENT_FX_SERVICE_ADDRESS
+          value: static://fx-service:9090
+        - name: GRPC_CLIENT_FX_SERVICE_NEGOTIATION_TYPE
+          value: plaintext
+        - name: GRPC_CLIENT_LIMITS_SERVICE_ADDRESS
+          value: static://limits-service:9090
+        - name: GRPC_CLIENT_LIMITS_SERVICE_NEGOTIATION_TYPE
+          value: plaintext
+        - name: GRPC_CLIENT_SANCTIONS_SERVICE_ADDRESS
+          value: static://sanctions-service:9090
+        - name: GRPC_CLIENT_SANCTIONS_SERVICE_NEGOTIATION_TYPE
+          value: plaintext
+        - name: GRPC_CLIENT_WALLET_SERVICE_ADDRESS
+          value: static://wallet-service:9090
+        - name: GRPC_CLIENT_WALLET_SERVICE_NEGOTIATION_TYPE
+          value: plaintext
 ---
 apiVersion: v1
 kind: Service
