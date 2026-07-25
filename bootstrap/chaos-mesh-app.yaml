@@ -8,26 +8,9 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: 'https://charts.chaos-mesh.org'
-    targetRevision: 2.7.0
-    chart: chaos-mesh
-    helm:
-      values: |
-        chaosDaemon:
-          runtime: containerd
-          socketPath: /run/containerd/containerd.sock
-        dashboard:
-          create: true
-          securityMode: false
-          ingress:
-            enabled: true
-            annotations:
-              kubernetes.io/ingress.class: nginx
-              cert-manager.io/cluster-issuer: homelab-ca-issuer
-            hosts:
-              - name: chaos.homelab
-            tls: true
-            tlsSecret: chaos-dashboard-tls
+    repoURL: 'https://github.com/MrPickle311/titan-gitops.git'
+    targetRevision: HEAD
+    path: infrastructure/chaos-mesh
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: chaos-mesh

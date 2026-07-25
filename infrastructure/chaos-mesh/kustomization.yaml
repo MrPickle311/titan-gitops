@@ -1,0 +1,38 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+helmCharts:
+  - name: chaos-mesh
+    repo: https://charts.chaos-mesh.org
+    version: 2.7.0
+    releaseName: chaos-mesh
+    namespace: chaos-mesh
+    valuesInline:
+      chaosDaemon:
+        runtime: containerd
+        socketPath: /run/containerd/containerd.sock
+      dashboard:
+        create: true
+        securityMode: false
+        ingress:
+          enabled: true
+          annotations:
+            kubernetes.io/ingress.class: nginx
+            cert-manager.io/cluster-issuer: homelab-ca-issuer
+          hosts:
+            - name: chaos.homelab
+          tls: true
+          tlsSecret: chaos-dashboard-tls
+
+patches:
+  - target:
+      kind: DaemonSet
+      name: chaos-daemon
+      namespace: chaos-mesh
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/command
+        value:
+          - /bin/sh
+          - -c
+          - update-alternatives --set iptables /usr/sbin/iptables-nft && exec /usr/local/bin/chaos-daemon --runtime containerd --http-port 31766 --grpc-port 31767 --pprof --ca /etc/chaos-daemon/cert/ca.crt --cert /etc/chaos-daemon/cert/tls.crt --key /etc/chaos-daemon/cert/tls.key --runtime-socket-path /host-run/containerd.sock
