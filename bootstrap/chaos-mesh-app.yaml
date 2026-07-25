@@ -18,6 +18,7 @@ spec:
           socketPath: /run/containerd/containerd.sock
         dashboard:
           create: true
+          securityMode: false
           ingress:
             enabled: true
             annotations:
@@ -41,3 +42,38 @@ spec:
       labels:
         pod-security.kubernetes.io/enforce: privileged
         pod-security.kubernetes.io/warn: privileged
+---
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+  namespace: default
+  name: account-cluster-manager-lfqka
+
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: role-cluster-manager-lfqka
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "namespaces"]
+    verbs: ["get", "watch", "list"]
+  - apiGroups: ["chaos-mesh.org"]
+    resources: [ "*" ]
+    verbs: ["get", "list", "watch", "create", "delete", "patch", "update"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: bind-cluster-manager-lfqka
+subjects:
+  - kind: ServiceAccount
+    name: account-cluster-manager-lfqka
+    namespace: default
+roleRef:
+  kind: ClusterRole
+  name: role-cluster-manager-lfqka
+  apiGroup: rbac.authorization.k8s.io
+
+
