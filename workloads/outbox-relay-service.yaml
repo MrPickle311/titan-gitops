@@ -1,0 +1,172 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: outbox-relay-service
+  namespace: applications
+  labels:
+    app: outbox-relay-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: outbox-relay-service
+  template:
+    metadata:
+      labels:
+        app: outbox-relay-service
+    spec:
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app: outbox-relay-service
+      volumes:
+        - name: pyroscope-agent
+          emptyDir: {}
+      initContainers:
+        - name: fetch-otel-pyroscope
+          image: busybox:latest
+          command:
+            - sh
+            - -c
+            - "wget -O /agent/opentelemetry-javaagent.jar https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/latest/download/opentelemetry-javaagent.jar && wget -O /agent/pyroscope-otel.jar https://github.com/grafana/otel-profiling-java/releases/latest/download/pyroscope-otel.jar && wget -O /agent/pyroscope.jar https://github.com/grafana/pyroscope-java/releases/latest/download/pyroscope.jar"
+          volumeMounts:
+            - name: pyroscope-agent
+              mountPath: /agent
+      containers:
+      - name: outbox-relay-service
+        image: registry.homelab/outbox-relay-service:latest
+        imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        ports:
+        - containerPort: 8089
+        volumeMounts:
+          - name: pyroscope-agent
+            mountPath: /agent
+        env:
+        - name: MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE
+          value: "*"
+        - name: MANAGEMENT_ENDPOINT_ENV_SHOW_VALUES
+          value: "ALWAYS"
+        - name: JAVA_TOOL_OPTIONS
+          value: "-javaagent:/agent/pyroscope.jar -javaagent:/agent/opentelemetry-javaagent.jar"
+        - name: OTEL_JAVAAGENT_EXTENSIONS
+          value: "/agent/pyroscope-otel.jar"
+        - name: OTEL_PYROSCOPE_START_PROFILING
+          value: "true"
+        - name: OTEL_PYROSCOPE_ADD_PROFILE_URL
+          value: "false"
+        - name: OTEL_PYROSCOPE_ADD_PROFILE_BASELINE_URL
+          value: "false"
+        - name: OTEL_SERVICE_NAME
+          value: "outbox-relay-service"
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: "http://tempo.monitoring.svc.cluster.local:4318"
+        - name: OTEL_LOGS_EXPORTER
+          value: "none"
+        - name: OTEL_METRICS_EXPORTER
+          value: "none"
+        - name: LOGGING_PATTERN_LEVEL
+          value: "trace_id=%X{trace_id} span_id=%X{span_id} %5p"
+        - name: PYROSCOPE_APPLICATION_NAME
+          value: "outbox-relay-service"
+        - name: PYROSCOPE_SERVER_ADDRESS
+          value: "http://pyroscope.monitoring.svc.cluster.local:4040"
+        - name: PYROSCOPE_FORMAT
+          value: "jfr"
+        - name: PYROSCOPE_PROFILING_INTERVAL
+          value: "10ms"
+        - name: PYROSCOPE_PROFILER_EVENT
+          value: "wall"
+        - name: PYROSCOPE_PROFILER_LOCK
+          value: "10ms"
+        - name: PYROSCOPE_PROFILER_ALLOC
+          value: "128k"
+        - name: PYROSCOPE_LOG_LEVEL
+          value: "info"
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: PYROSCOPE_LABELS
+          value: "pod=$(POD_NAME),service_name=outbox-relay-service"
+        - name: SPRING_DATASOURCE_URL
+          value: jdbc:postgresql://postgres-postgresql.databases.svc.cluster.local:5432/titan_db
+        - name: SPRING_DATASOURCE_USERNAME
+          value: postgres
+        - name: SPRING_DATASOURCE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-credentials
+              key: postgres-password
+        - name: KAFKA_BOOTSTRAP_SERVERS
+          value: kafka.messaging.svc.cluster.local:9092
+        - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
+          value: kafka.messaging.svc.cluster.local:9092
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: outbox-relay-service
+  namespace: applications
+  labels:
+    app: outbox-relay-service
+spec:
+  selector:
+    app: outbox-relay-service
+  ports:
+  - name: http
+    port: 8089
+    targetPort: 8089
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: outbox-relay-service-monitor
+  namespace: applications
+  labels:
+    release: kube-prometheus-stack
+spec:
+  selector:
+    matchLabels:
+      app: outbox-relay-service
+  endpoints:
+  - port: http
+    path: /actuator/prometheus
+    interval: 15s
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: outbox-relay-service-ingress
+  namespace: applications
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: "homelab-ca-issuer"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      proxy_hide_header X-Frame-Options;
+      proxy_hide_header Content-Security-Policy;
+spec:
+  tls:
+    - hosts:
+        - outbox-relay.homelab
+      secretName: outbox-relay-tls-secret
+  rules:
+  - host: outbox-relay.homelab
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: outbox-relay-service
+            port:
+              number: 8089
