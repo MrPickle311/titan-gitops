@@ -148,11 +148,6 @@ data:
             href: https://schema.homelab
             podSelector: app=schema-registry
             namespace: messaging
-        - Redis Insight:
-            icon: redis
-            href: https://redis-insight.homelab
-            podSelector: app=redisinsight
-            namespace: databases
         - pgAdmin:
             icon: postgresql
             href: https://pgadmin.homelab
