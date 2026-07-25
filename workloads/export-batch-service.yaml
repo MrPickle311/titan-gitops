@@ -15,6 +15,13 @@ spec:
       labels:
         app: export-batch-service
     spec:
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app: export-batch-service
       volumes:
         - name: pyroscope-agent
           emptyDir: {}
@@ -29,6 +36,13 @@ spec:
       - name: batch-service
         image: registry.homelab/export-batch-service:latest
         imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
         ports:
         - containerPort: 8083
         volumeMounts:

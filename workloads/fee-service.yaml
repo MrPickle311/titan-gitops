@@ -15,6 +15,13 @@ spec:
       labels:
         app: fee-service
     spec:
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app: fee-service
       volumes:
         - name: pyroscope-agent
           emptyDir: {}
@@ -32,6 +39,13 @@ spec:
       - name: fee-service
         image: registry.homelab/fee-service:latest
         imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
         ports:
         - containerPort: 9091
         volumeMounts:

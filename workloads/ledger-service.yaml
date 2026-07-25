@@ -15,6 +15,13 @@ spec:
       labels:
         app: ledger-service
     spec:
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app: ledger-service
       volumes:
         - name: pyroscope-agent
           emptyDir: {}
@@ -32,6 +39,13 @@ spec:
       - name: ledger-service
         image: registry.homelab/ledger-service:latest
         imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
         ports:
         - containerPort: 8082
         volumeMounts:

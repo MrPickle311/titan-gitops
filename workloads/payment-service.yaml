@@ -15,6 +15,13 @@ spec:
       labels:
         app: payment-service
     spec:
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app: payment-service
       volumes:
         - name: pyroscope-agent
           emptyDir: {}
@@ -32,6 +39,13 @@ spec:
       - name: payment-service
         image: registry.homelab/payment-service:latest
         imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
         ports:
         - containerPort: 8080
         volumeMounts:
