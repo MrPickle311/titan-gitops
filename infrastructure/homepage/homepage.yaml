@@ -158,6 +158,11 @@ data:
             href: https://pgadmin.homelab
             podSelector: app=pgadmin
             namespace: databases
+        - Chaos Mesh:
+            icon: chaosmesh
+            href: https://chaos.homelab
+            podSelector: app.kubernetes.io/component=chaos-dashboard
+            namespace: chaos-mesh
 ---
 apiVersion: apps/v1
 kind: Deployment
