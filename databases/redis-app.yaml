@@ -30,10 +30,6 @@ spec:
         existingSecret: "redis-cluster-credentials"
         existingSecretPasswordKey: "redis-password"
 
-        service:
-          type: LoadBalancer
-          loadBalancerIP: "10.0.0.202"
-
         persistence:
           enabled: true
           storageClass: "openebs-hostpath"
