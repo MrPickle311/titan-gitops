@@ -22,11 +22,11 @@ spec:
             ingest_max_jfr_decompressed_size: 33554432
           resources:
             requests:
-              cpu: 100m
-              memory: 128Mi
+              cpu: 200m
+              memory: 256Mi
             limits:
-              cpu: 500m
-              memory: 512Mi
+              cpu: 1000m
+              memory: 2Gi
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: monitoring
