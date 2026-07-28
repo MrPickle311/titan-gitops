@@ -20,6 +20,10 @@ spec:
         cluster:
           nodes: 6
           replicas: 1
+          externalAccess:
+            enabled: true
+            service:
+              type: LoadBalancer
         
         usePassword: true
         existingSecret: "redis-cluster-credentials"
