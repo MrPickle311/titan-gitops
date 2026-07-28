@@ -98,6 +98,16 @@ spec:
               fieldPath: metadata.name
         - name: PYROSCOPE_LABELS
           value: "pod=$(POD_NAME),service_name=fx-service"
+        - name: REDIS_HOST
+          value: redis-redis-cluster.databases.svc.cluster.local
+        - name: REDIS_PORT
+          value: "6379"
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: redis-cluster-credentials
+              key: redis-password
+              optional: true
 ---
 apiVersion: v1
 kind: Service
