@@ -9,6 +9,21 @@ spec:
     repoURL: 'https://argoproj.github.io/argo-helm'
     targetRevision: 0.41.11
     chart: argo-workflows
+    helm:
+      values: |
+        server:
+          secure: false
+          ingress:
+            enabled: true
+            ingressClassName: nginx
+            annotations:
+              cert-manager.io/cluster-issuer: "homelab-ca-issuer"
+            hosts:
+              - workflows.homelab
+            tls:
+              - secretName: workflows-tls
+                hosts:
+                  - workflows.homelab
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: argo
