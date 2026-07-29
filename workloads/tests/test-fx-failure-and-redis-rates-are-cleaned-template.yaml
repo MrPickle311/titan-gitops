@@ -17,7 +17,9 @@ spec:
     steps:
     - - arguments: {}
         name: inject-chaos-fx
-        template: apply-chaos-fx
+        templateRef:
+          name: common-test-steps
+          template: apply-chaos-fx
     - - arguments:
           parameters:
           - name: sleep-duration
@@ -49,26 +51,6 @@ spec:
             value: '{{steps.run-test.outputs.parameters.payment-id}}'
           - name: expected-state
             value: FAILED
-  - inputs: {}
-    metadata: {}
-    name: apply-chaos-fx
-    outputs: {}
-    resource:
-      action: create
-      manifest: |
-        kind: PodChaos
-        apiVersion: chaos-mesh.org/v1alpha1
-        metadata:
-          namespace: applications
-          name: isolate-fx-service
-        spec:
-          selector:
-            namespaces:
-              - applications
-            labelSelectors:
-              app: fx-service
-          mode: all
-          action: pod-failure
   - container:
       args:
       - |
@@ -126,21 +108,11 @@ spec:
     steps:
     - - arguments: {}
         name: remove-chaos-fx
-        template: delete-chaos-fx
+        templateRef:
+          name: common-test-steps
+          template: remove-chaos-fx
     - - arguments: {}
         name: restore-redis
         templateRef:
           name: common-test-steps
           template: restore-redis
-  - inputs: {}
-    metadata: {}
-    name: delete-chaos-fx
-    outputs: {}
-    resource:
-      action: delete
-      manifest: |
-        apiVersion: chaos-mesh.org/v1alpha1
-        kind: PodChaos
-        metadata:
-          name: isolate-fx-service
-          namespace: applications

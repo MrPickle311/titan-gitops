@@ -17,10 +17,14 @@ spec:
     steps:
     - - arguments: {}
         name: inject-chaos-fx
-        template: apply-chaos-fx
+        templateRef:
+          name: common-test-steps
+          template: apply-chaos-fx
       - arguments: {}
         name: inject-chaos-redis
-        template: apply-chaos-redis
+        templateRef:
+          name: common-test-steps
+          template: apply-chaos-redis
     - - arguments: {}
         name: run-test
         template: test-payment
@@ -44,44 +48,6 @@ spec:
             value: '{{steps.run-test.outputs.parameters.payment-id}}'
           - name: expected-state
             value: FAILED
-  - inputs: {}
-    metadata: {}
-    name: apply-chaos-fx
-    outputs: {}
-    resource:
-      action: create
-      manifest: |
-        kind: PodChaos
-        apiVersion: chaos-mesh.org/v1alpha1
-        metadata:
-          namespace: applications
-          name: fail-fx-service-pods
-        spec:
-          selector:
-            namespaces:
-              - applications
-            labelSelectors:
-              app: fx-service
-          mode: all
-          action: pod-failure
-  - inputs: {}
-    metadata: {}
-    name: apply-chaos-redis
-    outputs: {}
-    resource:
-      action: create
-      manifest: |
-        apiVersion: chaos-mesh.org/v1alpha1
-        kind: PodChaos
-        metadata:
-          name: fail-redis-pods
-          namespace: databases
-        spec:
-          action: pod-failure
-          mode: all
-          selector:
-            labelSelectors:
-              "app.kubernetes.io/name": "redis-cluster"
   - container:
       args:
       - |
@@ -130,31 +96,11 @@ spec:
     steps:
     - - arguments: {}
         name: remove-chaos-fx
-        template: delete-chaos-fx
+        templateRef:
+          name: common-test-steps
+          template: remove-chaos-fx
       - arguments: {}
         name: remove-chaos-redis
-        template: delete-chaos-redis
-  - inputs: {}
-    metadata: {}
-    name: delete-chaos-fx
-    outputs: {}
-    resource:
-      action: delete
-      manifest: |
-        apiVersion: chaos-mesh.org/v1alpha1
-        kind: PodChaos
-        metadata:
-          name: fail-fx-service-pods
-          namespace: applications
-  - inputs: {}
-    metadata: {}
-    name: delete-chaos-redis
-    outputs: {}
-    resource:
-      action: delete
-      manifest: |
-        apiVersion: chaos-mesh.org/v1alpha1
-        kind: PodChaos
-        metadata:
-          name: fail-redis-pods
-          namespace: databases
+        templateRef:
+          name: common-test-steps
+          template: remove-chaos-redis

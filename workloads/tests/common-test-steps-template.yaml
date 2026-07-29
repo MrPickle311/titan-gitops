@@ -158,3 +158,55 @@ spec:
     metadata: {}
     name: restore-redis
     outputs: {}
+  - name: apply-chaos-fx
+    resource:
+      action: create
+      manifest: |
+        kind: PodChaos
+        apiVersion: chaos-mesh.org/v1alpha1
+        metadata:
+          namespace: applications
+          name: fail-fx-service-pods
+        spec:
+          selector:
+            namespaces:
+              - applications
+            labelSelectors:
+              app: fx-service
+          mode: all
+          action: pod-failure
+  - name: remove-chaos-fx
+    resource:
+      action: delete
+      manifest: |
+        apiVersion: chaos-mesh.org/v1alpha1
+        kind: PodChaos
+        metadata:
+          name: fail-fx-service-pods
+          namespace: applications
+  - name: apply-chaos-redis
+    resource:
+      action: create
+      manifest: |
+        kind: PodChaos
+        apiVersion: chaos-mesh.org/v1alpha1
+        metadata:
+          namespace: databases
+          name: redis-failure
+        spec:
+          selector:
+            namespaces:
+              - databases
+            labelSelectors:
+              helm.sh/chart: redis-cluster-13.0.4
+          mode: all
+          action: pod-failure
+  - name: remove-chaos-redis
+    resource:
+      action: delete
+      manifest: |
+        apiVersion: chaos-mesh.org/v1alpha1
+        kind: PodChaos
+        metadata:
+          name: redis-failure
+          namespace: databases

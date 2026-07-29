@@ -17,7 +17,9 @@ spec:
     steps:
     - - arguments: {}
         name: inject-chaos
-        template: apply-chaos
+        templateRef:
+          name: common-test-steps
+          template: apply-chaos-redis
     - - arguments: {}
         name: run-test
         template: test-payment
@@ -41,28 +43,6 @@ spec:
             value: '{{steps.run-test.outputs.parameters.payment-id}}'
           - name: expected-state
             value: COMPLETED
-  - inputs: {}
-    metadata: {}
-    name: apply-chaos
-    outputs: {}
-    resource:
-      action: create
-      manifest: |
-        kind: PodChaos
-        apiVersion: chaos-mesh.org/v1alpha1
-        metadata:
-          namespace: databases
-          name: redis-failure
-          annotations:
-            experiment.chaos-mesh.org/pause: 'true'
-        spec:
-          selector:
-            namespaces:
-              - databases
-            labelSelectors:
-              helm.sh/chart: redis-cluster-13.0.4
-          mode: all
-          action: pod-failure
   - container:
       args:
       - |
@@ -112,16 +92,6 @@ spec:
     steps:
     - - arguments: {}
         name: remove-chaos
-        template: delete-chaos
-  - inputs: {}
-    metadata: {}
-    name: delete-chaos
-    outputs: {}
-    resource:
-      action: delete
-      manifest: |
-        apiVersion: chaos-mesh.org/v1alpha1
-        kind: PodChaos
-        metadata:
-          name: redis-failure
-          namespace: databases
+        templateRef:
+          name: common-test-steps
+          template: remove-chaos-redis

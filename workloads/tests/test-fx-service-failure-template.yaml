@@ -17,7 +17,9 @@ spec:
     steps:
     - - arguments: {}
         name: inject-chaos
-        template: apply-chaos
+        templateRef:
+          name: common-test-steps
+          template: apply-chaos-fx
     - - arguments: {}
         name: run-test
         template: test-payment
@@ -41,26 +43,6 @@ spec:
             value: '{{steps.run-test.outputs.parameters.payment-id}}'
           - name: expected-state
             value: FAILED
-  - inputs: {}
-    metadata: {}
-    name: apply-chaos
-    outputs: {}
-    resource:
-      action: create
-      manifest: |
-        kind: PodChaos
-        apiVersion: chaos-mesh.org/v1alpha1
-        metadata:
-          namespace: applications
-          name: fail-fx-service-pods
-        spec:
-          selector:
-            namespaces:
-              - applications
-            labelSelectors:
-              app: fx-service
-          mode: all
-          action: pod-failure
   - container:
       args:
       - |
@@ -109,16 +91,6 @@ spec:
     steps:
     - - arguments: {}
         name: remove-chaos
-        template: delete-chaos
-  - inputs: {}
-    metadata: {}
-    name: delete-chaos
-    outputs: {}
-    resource:
-      action: delete
-      manifest: |
-        apiVersion: chaos-mesh.org/v1alpha1
-        kind: PodChaos
-        metadata:
-          name: fail-fx-service-pods
-          namespace: applications
+        templateRef:
+          name: common-test-steps
+          template: remove-chaos-fx
