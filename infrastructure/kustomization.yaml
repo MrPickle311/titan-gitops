@@ -4,4 +4,5 @@ kind: Kustomization
 resources:
   - applications-namespace.yaml
   - cluster-config.yaml
+  - argo-workflows-rbac.yaml
 
