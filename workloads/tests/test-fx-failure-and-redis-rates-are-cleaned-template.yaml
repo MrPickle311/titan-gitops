@@ -42,41 +42,37 @@ spec:
     outputs: {}
     resource:
       action: create
-      manifest: "kind: PodChaos\napiVersion: chaos-mesh.org/v1alpha1\nmetadata:\n\
-        \  namespace: applications\n  name: isolate-fx-service\nspec:\n  selector:\n\
-        \    namespaces:\n      - applications\n    labelSelectors:\n\
-        \      app: fx-service\n  mode: all\n  action: pod-failure\n"
+      manifest: |
+        kind: PodChaos
+        apiVersion: chaos-mesh.org/v1alpha1
+        metadata:
+          namespace: applications
+          name: isolate-fx-service
+        spec:
+          selector:
+            namespaces:
+              - applications
+            labelSelectors:
+              app: fx-service
+          mode: all
+          action: pod-failure
   - container:
       args:
-      - 'echo "Waiting for Chaos Mesh to isolate fx-service pods..."
-
-        sleep 5
-
+      - |
+        echo "Waiting for Chaos Mesh to isolate fx-service pods..."
+        sleep 25
 
         echo "Backing up dynamic FX rates from Redis..."
-
         # Get the current dynamic rates and format them into a single string
+        RATES=$(redis-cli -c -h redis-redis-cluster.databases.svc.cluster.local -p 6379 -a $REDIS_PASSWORD --raw HGETALL fx-conversion-rates | tr '\n' ' ')
 
-        RATES=$(redis-cli -c -h redis-redis-cluster.databases.svc.cluster.local -p
-        6379 -a $REDIS_PASSWORD --raw HGETALL fx-conversion-rates | tr ''\n'' '' '')
-
-
-        # Store the backed up string safely in a temporary Redis String key (redis-cli
-        -c handles cluster redirects automatically)
-
-        redis-cli -c -h redis-redis-cluster.databases.svc.cluster.local -p 6379 -a
-        $REDIS_PASSWORD SET fx-rates-backup "$RATES"
-
+        # Store the backed up string safely in a temporary Redis String key (redis-cli -c handles cluster redirects automatically)
+        redis-cli -c -h redis-redis-cluster.databases.svc.cluster.local -p 6379 -a $REDIS_PASSWORD SET fx-rates-backup "$RATES"
 
         echo "Rates saved to fx-rates-backup: $RATES"
 
-
         echo "Clearing the actual FX rates table..."
-
-        redis-cli -c -h redis-redis-cluster.databases.svc.cluster.local -p 6379 -a
-        $REDIS_PASSWORD DEL fx-conversion-rates
-
-        '
+        redis-cli -c -h redis-redis-cluster.databases.svc.cluster.local -p 6379 -a $REDIS_PASSWORD DEL fx-conversion-rates
       command:
       - /bin/sh
       - -c
@@ -95,22 +91,40 @@ spec:
     outputs: {}
   - container:
       args:
-      - "apk add --no-cache curl jq\nTX_ID=\"tx-$RANDOM\"\nSRC_USER=\"1$RANDOM$RANDOM\"\
-        \nTGT_USER=\"2$RANDOM$RANDOM\"\necho \"1. Create payment...\"\nRES=$(curl\
-        \ -s -X POST http://payment-service:8080/api/payments \\\n  -H \"Content-Type:\
-        \ application/json\" \\\n  -d \"{\\\"transactionId\\\": \\\"$TX_ID\\\", \\\
-        \"amount\\\": \\\"150.00\\\", \\\"currency\\\": \\\"USD\\\", \\\"sourceUserId\\\
-        \": $SRC_USER, \\\"targetUserId\\\": $TGT_USER, \\\"sourceCurrency\\\": \\\
-        \"USD\\\", \\\"targetCurrency\\\": \\\"EUR\\\"}\")\n\nID=$(echo $RES | jq\
-        \ -r '.id')\necho \"ID: $ID\"\necho \"$ID\" > /tmp/payment_id.txt\n\necho\
-        \ \"2. Execute payment...\"\ncurl -s -X POST http://payment-service:8080/api/payments/$ID/execute\n\
-        \necho \"3. Waiting up to 30s for payment to reach terminal state...\"\nfor\
-        \ i in $(seq 1 15); do\n  STATE=$(curl -s http://payment-service:8080/api/payments/$ID\
-        \ | jq -r '.state')\n  if [ \"$STATE\" = \"FAILED\" ] || [ \"$STATE\" = \"\
-        COMPLETED\" ]; then\n    break\n  fi\n  sleep 2\ndone\n\necho \"4. Validate\
-        \ API state...\"\necho \"State: $STATE\"\n\nif [ \"$STATE\" != \"FAILED\"\
-        \ ]; then\n  echo \"Error: Not failed. Was: $STATE\"\n  exit 1\nfi\necho \"\
-        API check OK\"\n"
+      - |
+        apk add --no-cache curl jq
+        TX_ID="tx-$RANDOM"
+        SRC_USER="1$RANDOM$RANDOM"
+        TGT_USER="2$RANDOM$RANDOM"
+        echo "1. Create payment..."
+        RES=$(curl -s -X POST http://payment-service:8080/api/payments \
+          -H "Content-Type: application/json" \
+          -d "{\"transactionId\": \"$TX_ID\", \"amount\": \"150.00\", \"currency\": \"USD\", \"sourceUserId\": $SRC_USER, \"targetUserId\": $TGT_USER, \"sourceCurrency\": \"USD\", \"targetCurrency\": \"EUR\"}")
+
+        ID=$(echo $RES | jq -r '.id')
+        echo "ID: $ID"
+        echo "$ID" > /tmp/payment_id.txt
+
+        echo "2. Execute payment..."
+        curl -s -X POST http://payment-service:8080/api/payments/$ID/execute
+
+        echo "3. Waiting up to 30s for payment to reach terminal state..."
+        for i in $(seq 1 15); do
+          STATE=$(curl -s http://payment-service:8080/api/payments/$ID | jq -r '.state')
+          if [ "$STATE" = "FAILED" ] || [ "$STATE" = "COMPLETED" ]; then
+            break
+          fi
+          sleep 2
+        done
+
+        echo "4. Validate API state..."
+        echo "State: $STATE"
+
+        if [ "$STATE" != "FAILED" ]; then
+          echo "Error: Not failed. Was: $STATE"
+          exit 1
+        fi
+        echo "API check OK"
       command:
       - /bin/sh
       - -c
@@ -127,24 +141,33 @@ spec:
           path: /tmp/payment_id.txt
   - container:
       args:
-      - "echo \"Connecting to Postgres to verify payment {{inputs.parameters.payment-id}}...\"\
-        \nexport PGPASSWORD=$DB_PASSWORD\nPID={{inputs.parameters.payment-id}}\n\n\
-        echo \"1. Checking 'payments' table...\"\nSTATE=$(psql -h postgres-postgresql.databases.svc.cluster.local\
-        \ -U $DB_USER -d titan_db -t -c \"SELECT state FROM payments WHERE id=$PID;\"\
-        \ | xargs)\nif [ \"$STATE\" != \"FAILED\" ]; then\n  echo \"DB Validation\
-        \ Error: payments state is '$STATE', expected 'FAILED'\"\n  exit 1\nfi\n\n\
-        echo \"2. Checking 'payment_history' table...\"\nHISTORY_COUNT=$(psql -h postgres-postgresql.databases.svc.cluster.local\
-        \ -U $DB_USER -d titan_db -t -c \"SELECT count(*) FROM payment_history WHERE\
-        \ payment_id=$PID AND to_state='FAILED';\" | xargs)\nif [ \"$HISTORY_COUNT\"\
-        \ -eq 0 ]; then\n  echo \"DB Validation Error: payment_history has no FAILED\
-        \ record for this payment.\"\n  exit 1\nfi\n\necho \"3. Checking 'ledger_entries'\
-        \ table...\"\nLEDGER_COUNT=$(psql -h postgres-postgresql.databases.svc.cluster.local\
-        \ -U $DB_USER -d titan_db -t -c \"SELECT count(*) FROM ledger_entries WHERE\
-        \ payment_id=$PID;\" | xargs)\nif [ \"$LEDGER_COUNT\" -ne 0 ]; then\n  echo\
-        \ \"DB Validation Error: ledger_entries has $LEDGER_COUNT records, expected\
-        \ 0 (since it failed at FX phase)\"\n  exit 1\nfi\n\necho \"Success! Database\
-        \ entities (payments, payment_history, ledger_entries) correctly reflect the\
-        \ failed payment.\"\n"
+      - |
+        echo "Connecting to Postgres to verify payment {{inputs.parameters.payment-id}}..."
+        export PGPASSWORD=$DB_PASSWORD
+        PID={{inputs.parameters.payment-id}}
+
+        echo "1. Checking 'payments' table..."
+        STATE=$(psql -h postgres-postgresql.databases.svc.cluster.local -U $DB_USER -d titan_db -t -c "SELECT state FROM payments WHERE id=$PID;" | xargs)
+        if [ "$STATE" != "FAILED" ]; then
+          echo "DB Validation Error: payments state is '$STATE', expected 'FAILED'"
+          exit 1
+        fi
+
+        echo "2. Checking 'payment_history' table..."
+        HISTORY_COUNT=$(psql -h postgres-postgresql.databases.svc.cluster.local -U $DB_USER -d titan_db -t -c "SELECT count(*) FROM payment_history WHERE payment_id=$PID AND to_state='FAILED';" | xargs)
+        if [ "$HISTORY_COUNT" -eq 0 ]; then
+          echo "DB Validation Error: payment_history has no FAILED record for this payment."
+          exit 1
+        fi
+
+        echo "3. Checking 'ledger_entries' table..."
+        LEDGER_COUNT=$(psql -h postgres-postgresql.databases.svc.cluster.local -U $DB_USER -d titan_db -t -c "SELECT count(*) FROM ledger_entries WHERE payment_id=$PID;" | xargs)
+        if [ "$LEDGER_COUNT" -ne 0 ]; then
+          echo "DB Validation Error: ledger_entries has $LEDGER_COUNT records, expected 0 (since it failed at FX phase)"
+          exit 1
+        fi
+
+        echo "Success! Database entities (payments, payment_history, ledger_entries) correctly reflect the failed payment."
       command:
       - /bin/sh
       - -c
@@ -167,14 +190,24 @@ spec:
     outputs: {}
   - container:
       args:
-      - "PID={{inputs.parameters.payment-id}}\necho \"Consuming Kafka topic payment-webhooks\
-        \ to find message for payment $PID...\"\nsleep 3\n\nMSG=$(kcat -C -b kafka.messaging.svc.cluster.local:9092\
-        \ -t payment-webhooks -o -100 -e -q | grep \"\\\"paymentId\\\":$PID\" || true)\n\n\
-        if [ -z \"$MSG\" ]; then\n   echo \"Error: Could not find Kafka message for\
-        \ payment $PID in payment-webhooks topic!\"\n   exit 1\nfi\n\necho \"Found\
-        \ Kafka message: $MSG\"\nif ! echo \"$MSG\" | grep -q \"\\\"status\\\":\\\"\
-        FAILED\\\"\"; then\n   echo \"Error: Message does not contain FAILED status!\"\
-        \n   exit 1\nfi\necho \"Kafka message successfully validated!\"\n"
+      - |
+        PID={{inputs.parameters.payment-id}}
+        echo "Consuming Kafka topic payment-webhooks to find message for payment $PID..."
+        sleep 3
+
+        MSG=$(kcat -C -b kafka.messaging.svc.cluster.local:9092 -t payment-webhooks -o -100 -e -q | grep "\"paymentId\":$PID" || true)
+
+        if [ -z "$MSG" ]; then
+           echo "Error: Could not find Kafka message for payment $PID in payment-webhooks topic!"
+           exit 1
+        fi
+
+        echo "Found Kafka message: $MSG"
+        if ! echo "$MSG" | grep -q "\"status\":\"FAILED\""; then
+           echo "Error: Message does not contain FAILED status!"
+           exit 1
+        fi
+        echo "Kafka message successfully validated!"
       command:
       - /bin/sh
       - -c
@@ -200,17 +233,7 @@ spec:
         template: restore-redis
   - container:
       args:
-      - "echo \"Retrieving backed up rates from fx-rates-backup string key...\"\n\
-        RATES=$(redis-cli -c -h redis-redis-cluster.databases.svc.cluster.local -p\
-        \ 6379 -a $REDIS_PASSWORD GET fx-rates-backup)\n\nif [ -n \"$RATES\" ] &&\
-        \ [ \"$RATES\" != \"nil\" ]; then\n  echo \"Restoring dynamically fetched\
-        \ rates back to fx-conversion-rates hash...\"\n  # Use xargs to pass the space-separated\
-        \ string as arguments to HSET\n  echo \"$RATES\" | xargs redis-cli -c -h redis-redis-cluster.databases.svc.cluster.local\
-        \ -p 6379 -a $REDIS_PASSWORD HSET fx-conversion-rates\n  \n  echo \"Cleaning\
-        \ up backup key...\"\n  redis-cli -c -h redis-redis-cluster.databases.svc.cluster.local\
-        \ -p 6379 -a $REDIS_PASSWORD DEL fx-rates-backup\n  echo \"Dynamic restoration\
-        \ complete!\"\nelse\n  echo \"No backup found in fx-rates-backup, skipping\
-        \ restore.\"\nfi\n"
+      - "echo \"Retrieving backed up rates from fx-rates-backup string key...\"\nRATES=$(redis-cli -c -h redis-redis-cluster.databases.svc.cluster.local -p 6379 -a $REDIS_PASSWORD GET fx-rates-backup)\n\nif [ -n \"$RATES\" ] && [ \"$RATES\" != \"nil\" ]; then\n  echo \"Restoring dynamically fetched rates back to fx-conversion-rates hash...\"\n  # Use xargs to pass the space-separated string as arguments to HSET\n  echo \"$RATES\" | xargs redis-cli -c -h redis-redis-cluster.databases.svc.cluster.local -p 6379 -a $REDIS_PASSWORD HSET fx-conversion-rates\n  \n  echo \"Cleaning up backup key...\"\n  redis-cli -c -h redis-redis-cluster.databases.svc.cluster.local -p 6379 -a $REDIS_PASSWORD DEL fx-rates-backup\n  echo \"Dynamic restoration complete!\"\nelse\n  echo \"No backup found in fx-rates-backup, skipping restore.\"\nfi\n"
       command:
       - /bin/sh
       - -c
@@ -233,5 +256,9 @@ spec:
     outputs: {}
     resource:
       action: delete
-      manifest: "apiVersion: chaos-mesh.org/v1alpha1\nkind: PodChaos\nmetadata:\n\
-        \  name: isolate-fx-service\n  namespace: applications\n"
+      manifest: |
+        apiVersion: chaos-mesh.org/v1alpha1
+        kind: PodChaos
+        metadata:
+          name: isolate-fx-service
+          namespace: applications

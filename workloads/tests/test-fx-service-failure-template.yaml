@@ -27,25 +27,50 @@ spec:
     outputs: {}
     resource:
       action: create
-      manifest: "kind: PodChaos\napiVersion: chaos-mesh.org/v1alpha1\nmetadata:\n\
-        \  namespace: applications\n  name: fail-fx-service-pods\nspec:\n  selector:\n\
-        \    namespaces:\n      - applications\n    labelSelectors:\n      app: fx-service\n\
-        \  mode: all\n  action: pod-failure\n"
+      manifest: |
+        kind: PodChaos
+        apiVersion: chaos-mesh.org/v1alpha1
+        metadata:
+          namespace: applications
+          name: fail-fx-service-pods
+        spec:
+          selector:
+            namespaces:
+              - applications
+            labelSelectors:
+              app: fx-service
+          mode: all
+          action: pod-failure
   - container:
       args:
-      - "apk add --no-cache curl jq\nTX_ID=\"tx-$RANDOM\"\nSRC_USER=\"1$RANDOM$RANDOM\"\
-        \nTGT_USER=\"2$RANDOM$RANDOM\"\necho \"1. Create payment...\"\nRES=$(curl\
-        \ -s -X POST http://payment-service:8080/api/payments \\\n  -H \"Content-Type:\
-        \ application/json\" \\\n  -d \"{\\\"transactionId\\\": \\\"$TX_ID\\\", \\\
-        \"amount\\\": \\\"150.00\\\", \\\"currency\\\": \\\"USD\\\", \\\"sourceUserId\\\
-        \": $SRC_USER, \\\"targetUserId\\\": $TGT_USER, \\\"sourceCurrency\\\": \\\
-        \"USD\\\", \\\"targetCurrency\\\": \\\"EUR\\\"}\")\n\nID=$(echo $RES | jq\
-        \ -r '.id')\necho \"ID: $ID\"\n\necho \"2. Execute payment...\"\ncurl -s -X\
-        \ POST http://payment-service:8080/api/payments/$ID/execute\n\necho \"3. Wait\
-        \ 15s (Chaos active)...\"\nsleep 15\n\necho \"4. Validate state...\"\nSTATE=$(curl\
-        \ -s http://payment-service:8080/api/payments/$ID | jq -r '.state')\necho\
-        \ \"State: $STATE\"\n\nif [ \"$STATE\" != \"COMPLETED\" ]; then\n  echo \"\
-        Error: Not completed. Was: $STATE\"\n  exit 1\nfi\necho \"OK\"\n"
+      - |
+        apk add --no-cache curl jq
+        TX_ID="tx-$RANDOM"
+        SRC_USER="1$RANDOM$RANDOM"
+        TGT_USER="2$RANDOM$RANDOM"
+        echo "1. Create payment..."
+        RES=$(curl -s -X POST http://payment-service:8080/api/payments \
+          -H "Content-Type: application/json" \
+          -d "{\"transactionId\": \"$TX_ID\", \"amount\": \"150.00\", \"currency\": \"USD\", \"sourceUserId\": $SRC_USER, \"targetUserId\": $TGT_USER, \"sourceCurrency\": \"USD\", \"targetCurrency\": \"EUR\"}")
+
+        ID=$(echo $RES | jq -r '.id')
+        echo "ID: $ID"
+
+        echo "2. Execute payment..."
+        curl -s -X POST http://payment-service:8080/api/payments/$ID/execute
+
+        echo "3. Wait 15s (Chaos active)..."
+        sleep 15
+
+        echo "4. Validate state..."
+        STATE=$(curl -s http://payment-service:8080/api/payments/$ID | jq -r '.state')
+        echo "State: $STATE"
+
+        if [ "$STATE" != "COMPLETED" ]; then
+          echo "Error: Not completed. Was: $STATE"
+          exit 1
+        fi
+        echo "OK"
       command:
       - /bin/sh
       - -c
@@ -70,5 +95,9 @@ spec:
     outputs: {}
     resource:
       action: delete
-      manifest: "apiVersion: chaos-mesh.org/v1alpha1\nkind: PodChaos\nmetadata:\n\
-        \  name: fail-fx-service-pods\n  namespace: applications\n"
+      manifest: |
+        apiVersion: chaos-mesh.org/v1alpha1
+        kind: PodChaos
+        metadata:
+          name: fail-fx-service-pods
+          namespace: applications
