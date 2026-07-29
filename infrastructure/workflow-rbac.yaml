@@ -10,6 +10,9 @@ rules:
 - apiGroups: ["argoproj.io"]
   resources: ["workflowtaskresults"]
   verbs: ["create", "patch"]
+- apiGroups: ["chaos-mesh.org"]
+  resources: ["podchaos"]
+  verbs: ["create", "delete", "get", "patch"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
