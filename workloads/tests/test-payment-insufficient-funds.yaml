@@ -76,4 +76,8 @@ spec:
     inputs: {}
     metadata: {}
     name: test-payment
-    outputs: {}
+    outputs:
+      parameters:
+      - name: payment-id
+        valueFrom:
+          path: /tmp/payment_id.txt
