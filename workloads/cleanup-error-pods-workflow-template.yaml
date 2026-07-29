@@ -1,0 +1,55 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: error-pod-cleanup-sa
+  namespace: applications
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: error-pod-cleanup-role
+  namespace: applications
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: error-pod-cleanup-rolebinding
+  namespace: applications
+subjects:
+  - kind: ServiceAccount
+    name: error-pod-cleanup-sa
+    namespace: applications
+roleRef:
+  kind: Role
+  name: error-pod-cleanup-role
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: cleanup-error-pods
+  namespace: applications
+spec:
+  serviceAccountName: error-pod-cleanup-sa
+  entrypoint: cleanup
+  templates:
+    - name: cleanup
+      container:
+        image: bitnami/kubectl:latest
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            echo "Searching for pods in Error or Failed state in the 'applications' namespace..."
+            
+            # Deletes pods that have explicitly Failed (e.g. Evicted, Failed)
+            kubectl delete pods -n applications --field-selector=status.phase=Failed
+            
+            # Deletes pods that are specifically matching "Error" or "CrashLoopBackOff" in their status display
+            kubectl get pods -n applications --no-headers | grep -iE 'Error|CrashLoopBackOff' | awk '{print $1}' | xargs -r kubectl delete pod -n applications
+            
+            echo "Cleanup complete."
