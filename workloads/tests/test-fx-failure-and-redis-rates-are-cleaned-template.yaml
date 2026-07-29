@@ -43,8 +43,8 @@ spec:
     resource:
       action: create
       manifest: "kind: PodChaos\napiVersion: chaos-mesh.org/v1alpha1\nmetadata:\n\
-        \  namespace: applications\n  name: fx-failure\n  annotations:\n    experiment.chaos-mesh.org/pause:\
-        \ 'true'\nspec:\n  selector:\n    namespaces:\n      - applications\n    labelSelectors:\n\
+        \  namespace: applications\n  name: isolate-fx-service\nspec:\n  selector:\n\
+        \    namespaces:\n      - applications\n    labelSelectors:\n\
         \      app: fx-service\n  mode: all\n  action: pod-failure\n"
   - container:
       args:
