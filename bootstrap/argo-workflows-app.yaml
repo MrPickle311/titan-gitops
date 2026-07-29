@@ -13,6 +13,8 @@ spec:
       values: |
         server:
           secure: false
+          authModes:
+            - server
           ingress:
             enabled: true
             ingressClassName: nginx
