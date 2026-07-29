@@ -1,0 +1,74 @@
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  labels:
+    workflows.argoproj.io/creator: system-serviceaccount-argo-argo-workflows-server
+  name: test-payment-redis-pods-failure-template
+  namespace: applications
+spec:
+  arguments: {}
+  entrypoint: main
+  onExit: cleanup
+  templates:
+  - inputs: {}
+    metadata: {}
+    name: main
+    outputs: {}
+    steps:
+    - - arguments: {}
+        name: inject-chaos
+        template: apply-chaos
+    - - arguments: {}
+        name: run-test
+        template: test-payment
+  - inputs: {}
+    metadata: {}
+    name: apply-chaos
+    outputs: {}
+    resource:
+      action: create
+      manifest: "kind: PodChaos\napiVersion: chaos-mesh.org/v1alpha1\nmetadata:\n\
+        \  namespace: databases\n  name: redis-failure\n  annotations:\n    experiment.chaos-mesh.org/pause:\
+        \ 'true'\nspec:\n  selector:\n    namespaces:\n      - databases\n    labelSelectors:\n\
+        \      helm.sh/chart: redis-cluster-13.0.4\n  mode: all\n  action: pod-failure\n"
+  - container:
+      args:
+      - "apk add --no-cache curl jq\n\nTX_ID=\"tx-$RANDOM\"\nSRC_USER=\"1$RANDOM$RANDOM\"\
+        \nTGT_USER=\"2$RANDOM$RANDOM\"\necho \"1. Create payment...\"\nRES=$(curl\
+        \ -s -X POST http://payment-service:8080/api/payments \\\n  -H \"Content-Type:\
+        \ application/json\" \\\n  -d \"{\\\"transactionId\\\": \\\"$TX_ID\\\", \\\
+        \"amount\\\": \\\"150.00\\\", \\\"currency\\\": \\\"USD\\\", \\\"sourceUserId\\\
+        \": $SRC_USER, \\\"targetUserId\\\": $TGT_USER, \\\"sourceCurrency\\\": \\\
+        \"USD\\\", \\\"targetCurrency\\\": \\\"EUR\\\"}\")\n\nID=$(echo $RES | jq\
+        \ -r '.id')\necho \"ID: $ID\"\n\necho \"2. Execute payment...\"\ncurl -s -X\
+        \ POST http://payment-service:8080/api/payments/$ID/execute\n\necho \"3. Wait\
+        \ 15s (Chaos active)...\"\nsleep 15\n\necho \"4. Validate state...\"\nSTATE=$(curl\
+        \ -s http://payment-service:8080/api/payments/$ID | jq -r '.state')\necho\
+        \ \"State: $STATE\"\n\nif [ \"$STATE\" != \"COMPLETED\" ]; then\n  echo \"\
+        Error: Not completed. Was: $STATE\"\n  exit 1\nfi\necho \"OK\"\n"
+      command:
+      - /bin/sh
+      - -c
+      image: alpine:latest
+      name: ''
+      resources: {}
+    inputs: {}
+    metadata: {}
+    name: test-payment
+    outputs: {}
+  - inputs: {}
+    metadata: {}
+    name: cleanup
+    outputs: {}
+    steps:
+    - - arguments: {}
+        name: remove-chaos
+        template: delete-chaos
+  - inputs: {}
+    metadata: {}
+    name: delete-chaos
+    outputs: {}
+    resource:
+      action: delete
+      manifest: "apiVersion: chaos-mesh.org/v1alpha1\nkind: PodChaos\nmetadata:\n\
+        \  name: redis-failure\n  namespace: databases\n"

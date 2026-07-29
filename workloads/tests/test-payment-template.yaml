@@ -1,0 +1,35 @@
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  labels:
+    workflows.argoproj.io/creator: system-serviceaccount-argo-argo-workflows-server
+  name: test-payment-template
+  namespace: applications
+spec:
+  arguments: {}
+  entrypoint: test-flow
+  templates:
+  - container:
+      args:
+      - "apk add --no-cache curl jq\n\nTX_ID=\"tx-$RANDOM\"\necho \"1. Create payment...\"\
+        \nRES=$(curl -s -X POST http://payment-service:8080/api/payments \\\n  -H\
+        \ \"Content-Type: application/json\" \\\n  -d \"{\\\"transactionId\\\": \\\
+        \"$TX_ID\\\", \\\"amount\\\": \\\"150.00\\\", \\\"currency\\\": \\\"USD\\\"\
+        , \\\"sourceUserId\\\": 1001, \\\"targetUserId\\\": 2002, \\\"sourceCurrency\\\
+        \": \\\"USD\\\", \\\"targetCurrency\\\": \\\"EUR\\\"}\")\n\nID=$(echo $RES\
+        \ | jq -r '.id')\necho \"ID: $ID\"\n\necho \"2. Execute payment...\"\ncurl\
+        \ -s -X POST http://payment-service:8080/api/payments/$ID/execute\n\necho\
+        \ \"3. Wait 10s...\"\nsleep 10\n\necho \"4. Validate state...\"\nSTATE=$(curl\
+        \ -s http://payment-service:8080/api/payments/$ID | jq -r '.state')\necho\
+        \ \"State: $STATE\"\n\nif [ \"$STATE\" != \"COMPLETED\" ]; then\n  echo \"\
+        Error: Not completed\"\n  exit 1\nfi\necho \"OK\"\n"
+      command:
+      - /bin/sh
+      - -c
+      image: alpine:latest
+      name: ''
+      resources: {}
+    inputs: {}
+    metadata: {}
+    name: test-flow
+    outputs: {}
