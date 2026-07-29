@@ -5,4 +5,5 @@ resources:
   - applications-namespace.yaml
   - cluster-config.yaml
   - argo-workflows-rbac.yaml
+  - workflow-rbac.yaml
 
