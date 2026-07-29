@@ -18,9 +18,14 @@ spec:
     - - arguments: {}
         name: inject-chaos-fx
         template: apply-chaos-fx
-    - - arguments: {}
+    - - arguments:
+          parameters:
+          - name: sleep-duration
+            value: '25'
         name: backup-and-clear-redis
-        template: backup-and-clear-redis
+        templateRef:
+          name: common-test-steps
+          template: backup-and-clear-redis
     - - arguments: {}
         name: run-test
         template: test-payment
@@ -64,39 +69,6 @@ spec:
               app: fx-service
           mode: all
           action: pod-failure
-  - container:
-      args:
-      - |
-        echo "Waiting for Chaos Mesh to isolate fx-service pods..."
-        sleep 25
-
-        echo "Backing up dynamic FX rates from Redis..."
-        # Get the current dynamic rates and format them into a single string
-        RATES=$(redis-cli -c -h redis-redis-cluster.databases.svc.cluster.local -p 6379 -a $REDIS_PASSWORD --raw HGETALL fx-conversion-rates | tr '\n' ' ')
-
-        # Store the backed up string safely in a temporary Redis String key (redis-cli -c handles cluster redirects automatically)
-        redis-cli -c -h redis-redis-cluster.databases.svc.cluster.local -p 6379 -a $REDIS_PASSWORD SET fx-rates-backup "$RATES"
-
-        echo "Rates saved to fx-rates-backup: $RATES"
-
-        echo "Clearing the actual FX rates table..."
-        redis-cli -c -h redis-redis-cluster.databases.svc.cluster.local -p 6379 -a $REDIS_PASSWORD DEL fx-conversion-rates
-      command:
-      - /bin/sh
-      - -c
-      env:
-      - name: REDIS_PASSWORD
-        valueFrom:
-          secretKeyRef:
-            key: redis-password
-            name: redis-cluster-credentials
-      image: redis:alpine
-      name: ''
-      resources: {}
-    inputs: {}
-    metadata: {}
-    name: backup-and-clear-redis
-    outputs: {}
   - container:
       args:
       - |
@@ -157,26 +129,9 @@ spec:
         template: delete-chaos-fx
     - - arguments: {}
         name: restore-redis
-        template: restore-redis
-  - container:
-      args:
-      - "echo \"Retrieving backed up rates from fx-rates-backup string key...\"\nRATES=$(redis-cli -c -h redis-redis-cluster.databases.svc.cluster.local -p 6379 -a $REDIS_PASSWORD GET fx-rates-backup)\n\nif [ -n \"$RATES\" ] && [ \"$RATES\" != \"nil\" ]; then\n  echo \"Restoring dynamically fetched rates back to fx-conversion-rates hash...\"\n  # Use xargs to pass the space-separated string as arguments to HSET\n  echo \"$RATES\" | xargs redis-cli -c -h redis-redis-cluster.databases.svc.cluster.local -p 6379 -a $REDIS_PASSWORD HSET fx-conversion-rates\n  \n  echo \"Cleaning up backup key...\"\n  redis-cli -c -h redis-redis-cluster.databases.svc.cluster.local -p 6379 -a $REDIS_PASSWORD DEL fx-rates-backup\n  echo \"Dynamic restoration complete!\"\nelse\n  echo \"No backup found in fx-rates-backup, skipping restore.\"\nfi\n"
-      command:
-      - /bin/sh
-      - -c
-      env:
-      - name: REDIS_PASSWORD
-        valueFrom:
-          secretKeyRef:
-            key: redis-password
-            name: redis-cluster-credentials
-      image: redis:alpine
-      name: ''
-      resources: {}
-    inputs: {}
-    metadata: {}
-    name: restore-redis
-    outputs: {}
+        templateRef:
+          name: common-test-steps
+          template: restore-redis
   - inputs: {}
     metadata: {}
     name: delete-chaos-fx

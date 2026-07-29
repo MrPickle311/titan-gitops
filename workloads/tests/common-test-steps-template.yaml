@@ -5,88 +5,156 @@ metadata:
   namespace: applications
 spec:
   templates:
-    - name: validate-db
-      inputs:
-        parameters:
-          - name: payment-id
-          - name: expected-state
-      container:
-        image: postgres:alpine
-        command:
-          - /bin/sh
-          - -c
-        args:
-          - |
-            echo "Connecting to Postgres to verify payment {{inputs.parameters.payment-id}}..."
-            export PGPASSWORD=$DB_PASSWORD
-            PID={{inputs.parameters.payment-id}}
-            EXPECTED={{inputs.parameters.expected-state}}
-            
-            echo "1. Checking 'payments' table..."
-            STATE=$(psql -h postgres-postgresql.databases.svc.cluster.local -U $DB_USER -d titan_db -t -c "SELECT state FROM payments WHERE id=$PID;" | xargs)
-            if [ "$STATE" != "$EXPECTED" ]; then
-              echo "DB Validation Error: payments state is '$STATE', expected '$EXPECTED'"
-              exit 1
-            fi
-            
-            echo "2. Checking 'payment_history' table..."
-            HISTORY_COUNT=$(psql -h postgres-postgresql.databases.svc.cluster.local -U $DB_USER -d titan_db -t -c "SELECT count(*) FROM payment_history WHERE payment_id=$PID AND to_state='$EXPECTED';" | xargs)
-            if [ "$HISTORY_COUNT" -eq 0 ]; then
-              echo "DB Validation Error: payment_history has no $EXPECTED record for this payment."
-              exit 1
-            fi
-            
-            echo "3. Checking 'ledger_entries' table..."
-            LEDGER_COUNT=$(psql -h postgres-postgresql.databases.svc.cluster.local -U $DB_USER -d titan_db -t -c "SELECT count(*) FROM ledger_entries WHERE payment_id=$PID;" | xargs)
-            if [ "$EXPECTED" = "FAILED" ]; then
-              if [ "$LEDGER_COUNT" -ne 0 ]; then
-                echo "DB Validation Error: ledger_entries has $LEDGER_COUNT records, expected 0 (since it failed)"
-                exit 1
-              fi
-            else
-              if [ "$LEDGER_COUNT" -eq 0 ]; then
-                echo "DB Validation Error: ledger_entries has 0 records, expected some for a COMPLETED payment"
-                exit 1
-              fi
-            fi
-            
-            echo "Success! Database entities correctly reflect the $EXPECTED payment."
-        env:
-          - name: DB_USER
-            value: postgres
-          - name: DB_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                key: postgres-password
-                name: postgres-credentials
+  - name: validate-db
+    inputs:
+      parameters:
+      - name: payment-id
+      - name: expected-state
+    container:
+      image: postgres:alpine
+      command:
+      - /bin/sh
+      - -c
+      args:
+      - |
+        echo "Connecting to Postgres to verify payment {{inputs.parameters.payment-id}}..."
+        export PGPASSWORD=$DB_PASSWORD
+        PID={{inputs.parameters.payment-id}}
+        EXPECTED={{inputs.parameters.expected-state}}
 
-    - name: validate-kafka
-      inputs:
-        parameters:
-          - name: payment-id
-          - name: expected-state
-      container:
-        image: edenhill/kcat:1.7.1
-        command:
-          - /bin/sh
-          - -c
-        args:
-          - |
-            PID={{inputs.parameters.payment-id}}
-            EXPECTED={{inputs.parameters.expected-state}}
-            echo "Consuming Kafka topic payment-webhooks to find message for payment $PID..."
-            sleep 3
-            
-            MSG=$(kcat -C -b kafka.messaging.svc.cluster.local:9092 -t payment-webhooks -o -100 -e -q | grep "\"paymentId\":$PID" || true)
-            
-            if [ -z "$MSG" ]; then
-               echo "Error: Could not find Kafka message for payment $PID in payment-webhooks topic!"
-               exit 1
-            fi
-            
-            echo "Found Kafka message: $MSG"
-            if ! echo "$MSG" | grep -q "\"status\":\"$EXPECTED\""; then
-               echo "Error: Message does not contain $EXPECTED status!"
-               exit 1
-            fi
-            echo "Kafka message successfully validated!"
+        echo "1. Checking 'payments' table..."
+        STATE=$(psql -h postgres-postgresql.databases.svc.cluster.local -U $DB_USER -d titan_db -t -c "SELECT state FROM payments WHERE id=$PID;" | xargs)
+        if [ "$STATE" != "$EXPECTED" ]; then
+          echo "DB Validation Error: payments state is '$STATE', expected '$EXPECTED'"
+          exit 1
+        fi
+
+        echo "2. Checking 'payment_history' table..."
+        HISTORY_COUNT=$(psql -h postgres-postgresql.databases.svc.cluster.local -U $DB_USER -d titan_db -t -c "SELECT count(*) FROM payment_history WHERE payment_id=$PID AND to_state='$EXPECTED';" | xargs)
+        if [ "$HISTORY_COUNT" -eq 0 ]; then
+          echo "DB Validation Error: payment_history has no $EXPECTED record for this payment."
+          exit 1
+        fi
+
+        echo "3. Checking 'ledger_entries' table..."
+        LEDGER_COUNT=$(psql -h postgres-postgresql.databases.svc.cluster.local -U $DB_USER -d titan_db -t -c "SELECT count(*) FROM ledger_entries WHERE payment_id=$PID;" | xargs)
+        if [ "$EXPECTED" = "FAILED" ]; then
+          if [ "$LEDGER_COUNT" -ne 0 ]; then
+            echo "DB Validation Error: ledger_entries has $LEDGER_COUNT records, expected 0 (since it failed)"
+            exit 1
+          fi
+        else
+          if [ "$LEDGER_COUNT" -eq 0 ]; then
+            echo "DB Validation Error: ledger_entries has 0 records, expected some for a COMPLETED payment"
+            exit 1
+          fi
+        fi
+
+        echo "Success! Database entities correctly reflect the $EXPECTED payment."
+      env:
+      - name: DB_USER
+        value: postgres
+      - name: DB_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            key: postgres-password
+            name: postgres-credentials
+  - name: validate-kafka
+    inputs:
+      parameters:
+      - name: payment-id
+      - name: expected-state
+    container:
+      image: edenhill/kcat:1.7.1
+      command:
+      - /bin/sh
+      - -c
+      args:
+      - |
+        PID={{inputs.parameters.payment-id}}
+        EXPECTED={{inputs.parameters.expected-state}}
+        echo "Consuming Kafka topic payment-webhooks to find message for payment $PID..."
+        sleep 3
+
+        MSG=$(kcat -C -b kafka.messaging.svc.cluster.local:9092 -t payment-webhooks -o -100 -e -q | grep "\"paymentId\":$PID" || true)
+
+        if [ -z "$MSG" ]; then
+           echo "Error: Could not find Kafka message for payment $PID in payment-webhooks topic!"
+           exit 1
+        fi
+
+        echo "Found Kafka message: $MSG"
+        if ! echo "$MSG" | grep -q "\"status\":\"$EXPECTED\""; then
+           echo "Error: Message does not contain $EXPECTED status!"
+           exit 1
+        fi
+        echo "Kafka message successfully validated!"
+  - container:
+      args:
+      - |
+        echo "Waiting for Chaos Mesh to isolate fx-service pods..."
+        sleep {{inputs.parameters.sleep-duration}}
+
+        echo "Backing up dynamic FX rates from Redis..."
+        # Get the current dynamic rates and format them into a single string
+        RATES=$(redis-cli -c -h redis-redis-cluster.databases.svc.cluster.local -p 6379 -a $REDIS_PASSWORD --raw HGETALL fx-conversion-rates | tr '\n' ' ')
+
+        # Store the backed up string safely in a temporary Redis String key (redis-cli -c handles cluster redirects automatically)
+        redis-cli -c -h redis-redis-cluster.databases.svc.cluster.local -p 6379 -a $REDIS_PASSWORD SET fx-rates-backup "$RATES"
+
+        echo "Rates saved to fx-rates-backup: $RATES"
+
+        echo "Clearing the actual FX rates table..."
+        redis-cli -c -h redis-redis-cluster.databases.svc.cluster.local -p 6379 -a $REDIS_PASSWORD DEL fx-conversion-rates
+      command:
+      - /bin/sh
+      - -c
+      env:
+      - name: REDIS_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            key: redis-password
+            name: redis-cluster-credentials
+      image: redis:alpine
+      name: ''
+      resources: {}
+    inputs:
+      parameters:
+      - name: sleep-duration
+        default: '25'
+    metadata: {}
+    name: backup-and-clear-redis
+    outputs: {}
+  - container:
+      args:
+      - |
+        echo "Retrieving backed up rates from fx-rates-backup string key..."
+        RATES=$(redis-cli -c -h redis-redis-cluster.databases.svc.cluster.local -p 6379 -a $REDIS_PASSWORD GET fx-rates-backup)
+
+        if [ -n "$RATES" ] && [ "$RATES" != "nil" ]; then
+          echo "Restoring dynamically fetched rates back to fx-conversion-rates hash..."
+          # Use xargs to pass the space-separated string as arguments to HSET
+          echo "$RATES" | xargs redis-cli -c -h redis-redis-cluster.databases.svc.cluster.local -p 6379 -a $REDIS_PASSWORD HSET fx-conversion-rates
+          
+          echo "Cleaning up backup key..."
+          redis-cli -c -h redis-redis-cluster.databases.svc.cluster.local -p 6379 -a $REDIS_PASSWORD DEL fx-rates-backup
+          echo "Dynamic restoration complete!"
+        else
+          echo "No backup found in fx-rates-backup, skipping restore."
+        fi
+      command:
+      - /bin/sh
+      - -c
+      env:
+      - name: REDIS_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            key: redis-password
+            name: redis-cluster-credentials
+      image: redis:alpine
+      name: ''
+      resources: {}
+    inputs: {}
+    metadata: {}
+    name: restore-redis
+    outputs: {}
