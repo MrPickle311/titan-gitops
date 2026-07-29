@@ -50,7 +50,7 @@ spec:
       args:
       - 'echo "Waiting for Chaos Mesh to isolate fx-service pods..."
 
-        sleep 5
+        sleep 25
 
 
         echo "Backing up dynamic FX rates from Redis..."
