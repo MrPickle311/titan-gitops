@@ -169,14 +169,12 @@ spec:
       args:
       - "PID={{inputs.parameters.payment-id}}\necho \"Consuming Kafka topic payment-webhooks\
         \ to find message for payment $PID...\"\nsleep 3\n\nMSG=$(kcat -C -b kafka.messaging.svc.cluster.local:9092\
-        \ -t payment-webhooks -o -100 -e -q | grep \"\\\"aggregateId\\\":\\\"$PID\\\"\"\
-        \ || true)\n\nif [ -z \"$MSG\" ]; then\n   echo \"Error: Could not find Kafka\
-        \ message for payment $PID in payment-webhooks topic!\"\n   exit 1\nfi\n\n\
-        echo \"Found Kafka message: $MSG\"\nif ! echo \"$MSG\" | grep -q \"\\\"status\\\
-        \":\\\"FAILED\\\"\" && ! echo \"$MSG\" | grep -q \"\\\"eventType\\\":\\\"\
-        PAYMENT_FAILED\\\"\" && ! echo \"$MSG\" | grep -q \"FAILED\"; then\n   echo\
-        \ \"Error: Message does not contain FAILED status!\"\n   exit 1\nfi\necho\
-        \ \"Kafka message successfully validated!\"\n"
+        \ -t payment-webhooks -o -100 -e -q | grep \"\\\"paymentId\\\":$PID\" || true)\n\n\
+        if [ -z \"$MSG\" ]; then\n   echo \"Error: Could not find Kafka message for\
+        \ payment $PID in payment-webhooks topic!\"\n   exit 1\nfi\n\necho \"Found\
+        \ Kafka message: $MSG\"\nif ! echo \"$MSG\" | grep -q \"\\\"status\\\":\\\"\
+        FAILED\\\"\"; then\n   echo \"Error: Message does not contain FAILED status!\"\
+        \n   exit 1\nfi\necho \"Kafka message successfully validated!\"\n"
       command:
       - /bin/sh
       - -c
