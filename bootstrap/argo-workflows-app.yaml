@@ -1,19 +1,17 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: kafka-ui
+  name: argo-workflows
   namespace: argocd
-  finalizers:
-    - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   source:
-    repoURL: 'https://github.com/MrPickle311/titan-gitops.git'
-    targetRevision: HEAD
-    path: databases/kafka-ui
+    repoURL: 'https://argoproj.github.io/argo-helm'
+    targetRevision: 0.41.11
+    chart: argo-workflows
   destination:
     server: 'https://kubernetes.default.svc'
-    namespace: messaging
+    namespace: argo
   syncPolicy:
     automated:
       prune: true
