@@ -21,6 +21,26 @@ spec:
     - - arguments: {}
         name: run-test
         template: test-payment
+    - - name: validate-db
+        templateRef:
+          name: common-test-steps
+          template: validate-db
+        arguments:
+          parameters:
+          - name: payment-id
+            value: '{{steps.run-test.outputs.parameters.payment-id}}'
+          - name: expected-state
+            value: COMPLETED
+    - - name: validate-kafka
+        templateRef:
+          name: common-test-steps
+          template: validate-kafka
+        arguments:
+          parameters:
+          - name: payment-id
+            value: '{{steps.run-test.outputs.parameters.payment-id}}'
+          - name: expected-state
+            value: COMPLETED
   - inputs: {}
     metadata: {}
     name: apply-chaos
@@ -58,6 +78,7 @@ spec:
 
         ID=$(echo $RES | jq -r '.id')
         echo "ID: $ID"
+        echo "$ID" > /tmp/payment_id.txt
 
         echo "2. Execute payment..."
         curl -s -X POST http://payment-service:8080/api/payments/$ID/execute

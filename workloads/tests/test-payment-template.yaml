@@ -6,45 +6,68 @@ metadata:
   name: test-payment-template
   namespace: applications
 spec:
-  arguments: {}
-  entrypoint: test-flow
+  entrypoint: main
   templates:
-  - container:
-      args:
-      - |
-        apk add --no-cache curl jq
+    - name: main
+      steps:
+        - - name: run-test
+            template: test-payment
+        - - name: validate-db
+            templateRef:
+              name: common-test-steps
+              template: validate-db
+            arguments:
+              parameters:
+                - name: payment-id
+                  value: '{{steps.run-test.outputs.parameters.payment-id}}'
+                - name: expected-state
+                  value: 'COMPLETED'
+        - - name: validate-kafka
+            templateRef:
+              name: common-test-steps
+              template: validate-kafka
+            arguments:
+              parameters:
+                - name: payment-id
+                  value: '{{steps.run-test.outputs.parameters.payment-id}}'
+                - name: expected-state
+                  value: 'COMPLETED'
+    - name: test-payment
+      container:
+        image: alpine:latest
+        command:
+          - /bin/sh
+          - -c
+        args:
+          - |
+            apk add --no-cache curl jq
+            TX_ID="tx-$RANDOM"
+            echo "1. Create payment..."
+            RES=$(curl -s -X POST http://payment-service:8080/api/payments \
+              -H "Content-Type: application/json" \
+              -d "{\"transactionId\": \"$TX_ID\", \"amount\": \"150.00\", \"currency\": \"USD\", \"sourceUserId\": 1001, \"targetUserId\": 2002, \"sourceCurrency\": \"USD\", \"targetCurrency\": \"EUR\"}")
 
-        TX_ID="tx-$RANDOM"
-        echo "1. Create payment..."
-        RES=$(curl -s -X POST http://payment-service:8080/api/payments \
-          -H "Content-Type: application/json" \
-          -d "{\"transactionId\": \"$TX_ID\", \"amount\": \"150.00\", \"currency\": \"USD\", \"sourceUserId\": 1001, \"targetUserId\": 2002, \"sourceCurrency\": \"USD\", \"targetCurrency\": \"EUR\"}")
+            ID=$(echo $RES | jq -r '.id')
+            echo "ID: $ID"
+            echo "$ID" > /tmp/payment_id.txt
 
-        ID=$(echo $RES | jq -r '.id')
-        echo "ID: $ID"
+            echo "2. Execute payment..."
+            curl -s -X POST http://payment-service:8080/api/payments/$ID/execute
 
-        echo "2. Execute payment..."
-        curl -s -X POST http://payment-service:8080/api/payments/$ID/execute
+            echo "3. Wait 10s..."
+            sleep 10
 
-        echo "3. Wait 10s..."
-        sleep 10
+            echo "4. Validate state..."
+            STATE=$(curl -s http://payment-service:8080/api/payments/$ID | jq -r '.state')
+            echo "State: $STATE"
 
-        echo "4. Validate state..."
-        STATE=$(curl -s http://payment-service:8080/api/payments/$ID | jq -r '.state')
-        echo "State: $STATE"
-
-        if [ "$STATE" != "COMPLETED" ]; then
-          echo "Error: Not completed"
-          exit 1
-        fi
-        echo "OK"
-      command:
-      - /bin/sh
-      - -c
-      image: alpine:latest
-      name: ''
-      resources: {}
-    inputs: {}
-    metadata: {}
-    name: test-flow
-    outputs: {}
+            if [ "$STATE" != "COMPLETED" ]; then
+              echo "Error: Not completed"
+              exit 1
+            fi
+            echo "OK"
+      outputs:
+        parameters:
+          - name: payment-id
+            valueFrom:
+              path: /tmp/payment_id.txt

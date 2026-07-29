@@ -1,0 +1,92 @@
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: common-test-steps
+  namespace: applications
+spec:
+  templates:
+    - name: validate-db
+      inputs:
+        parameters:
+          - name: payment-id
+          - name: expected-state
+      container:
+        image: postgres:alpine
+        command:
+          - /bin/sh
+          - -c
+        args:
+          - |
+            echo "Connecting to Postgres to verify payment {{inputs.parameters.payment-id}}..."
+            export PGPASSWORD=$DB_PASSWORD
+            PID={{inputs.parameters.payment-id}}
+            EXPECTED={{inputs.parameters.expected-state}}
+            
+            echo "1. Checking 'payments' table..."
+            STATE=$(psql -h postgres-postgresql.databases.svc.cluster.local -U $DB_USER -d titan_db -t -c "SELECT state FROM payments WHERE id=$PID;" | xargs)
+            if [ "$STATE" != "$EXPECTED" ]; then
+              echo "DB Validation Error: payments state is '$STATE', expected '$EXPECTED'"
+              exit 1
+            fi
+            
+            echo "2. Checking 'payment_history' table..."
+            HISTORY_COUNT=$(psql -h postgres-postgresql.databases.svc.cluster.local -U $DB_USER -d titan_db -t -c "SELECT count(*) FROM payment_history WHERE payment_id=$PID AND to_state='$EXPECTED';" | xargs)
+            if [ "$HISTORY_COUNT" -eq 0 ]; then
+              echo "DB Validation Error: payment_history has no $EXPECTED record for this payment."
+              exit 1
+            fi
+            
+            echo "3. Checking 'ledger_entries' table..."
+            LEDGER_COUNT=$(psql -h postgres-postgresql.databases.svc.cluster.local -U $DB_USER -d titan_db -t -c "SELECT count(*) FROM ledger_entries WHERE payment_id=$PID;" | xargs)
+            if [ "$EXPECTED" = "FAILED" ]; then
+              if [ "$LEDGER_COUNT" -ne 0 ]; then
+                echo "DB Validation Error: ledger_entries has $LEDGER_COUNT records, expected 0 (since it failed)"
+                exit 1
+              fi
+            else
+              if [ "$LEDGER_COUNT" -eq 0 ]; then
+                echo "DB Validation Error: ledger_entries has 0 records, expected some for a COMPLETED payment"
+                exit 1
+              fi
+            fi
+            
+            echo "Success! Database entities correctly reflect the $EXPECTED payment."
+        env:
+          - name: DB_USER
+            value: postgres
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: postgres-password
+                name: postgres-credentials
+
+    - name: validate-kafka
+      inputs:
+        parameters:
+          - name: payment-id
+          - name: expected-state
+      container:
+        image: edenhill/kcat:1.7.1
+        command:
+          - /bin/sh
+          - -c
+        args:
+          - |
+            PID={{inputs.parameters.payment-id}}
+            EXPECTED={{inputs.parameters.expected-state}}
+            echo "Consuming Kafka topic payment-webhooks to find message for payment $PID..."
+            sleep 3
+            
+            MSG=$(kcat -C -b kafka.messaging.svc.cluster.local:9092 -t payment-webhooks -o -100 -e -q | grep "\"paymentId\":$PID" || true)
+            
+            if [ -z "$MSG" ]; then
+               echo "Error: Could not find Kafka message for payment $PID in payment-webhooks topic!"
+               exit 1
+            fi
+            
+            echo "Found Kafka message: $MSG"
+            if ! echo "$MSG" | grep -q "\"status\":\"$EXPECTED\""; then
+               echo "Error: Message does not contain $EXPECTED status!"
+               exit 1
+            fi
+            echo "Kafka message successfully validated!"

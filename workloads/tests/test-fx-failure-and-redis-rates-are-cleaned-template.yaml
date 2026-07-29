@@ -24,18 +24,26 @@ spec:
     - - arguments: {}
         name: run-test
         template: test-payment
-    - - arguments:
+    - - name: validate-db
+        templateRef:
+          name: common-test-steps
+          template: validate-db
+        arguments:
           parameters:
           - name: payment-id
             value: '{{steps.run-test.outputs.parameters.payment-id}}'
-        name: validate-db
-        template: validate-db
-    - - arguments:
+          - name: expected-state
+            value: FAILED
+    - - name: validate-kafka
+        templateRef:
+          name: common-test-steps
+          template: validate-kafka
+        arguments:
           parameters:
           - name: payment-id
             value: '{{steps.run-test.outputs.parameters.payment-id}}'
-        name: validate-kafka
-        template: validate-kafka
+          - name: expected-state
+            value: FAILED
   - inputs: {}
     metadata: {}
     name: apply-chaos-fx
@@ -139,87 +147,6 @@ spec:
       - name: payment-id
         valueFrom:
           path: /tmp/payment_id.txt
-  - container:
-      args:
-      - |
-        echo "Connecting to Postgres to verify payment {{inputs.parameters.payment-id}}..."
-        export PGPASSWORD=$DB_PASSWORD
-        PID={{inputs.parameters.payment-id}}
-
-        echo "1. Checking 'payments' table..."
-        STATE=$(psql -h postgres-postgresql.databases.svc.cluster.local -U $DB_USER -d titan_db -t -c "SELECT state FROM payments WHERE id=$PID;" | xargs)
-        if [ "$STATE" != "FAILED" ]; then
-          echo "DB Validation Error: payments state is '$STATE', expected 'FAILED'"
-          exit 1
-        fi
-
-        echo "2. Checking 'payment_history' table..."
-        HISTORY_COUNT=$(psql -h postgres-postgresql.databases.svc.cluster.local -U $DB_USER -d titan_db -t -c "SELECT count(*) FROM payment_history WHERE payment_id=$PID AND to_state='FAILED';" | xargs)
-        if [ "$HISTORY_COUNT" -eq 0 ]; then
-          echo "DB Validation Error: payment_history has no FAILED record for this payment."
-          exit 1
-        fi
-
-        echo "3. Checking 'ledger_entries' table..."
-        LEDGER_COUNT=$(psql -h postgres-postgresql.databases.svc.cluster.local -U $DB_USER -d titan_db -t -c "SELECT count(*) FROM ledger_entries WHERE payment_id=$PID;" | xargs)
-        if [ "$LEDGER_COUNT" -ne 0 ]; then
-          echo "DB Validation Error: ledger_entries has $LEDGER_COUNT records, expected 0 (since it failed at FX phase)"
-          exit 1
-        fi
-
-        echo "Success! Database entities (payments, payment_history, ledger_entries) correctly reflect the failed payment."
-      command:
-      - /bin/sh
-      - -c
-      env:
-      - name: DB_USER
-        value: postgres
-      - name: DB_PASSWORD
-        valueFrom:
-          secretKeyRef:
-            key: postgres-password
-            name: postgres-credentials
-      image: postgres:alpine
-      name: ''
-      resources: {}
-    inputs:
-      parameters:
-      - name: payment-id
-    metadata: {}
-    name: validate-db
-    outputs: {}
-  - container:
-      args:
-      - |
-        PID={{inputs.parameters.payment-id}}
-        echo "Consuming Kafka topic payment-webhooks to find message for payment $PID..."
-        sleep 3
-
-        MSG=$(kcat -C -b kafka.messaging.svc.cluster.local:9092 -t payment-webhooks -o -100 -e -q | grep "\"paymentId\":$PID" || true)
-
-        if [ -z "$MSG" ]; then
-           echo "Error: Could not find Kafka message for payment $PID in payment-webhooks topic!"
-           exit 1
-        fi
-
-        echo "Found Kafka message: $MSG"
-        if ! echo "$MSG" | grep -q "\"status\":\"FAILED\""; then
-           echo "Error: Message does not contain FAILED status!"
-           exit 1
-        fi
-        echo "Kafka message successfully validated!"
-      command:
-      - /bin/sh
-      - -c
-      image: edenhill/kcat:1.7.1
-      name: ''
-      resources: {}
-    inputs:
-      parameters:
-      - name: payment-id
-    metadata: {}
-    name: validate-kafka
-    outputs: {}
   - inputs: {}
     metadata: {}
     name: cleanup
