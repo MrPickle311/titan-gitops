@@ -130,16 +130,16 @@ spec:
       - "echo \"Connecting to Postgres to verify payment {{inputs.parameters.payment-id}}...\"\
         \nexport PGPASSWORD=$DB_PASSWORD\nPID={{inputs.parameters.payment-id}}\n\n\
         echo \"1. Checking 'payments' table...\"\nSTATE=$(psql -h postgres-postgresql.databases.svc.cluster.local\
-        \ -U $DB_USER -d payment_db -t -c \"SELECT state FROM payments WHERE id=$PID;\"\
+        \ -U $DB_USER -d titan_db -t -c \"SELECT state FROM payments WHERE id=$PID;\"\
         \ | xargs)\nif [ \"$STATE\" != \"FAILED\" ]; then\n  echo \"DB Validation\
         \ Error: payments state is '$STATE', expected 'FAILED'\"\n  exit 1\nfi\n\n\
         echo \"2. Checking 'payment_history' table...\"\nHISTORY_COUNT=$(psql -h postgres-postgresql.databases.svc.cluster.local\
-        \ -U $DB_USER -d payment_db -t -c \"SELECT count(*) FROM payment_history WHERE\
+        \ -U $DB_USER -d titan_db -t -c \"SELECT count(*) FROM payment_history WHERE\
         \ payment_id=$PID AND to_state='FAILED';\" | xargs)\nif [ \"$HISTORY_COUNT\"\
         \ -eq 0 ]; then\n  echo \"DB Validation Error: payment_history has no FAILED\
         \ record for this payment.\"\n  exit 1\nfi\n\necho \"3. Checking 'ledger_entries'\
         \ table...\"\nLEDGER_COUNT=$(psql -h postgres-postgresql.databases.svc.cluster.local\
-        \ -U $DB_USER -d payment_db -t -c \"SELECT count(*) FROM ledger_entries WHERE\
+        \ -U $DB_USER -d titan_db -t -c \"SELECT count(*) FROM ledger_entries WHERE\
         \ payment_id=$PID;\" | xargs)\nif [ \"$LEDGER_COUNT\" -ne 0 ]; then\n  echo\
         \ \"DB Validation Error: ledger_entries has $LEDGER_COUNT records, expected\
         \ 0 (since it failed at FX phase)\"\n  exit 1\nfi\n\necho \"Success! Database\
@@ -150,10 +150,7 @@ spec:
       - -c
       env:
       - name: DB_USER
-        valueFrom:
-          secretKeyRef:
-            key: postgres-user
-            name: postgres-credentials
+        value: postgres
       - name: DB_PASSWORD
         valueFrom:
           secretKeyRef:
