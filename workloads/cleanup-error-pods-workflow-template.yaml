@@ -49,7 +49,8 @@ spec:
             # Deletes pods that have explicitly Failed (e.g. Evicted, Failed)
             kubectl delete pods -n applications --field-selector=status.phase=Failed
             
-            # Deletes pods that are specifically matching "Error" or "CrashLoopBackOff" in their status display
-            kubectl get pods -n applications --no-headers | grep -iE 'Error|CrashLoopBackOff' | awk '{print $1}' | xargs -r kubectl delete pod -n applications
+            # Deletes pods that are specifically matching "Error" or "CrashLoopBackOff" in their STATUS column (column 3)
+            # We avoid grep here because the workflow pod itself has 'error' in its name, which would cause it to delete itself!
+            kubectl get pods -n applications --no-headers | awk '$3 ~ /Error|CrashLoopBackOff/ {print $1}' | xargs -r kubectl delete pod -n applications
             
             echo "Cleanup complete."
