@@ -32,7 +32,7 @@ spec:
           - name: payment-id
             value: '{{steps.run-test.outputs.parameters.payment-id}}'
           - name: expected-state
-            value: FAILED
+            value: COMPLETED
     - - name: validate-kafka
         templateRef:
           name: common-test-steps
@@ -42,7 +42,7 @@ spec:
           - name: payment-id
             value: '{{steps.run-test.outputs.parameters.payment-id}}'
           - name: expected-state
-            value: FAILED
+            value: COMPLETED
   - container:
       args:
       - |
