@@ -322,3 +322,32 @@ spec:
           kubectl exec -n applications deploy/fraud-service -- sh -c '
           env -u JAVA_TOOL_OPTIONS /opt/byteman/bin/bmsubmit.sh -p 9288 -u /tmp/mock-fraud.btm
           '
+  - name: apply-chaos-limits
+    container:
+      image: bitnami/kubectl:latest
+      command: [sh, -c]
+      args:
+      - |
+        cat <<EOF | kubectl apply -f -
+        apiVersion: chaos-mesh.org/v1alpha1
+        kind: PodChaos
+        metadata:
+          name: limits-service-failure
+          namespace: applications
+        spec:
+          action: pod-failure
+          mode: all
+          duration: "30s"
+          selector:
+            namespaces:
+              - applications
+            labelSelectors:
+              app: limits-service
+        EOF
+  - name: remove-chaos-limits
+    container:
+      image: bitnami/kubectl:latest
+      command: [sh, -c]
+      args:
+      - "kubectl delete podchaos limits-service-failure -n applications --ignore-not-found"
+
