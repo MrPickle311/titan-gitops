@@ -237,31 +237,27 @@ spec:
           name: fail-auth-service-pods
           namespace: applications
   - name: apply-chaos-auth-rejected
-    resource:
-      action: create
-      manifest: |
-        apiVersion: chaos-mesh.org/v1alpha1
-        kind: JVMChaos
-        metadata:
-          name: mock-auth-rejected
-          namespace: applications
-        spec:
-          action: return
-          mode: all
-          selector:
-            namespaces:
-            - applications
-            labelSelectors:
-              app: authorization-service
-          class: com.example.authorization.AuthorizationGrpcService
-          method: isSuccess
-          value: 'false'
+    container:
+      image: bitnami/kubectl:latest
+      command: [sh, -c]
+      args:
+        - |
+          kubectl exec -n applications deploy/authorization-service -- sh -c '
+          cat > /tmp/mock.btm << "EOF"
+          RULE mock-auth-failure
+          CLASS com.example.authorization.AuthorizationGrpcService
+          METHOD isSuccess
+          AT ENTRY
+          IF true
+          DO return false;
+          ENDRULE
+          EOF
+          /opt/byteman/bin/bmsubmit.sh -p 9288 -l /tmp/mock.btm
+          '
   - name: remove-chaos-auth-rejected
-    resource:
-      action: delete
-      manifest: |
-        apiVersion: chaos-mesh.org/v1alpha1
-        kind: JVMChaos
-        metadata:
-          name: mock-auth-rejected
-          namespace: applications
+    container:
+      image: bitnami/kubectl:latest
+      command: [sh, -c]
+      args:
+        - |
+          kubectl exec -n applications deploy/authorization-service -- /opt/byteman/bin/bmsubmit.sh -p 9288 -u mock-auth-failure

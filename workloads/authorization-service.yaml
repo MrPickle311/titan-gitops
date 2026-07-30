@@ -57,7 +57,7 @@ spec:
         - name: MANAGEMENT_ENDPOINT_ENV_SHOW_VALUES
           value: "ALWAYS"
         - name: JAVA_TOOL_OPTIONS
-          value: -javaagent:/agent/pyroscope.jar -javaagent:/agent/opentelemetry-javaagent.jar -XX:+EnableDynamicAgentLoading
+          value: -javaagent:/opt/byteman/lib/byteman.jar=listener:true,port:9288,address:0.0.0.0 -javaagent:/agent/pyroscope.jar -javaagent:/agent/opentelemetry-javaagent.jar
         - name: OTEL_JAVAAGENT_EXTENSIONS
           value: "/agent/pyroscope-otel.jar"
         - name: OTEL_PYROSCOPE_START_PROFILING
