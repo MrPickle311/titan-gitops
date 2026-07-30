@@ -33,6 +33,8 @@ spec:
             value: '{{steps.run-test.outputs.parameters.payment-id}}'
           - name: expected-state
             value: FAILED
+          - name: expected-history-state
+            value: AUTH_REJECTED
     - - name: validate-kafka
         templateRef:
           name: common-test-steps

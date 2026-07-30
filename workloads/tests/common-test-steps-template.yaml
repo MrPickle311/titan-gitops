@@ -10,6 +10,8 @@ spec:
       parameters:
       - name: payment-id
       - name: expected-state
+      - name: expected-history-state
+        default: ""
     container:
       image: postgres:alpine
       command:
@@ -21,6 +23,10 @@ spec:
         export PGPASSWORD=$DB_PASSWORD
         PID={{inputs.parameters.payment-id}}
         EXPECTED={{inputs.parameters.expected-state}}
+        EXPECTED_HISTORY="{{inputs.parameters.expected-history-state}}"
+        if [ -z "$EXPECTED_HISTORY" ]; then
+          EXPECTED_HISTORY="$EXPECTED"
+        fi
 
         echo "1. Checking 'payments' table..."
         STATE=$(psql -h postgres-postgresql.databases.svc.cluster.local -U $DB_USER -d titan_db -t -c "SELECT state FROM payments WHERE id=$PID;" | xargs)
@@ -29,10 +35,10 @@ spec:
           exit 1
         fi
 
-        echo "2. Checking 'payment_history' table..."
-        HISTORY_COUNT=$(psql -h postgres-postgresql.databases.svc.cluster.local -U $DB_USER -d titan_db -t -c "SELECT count(*) FROM payment_history WHERE payment_id=$PID AND to_state='$EXPECTED';" | xargs)
+        echo "2. Checking 'payment_history' table for $EXPECTED_HISTORY..."
+        HISTORY_COUNT=$(psql -h postgres-postgresql.databases.svc.cluster.local -U $DB_USER -d titan_db -t -c "SELECT count(*) FROM payment_history WHERE payment_id=$PID AND to_state='$EXPECTED_HISTORY';" | xargs)
         if [ "$HISTORY_COUNT" -eq 0 ]; then
-          echo "DB Validation Error: payment_history has no $EXPECTED record for this payment."
+          echo "DB Validation Error: payment_history has no $EXPECTED_HISTORY record for this payment."
           exit 1
         fi
 
@@ -247,9 +253,9 @@ spec:
           RULE mock-auth-failure
           CLASS com.example.authorization.AuthorizationGrpcService
           METHOD authorize
-          AT CALL StreamObserver.onNext
+          AT ENTRY
           IF true
-          DO $1 = com.example.payments.authorization.grpc.AuthorizationResponse.newBuilder().setSuccess(false).build()
+          DO $2.onNext(com.example.payments.authorization.grpc.AuthorizationResponse.newBuilder().setSuccess(false).build()); $2.onCompleted(); return
           ENDRULE
           EOF
           env -u JAVA_TOOL_OPTIONS /opt/byteman/bin/bmsubmit.sh -p 9288 -l /tmp/mock.btm
