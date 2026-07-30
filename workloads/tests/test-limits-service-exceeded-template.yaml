@@ -50,6 +50,7 @@ spec:
         
         echo "0. Inject limit exceeded for $SRC_USER"
         export PGPASSWORD=$DB_PASSWORD
+        psql -h postgres-postgresql.databases.svc.cluster.local -U $DB_USER -d titan_db -c "DELETE FROM daily_limit_records WHERE user_id = $SRC_USER;"
         psql -h postgres-postgresql.databases.svc.cluster.local -U $DB_USER -d titan_db -c "INSERT INTO daily_limit_records (id, amount_used, date, user_id) VALUES ($RANDOM$RANDOM, 1000000.00, CURRENT_DATE, $SRC_USER);"
 
         echo "1. Create payment..."
