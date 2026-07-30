@@ -5,8 +5,11 @@ metadata:
   namespace: applications
 rules:
 - apiGroups: [""]
-  resources: ["pods"]
-  verbs: ["patch"]
+  resources: ["pods", "pods/exec"]
+  verbs: ["get", "list", "patch", "create"]
+- apiGroups: ["apps"]
+  resources: ["deployments"]
+  verbs: ["get", "list"]
 - apiGroups: ["argoproj.io"]
   resources: ["workflowtaskresults"]
   verbs: ["create", "patch"]
