@@ -50,6 +50,8 @@ spec:
         TX_ID="tx-$RANDOM"
         SRC_USER="1$RANDOM$RANDOM"
         TGT_USER="2$RANDOM$RANDOM"
+        echo "0. Wait 15s for JVMChaos to attach to authorization-service..."
+        sleep 15
         echo "1. Create payment..."
         RES=$(curl -s -X POST http://payment-service:8080/api/payments \
           -H "Content-Type: application/json" \
