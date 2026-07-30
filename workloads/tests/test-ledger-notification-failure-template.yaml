@@ -3,17 +3,23 @@ kind: WorkflowTemplate
 metadata:
   labels:
     workflows.argoproj.io/creator: system-serviceaccount-argo-argo-workflows-server
-  name: test-payment-insufficient-funds
+  name: test-ledger-notification-failure-template
   namespace: applications
 spec:
   arguments: {}
   entrypoint: main
+  onExit: cleanup
   templates:
   - inputs: {}
     metadata: {}
     name: main
     outputs: {}
     steps:
+    - - arguments: {}
+        name: inject-chaos
+        templateRef:
+          name: common-test-steps
+          template: apply-byteman-ledger
     - - arguments: {}
         name: run-test
         template: test-payment
@@ -26,9 +32,9 @@ spec:
           - name: payment-id
             value: '{{steps.run-test.outputs.parameters.payment-id}}'
           - name: expected-state
-            value: FAILED
+            value: COMPLETED
           - name: expected-history-state
-            value: SETTLEMENT_FAILED
+            value: LEDGER_NOTIFICATION_FAILED
     - - name: validate-kafka
         templateRef:
           name: common-test-steps
@@ -38,17 +44,18 @@ spec:
           - name: payment-id
             value: '{{steps.run-test.outputs.parameters.payment-id}}'
           - name: expected-state
-            value: FAILED
+            value: COMPLETED
   - container:
       args:
       - |
         apk add --no-cache curl jq
-
         TX_ID="tx-$RANDOM"
+        SRC_USER="2002"
+        TGT_USER="1$RANDOM$RANDOM"
         echo "1. Create payment..."
         RES=$(curl -s -X POST http://payment-service:8080/api/payments \
           -H "Content-Type: application/json" \
-          -d "{\"transactionId\": \"$TX_ID\", \"amount\": \"150.00\", \"currency\": \"USD\", \"sourceUserId\": 1001, \"targetUserId\": 2002, \"sourceCurrency\": \"USD\", \"targetCurrency\": \"EUR\"}")
+          -d "{\"transactionId\": \"$TX_ID\", \"amount\": \"150.00\", \"currency\": \"USD\", \"sourceUserId\": $SRC_USER, \"targetUserId\": $TGT_USER, \"sourceCurrency\": \"USD\", \"targetCurrency\": \"EUR\"}")
 
         ID=$(echo $RES | jq -r '.id')
         echo "ID: $ID"
@@ -57,15 +64,15 @@ spec:
         echo "2. Execute payment..."
         curl -s -X POST http://payment-service:8080/api/payments/$ID/execute
 
-        echo "3. Wait 15s (Chaos active)..."
+        echo "3. Wait 15s..."
         sleep 15
 
         echo "4. Validate state..."
         STATE=$(curl -s http://payment-service:8080/api/payments/$ID | jq -r '.state')
         echo "State: $STATE"
 
-        if [ "$STATE" != "FAILED" ]; then
-          echo "Error: Not completed. Was: $STATE"
+        if [ "$STATE" != "COMPLETED" ]; then
+          echo "Error: Not COMPLETED. Was: $STATE"
           exit 1
         fi
         echo "OK"
@@ -83,3 +90,13 @@ spec:
       - name: payment-id
         valueFrom:
           path: /tmp/payment_id.txt
+  - inputs: {}
+    metadata: {}
+    name: cleanup
+    outputs: {}
+    steps:
+    - - arguments: {}
+        name: remove-chaos
+        templateRef:
+          name: common-test-steps
+          template: remove-byteman-ledger

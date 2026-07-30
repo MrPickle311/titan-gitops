@@ -434,3 +434,35 @@ spec:
       command: [sh, -c]
       args:
       - "kubectl delete podchaos wallet-service-failure -n applications --ignore-not-found"
+  - name: apply-byteman-ledger
+    container:
+      image: bitnami/kubectl:latest
+      command: [sh, -c]
+      args:
+      - |
+        cat <<EOF > /tmp/mock-ledger.btm
+        RULE fail ledger notification
+        CLASS com.example.payment.infrastructure.external.ledger.LedgerPublisher
+        METHOD publishEvent
+        AT ENTRY
+        IF true
+        DO throw new java.lang.RuntimeException("Simulated ledger failure");
+        ENDRULE
+        EOF
+        kubectl exec -n applications deploy/payment-service -- env -u JAVA_TOOL_OPTIONS /opt/byteman/bin/bmsubmit.sh -p 9288 -l /tmp/mock-ledger.btm
+  - name: remove-byteman-ledger
+    container:
+      image: bitnami/kubectl:latest
+      command: [sh, -c]
+      args:
+      - |
+        cat <<EOF > /tmp/mock-ledger.btm
+        RULE fail ledger notification
+        CLASS com.example.payment.infrastructure.external.ledger.LedgerPublisher
+        METHOD publishEvent
+        AT ENTRY
+        IF true
+        DO throw new java.lang.RuntimeException("Simulated ledger failure");
+        ENDRULE
+        EOF
+        kubectl exec -n applications deploy/payment-service -- env -u JAVA_TOOL_OPTIONS /opt/byteman/bin/bmsubmit.sh -p 9288 -u /tmp/mock-ledger.btm || true
