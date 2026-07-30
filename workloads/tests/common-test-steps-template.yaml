@@ -252,10 +252,10 @@ spec:
           cat > /tmp/mock.btm << "EOF"
           RULE mock-auth-failure
           CLASS com.example.authorization.AuthorizationGrpcService
-          METHOD authorize
+          METHOD isSuccess
           AT ENTRY
           IF true
-          DO $2.onNext(com.example.payments.authorization.grpc.AuthorizationResponse.newBuilder().setSuccess(false).build()); $2.onCompleted(); return
+          DO return false
           ENDRULE
           EOF
           env -u JAVA_TOOL_OPTIONS /opt/byteman/bin/bmsubmit.sh -p 9288 -l /tmp/mock.btm
