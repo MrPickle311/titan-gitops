@@ -350,4 +350,31 @@ spec:
       command: [sh, -c]
       args:
       - "kubectl delete podchaos limits-service-failure -n applications --ignore-not-found"
-
+  - name: apply-chaos-sanctions
+    container:
+      image: bitnami/kubectl:latest
+      command: [sh, -c]
+      args:
+      - |
+        cat <<EOF | kubectl apply -f -
+        apiVersion: chaos-mesh.org/v1alpha1
+        kind: PodChaos
+        metadata:
+          name: sanctions-service-failure
+          namespace: applications
+        spec:
+          action: pod-failure
+          mode: all
+          duration: "30s"
+          selector:
+            namespaces:
+              - applications
+            labelSelectors:
+              app: sanctions-service
+        EOF
+  - name: remove-chaos-sanctions
+    container:
+      image: bitnami/kubectl:latest
+      command: [sh, -c]
+      args:
+      - "kubectl delete podchaos sanctions-service-failure -n applications --ignore-not-found"
