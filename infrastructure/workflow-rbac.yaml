@@ -15,7 +15,7 @@ rules:
   verbs: ["create", "patch"]
 - apiGroups: ["chaos-mesh.org"]
   resources: ["podchaos", "jvmchaos", "httpchaos"]
-  verbs: ["create", "delete", "get", "patch"]
+  verbs: ["create", "delete", "get", "list", "patch"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
@@ -39,7 +39,7 @@ metadata:
 rules:
 - apiGroups: ["chaos-mesh.org"]
   resources: ["podchaos", "jvmchaos", "httpchaos"]
-  verbs: ["create", "delete", "get", "patch"]
+  verbs: ["create", "delete", "get", "list", "patch"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
