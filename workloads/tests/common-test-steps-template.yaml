@@ -378,3 +378,59 @@ spec:
       command: [sh, -c]
       args:
       - "kubectl delete podchaos sanctions-service-failure -n applications --ignore-not-found"
+  - name: apply-chaos-fee
+    container:
+      image: bitnami/kubectl:latest
+      command: [sh, -c]
+      args:
+      - |
+        cat <<EOF | kubectl apply -f -
+        apiVersion: chaos-mesh.org/v1alpha1
+        kind: PodChaos
+        metadata:
+          name: fee-service-failure
+          namespace: applications
+        spec:
+          action: pod-failure
+          mode: all
+          duration: "30s"
+          selector:
+            namespaces:
+              - applications
+            labelSelectors:
+              app: fee-service
+        EOF
+  - name: remove-chaos-fee
+    container:
+      image: bitnami/kubectl:latest
+      command: [sh, -c]
+      args:
+      - "kubectl delete podchaos fee-service-failure -n applications --ignore-not-found"
+  - name: apply-chaos-wallet
+    container:
+      image: bitnami/kubectl:latest
+      command: [sh, -c]
+      args:
+      - |
+        cat <<EOF | kubectl apply -f -
+        apiVersion: chaos-mesh.org/v1alpha1
+        kind: PodChaos
+        metadata:
+          name: wallet-service-failure
+          namespace: applications
+        spec:
+          action: pod-failure
+          mode: all
+          duration: "30s"
+          selector:
+            namespaces:
+              - applications
+            labelSelectors:
+              app: wallet-service
+        EOF
+  - name: remove-chaos-wallet
+    container:
+      image: bitnami/kubectl:latest
+      command: [sh, -c]
+      args:
+      - "kubectl delete podchaos wallet-service-failure -n applications --ignore-not-found"
