@@ -459,3 +459,58 @@ spec:
       args:
       - |
         kubectl exec -n applications deploy/payment-service -- env -u JAVA_TOOL_OPTIONS /opt/byteman/bin/bmsubmit.sh -p 9288 -u /tmp/mock-ledger.btm || true
+  - name: validate-kafka-compensation
+    inputs:
+      parameters:
+      - name: payment-id
+    container:
+      image: edenhill/kcat:1.7.1
+      command:
+      - /bin/sh
+      - -c
+      args:
+      - |
+        PID={{inputs.parameters.payment-id}}
+        echo "Consuming Kafka topic payment-compensations to find messages for payment $PID..."
+        sleep 5
+        # The eventType or payload should contain the payment ID
+        MSG=$(kcat -C -b kafka.messaging.svc.cluster.local:9092 -t payment-compensations -o -100 -e -q | grep "\"$PID\"" || true)
+        if [ -z "$MSG" ]; then
+           echo "Error: Could not find Kafka message for payment $PID in payment-compensations topic!"
+           exit 1
+        fi
+        echo "Found Kafka message for compensation: $MSG"
+        echo "Kafka compensation message successfully validated!"
+  - name: apply-byteman-compensation
+    container:
+      image: bitnami/kubectl:latest
+      command: [sh, -c]
+      args:
+      - |
+        kubectl exec -n applications deploy/payment-service -- sh -c '
+        cat > /tmp/mock-comp.btm << "EOF"
+        RULE fail fee refund
+        CLASS com.example.payment.infrastructure.external.adapter.GrpcWalletGatewayAdapter
+        METHOD debit
+        AT ENTRY
+        IF $1.getIdempotencyKey().endsWith("-FEE_REFUND")
+        DO throw new java.lang.RuntimeException("Simulated refund failure");
+        ENDRULE
+
+        RULE fail limits release
+        CLASS com.example.payment.infrastructure.external.adapter.GrpcLimitsGatewayAdapter
+        METHOD releaseLimit
+        AT ENTRY
+        IF true
+        DO throw new java.lang.RuntimeException("Simulated limits release failure");
+        ENDRULE
+        EOF
+        env -u JAVA_TOOL_OPTIONS /opt/byteman/bin/bmsubmit.sh -p 9288 -l /tmp/mock-comp.btm
+        '
+  - name: remove-byteman-compensation
+    container:
+      image: bitnami/kubectl:latest
+      command: [sh, -c]
+      args:
+      - |
+        kubectl exec -n applications deploy/payment-service -- env -u JAVA_TOOL_OPTIONS /opt/byteman/bin/bmsubmit.sh -p 9288 -u /tmp/mock-comp.btm || true
