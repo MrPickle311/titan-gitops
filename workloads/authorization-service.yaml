@@ -7,6 +7,7 @@ metadata:
     app: authorization-service
 spec:
   replicas: 1
+  revisionHistoryLimit: 0
   selector:
     matchLabels:
       app: authorization-service
