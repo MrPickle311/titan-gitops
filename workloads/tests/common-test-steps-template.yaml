@@ -210,3 +210,29 @@ spec:
         metadata:
           name: redis-failure
           namespace: databases
+  - name: apply-chaos-auth
+    resource:
+      action: create
+      manifest: |
+        kind: PodChaos
+        apiVersion: chaos-mesh.org/v1alpha1
+        metadata:
+          namespace: applications
+          name: fail-auth-service-pods
+        spec:
+          selector:
+            namespaces:
+              - applications
+            labelSelectors:
+              app: authorization-service
+          mode: all
+          action: pod-failure
+  - name: remove-chaos-auth
+    resource:
+      action: delete
+      manifest: |
+        apiVersion: chaos-mesh.org/v1alpha1
+        kind: PodChaos
+        metadata:
+          name: fail-auth-service-pods
+          namespace: applications
