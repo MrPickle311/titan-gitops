@@ -44,9 +44,9 @@ spec:
 
         echo "3. Checking 'ledger_entries' table..."
         LEDGER_COUNT=$(psql -h postgres-postgresql.databases.svc.cluster.local -U $DB_USER -d titan_db -t -c "SELECT count(*) FROM ledger_entries WHERE payment_id=$PID;" | xargs)
-        if [ "$EXPECTED" = "FAILED" ]; then
+        if [ "$EXPECTED" = "FAILED" ] || [ "$EXPECTED_HISTORY" = "LEDGER_NOTIFICATION_FAILED" ]; then
           if [ "$LEDGER_COUNT" -ne 0 ]; then
-            echo "DB Validation Error: ledger_entries has $LEDGER_COUNT records, expected 0 (since it failed)"
+            echo "DB Validation Error: ledger_entries has $LEDGER_COUNT records, expected 0 (since it failed or ledger notification failed)"
             exit 1
           fi
         else
