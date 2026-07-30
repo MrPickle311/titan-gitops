@@ -246,13 +246,13 @@ spec:
           cat > /tmp/mock.btm << "EOF"
           RULE mock-auth-failure
           CLASS com.example.authorization.AuthorizationGrpcService
-          METHOD isSuccess
-          AT ENTRY
+          METHOD authorize
+          AT CALL StreamObserver.onNext
           IF true
-          DO return false;
+          DO $1 = com.example.payments.authorization.grpc.AuthorizationResponse.newBuilder().setSuccess(false).build()
           ENDRULE
           EOF
-          /opt/byteman/bin/bmsubmit.sh -p 9288 -l /tmp/mock.btm
+          env -u JAVA_TOOL_OPTIONS /opt/byteman/bin/bmsubmit.sh -p 9288 -l /tmp/mock.btm
           '
   - name: remove-chaos-auth-rejected
     container:
@@ -260,4 +260,4 @@ spec:
       command: [sh, -c]
       args:
         - |
-          kubectl exec -n applications deploy/authorization-service -- /opt/byteman/bin/bmsubmit.sh -p 9288 -u mock-auth-failure
+          kubectl exec -n applications deploy/authorization-service -- env -u JAVA_TOOL_OPTIONS /opt/byteman/bin/bmsubmit.sh -p 9288 -u mock-auth-failure
