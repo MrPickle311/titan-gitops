@@ -49,8 +49,8 @@ spec:
         TGT_USER="2$RANDOM$RANDOM"
         
         echo "0. Inject limit exceeded for $SRC_USER"
-        export PGPASSWORD=titan_password
-        psql -h postgres-postgresql.databases.svc.cluster.local -U titan_user -d titan_db -c "INSERT INTO daily_limit_records (id, amount_used, date, user_id) VALUES ($RANDOM$RANDOM, 1000000.00, CURRENT_DATE, $SRC_USER);"
+        export PGPASSWORD=$DB_PASSWORD
+        psql -h postgres-postgresql.databases.svc.cluster.local -U $DB_USER -d titan_db -c "INSERT INTO daily_limit_records (id, amount_used, date, user_id) VALUES ($RANDOM$RANDOM, 1000000.00, CURRENT_DATE, $SRC_USER);"
 
         echo "1. Create payment..."
         RES=$(curl -s -X POST http://payment-service:8080/api/payments \
@@ -81,6 +81,14 @@ spec:
       - -c
       image: alpine:latest
       name: ''
+      env:
+      - name: DB_USER
+        value: postgres
+      - name: DB_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            key: postgres-password
+            name: postgres-credentials
       resources: {}
     inputs: {}
     metadata: {}
@@ -105,5 +113,13 @@ spec:
       - -c
       args:
       - |
-        export PGPASSWORD=titan_password
-        psql -h postgres-postgresql.databases.svc.cluster.local -U titan_user -d titan_db -c "DELETE FROM daily_limit_records WHERE user_id = 999999999;"
+        export PGPASSWORD=$DB_PASSWORD
+        psql -h postgres-postgresql.databases.svc.cluster.local -U $DB_USER -d titan_db -c "DELETE FROM daily_limit_records WHERE user_id = 999999999;"
+      env:
+      - name: DB_USER
+        value: postgres
+      - name: DB_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            key: postgres-password
+            name: postgres-credentials
