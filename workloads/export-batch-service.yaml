@@ -7,6 +7,7 @@ metadata:
     app: export-batch-service
 spec:
   replicas: 1
+  revisionHistoryLimit: 0
   selector:
     matchLabels:
       app: export-batch-service
