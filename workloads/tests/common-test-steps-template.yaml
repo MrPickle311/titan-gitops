@@ -267,3 +267,58 @@ spec:
       args:
         - |
           kubectl exec -n applications deploy/authorization-service -- env -u JAVA_TOOL_OPTIONS /opt/byteman/bin/bmsubmit.sh -p 9288 -u /tmp/mock.btm
+  - name: apply-chaos-fraud
+    container:
+      image: bitnami/kubectl:latest
+      command: [sh, -c]
+      args:
+      - |
+        cat <<EOF | kubectl apply -f -
+        apiVersion: chaos-mesh.org/v1alpha1
+        kind: PodChaos
+        metadata:
+          name: fraud-service-failure
+          namespace: applications
+        spec:
+          action: pod-failure
+          mode: all
+          duration: "30s"
+          selector:
+            namespaces:
+              - applications
+            labelSelectors:
+              app: fraud-service
+        EOF
+  - name: remove-chaos-fraud
+    container:
+      image: bitnami/kubectl:latest
+      command: [sh, -c]
+      args:
+      - "kubectl delete podchaos fraud-service-failure -n applications --ignore-not-found"
+  - name: apply-chaos-fraud-rejected
+    container:
+      image: bitnami/kubectl:latest
+      command: [sh, -c]
+      args:
+        - |
+          kubectl exec -n applications deploy/fraud-service -- sh -c '
+          cat > /tmp/mock-fraud.btm << "EOF"
+          RULE mock-fraud-detected
+          CLASS com.example.fraud.application.FraudResult
+          METHOD isHighRisk
+          AT ENTRY
+          IF true
+          DO return true
+          ENDRULE
+          EOF
+          env -u JAVA_TOOL_OPTIONS /opt/byteman/bin/bmsubmit.sh -p 9288 -l /tmp/mock-fraud.btm
+          '
+  - name: remove-chaos-fraud-rejected
+    container:
+      image: bitnami/kubectl:latest
+      command: [sh, -c]
+      args:
+        - |
+          kubectl exec -n applications deploy/fraud-service -- sh -c '
+          env -u JAVA_TOOL_OPTIONS /opt/byteman/bin/bmsubmit.sh -p 9288 -u /tmp/mock-fraud.btm
+          '
