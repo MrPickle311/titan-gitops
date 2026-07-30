@@ -260,4 +260,4 @@ spec:
       command: [sh, -c]
       args:
         - |
-          kubectl exec -n applications deploy/authorization-service -- env -u JAVA_TOOL_OPTIONS /opt/byteman/bin/bmsubmit.sh -p 9288 -u mock-auth-failure
+          kubectl exec -n applications deploy/authorization-service -- env -u JAVA_TOOL_OPTIONS /opt/byteman/bin/bmsubmit.sh -p 9288 -u /tmp/mock.btm
