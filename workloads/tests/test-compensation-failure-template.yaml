@@ -61,18 +61,19 @@ spec:
         echo "2. Execute payment..."
         curl -s --max-time 30 -X POST http://payment-service:8080/api/payments/$ID/execute
 
-        echo "3. Wait 15s for processing and compensation..."
-        sleep 15
+        echo "3. Wait for state to become FAILED..."
+        for i in $(seq 1 30); do
+          STATE=$(curl -s --max-time 30 http://payment-service:8080/api/payments/$ID | jq -r '.state')
+          echo "Current State: $STATE"
+          if [ "$STATE" = "FAILED" ]; then
+            echo "OK"
+            exit 0
+          fi
+          sleep 2
+        done
 
-        echo "4. Validate state..."
-        STATE=$(curl -s --max-time 30 http://payment-service:8080/api/payments/$ID | jq -r '.state')
-        echo "State: $STATE"
-
-        if [ "$STATE" != "FAILED" ]; then
-          echo "Error: Not FAILED. Was: $STATE"
-          exit 1
-        fi
-        echo "OK"
+        echo "Error: Not FAILED after 60s. Was: $STATE"
+        exit 1
       command:
       - /bin/sh
       - -c
