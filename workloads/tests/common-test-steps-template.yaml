@@ -481,6 +481,27 @@ spec:
         fi
         echo "Found Kafka message for compensation: $MSG"
         echo "Kafka compensation message successfully validated!"
+  - name: validate-kafka-retry
+    inputs:
+      parameters:
+      - name: payment-id
+    container:
+      image: bitnami/kubectl:latest
+      command: [sh, -c]
+      args:
+      - |
+        PID={{inputs.parameters.payment-id}}
+        echo "Waiting for Kafka consumer to retry and succeed for payment $PID..."
+        for i in $(seq 1 30); do
+          LOGS=$(kubectl logs -n applications deploy/payment-service --tail=500 | grep "paymentId=$PID")
+          if echo "$LOGS" | grep -q "Limits released successfully" && echo "$LOGS" | grep -q "Fee refund completed"; then
+            echo "Success: Found retry success logs for payment $PID!"
+            exit 0
+          fi
+          sleep 2
+        done
+        echo "Error: Did not find successful retry logs for payment $PID"
+        exit 1
   - name: apply-byteman-compensation
     container:
       image: bitnami/kubectl:latest

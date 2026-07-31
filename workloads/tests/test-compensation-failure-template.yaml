@@ -41,6 +41,18 @@ spec:
           parameters:
           - name: payment-id
             value: '{{steps.run-test.outputs.parameters.payment-id}}'
+    - - name: remove-chaos
+        templateRef:
+          name: common-test-steps
+          template: remove-byteman-compensation
+    - - name: validate-retry
+        templateRef:
+          name: common-test-steps
+          template: validate-kafka-retry
+        arguments:
+          parameters:
+          - name: payment-id
+            value: '{{steps.run-test.outputs.parameters.payment-id}}'
   - container:
       args:
       - |
