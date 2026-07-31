@@ -50,7 +50,7 @@ spec:
         SRC_USER="999"
         TGT_USER="1$RANDOM$RANDOM"
         echo "1. Create payment..."
-        RES=$(curl -s -X POST http://payment-service:8080/api/payments \
+        RES=$(curl -s --max-time 30 -X POST http://payment-service:8080/api/payments \
           -H "Content-Type: application/json" \
           -d "{\"transactionId\": \"$TX_ID\", \"amount\": \"150.00\", \"currency\": \"USD\", \"sourceUserId\": $SRC_USER, \"targetUserId\": $TGT_USER, \"sourceCurrency\": \"USD\", \"targetCurrency\": \"EUR\"}")
 
@@ -59,13 +59,13 @@ spec:
         echo "$ID" > /tmp/payment_id.txt
 
         echo "2. Execute payment..."
-        curl -s -X POST http://payment-service:8080/api/payments/$ID/execute
+        curl -s --max-time 30 -X POST http://payment-service:8080/api/payments/$ID/execute
 
         echo "3. Wait 15s for processing and compensation..."
         sleep 15
 
         echo "4. Validate state..."
-        STATE=$(curl -s http://payment-service:8080/api/payments/$ID | jq -r '.state')
+        STATE=$(curl -s --max-time 30 http://payment-service:8080/api/payments/$ID | jq -r '.state')
         echo "State: $STATE"
 
         if [ "$STATE" != "FAILED" ]; then
