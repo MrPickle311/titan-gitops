@@ -53,6 +53,7 @@ spec:
                   app: outbox-relay-service
               direction: to
               target:
+                mode: all
                 selector:
                   namespaces:
                     - messaging
