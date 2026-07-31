@@ -65,6 +65,51 @@ spec:
           secretKeyRef:
             key: postgres-password
             name: postgres-credentials
+  - name: validate-db-compensation
+    inputs:
+      parameters:
+      - name: payment-id
+    container:
+      image: postgres:alpine
+      command:
+      - /bin/sh
+      - -c
+      args:
+      - |
+        echo "Connecting to Postgres to verify compensation for payment {{inputs.parameters.payment-id}}..."
+        export PGPASSWORD=$DB_PASSWORD
+        PID={{inputs.parameters.payment-id}}
+
+        echo "1. Checking 'payments' table..."
+        STATE=$(psql -h postgres-postgresql.databases.svc.cluster.local -U $DB_USER -d titan_db -t -c "SELECT state FROM payments WHERE id=$PID;" | xargs)
+        if [ "$STATE" != "FAILED" ]; then
+          echo "DB Validation Error: payments state is '$STATE', expected 'FAILED'"
+          exit 1
+        fi
+
+        echo "2. Checking 'limits' table (via idempotency_keys)..."
+        LIMITS_COUNT=$(psql -h postgres-postgresql.databases.svc.cluster.local -U $DB_USER -d titan_db -t -c "SELECT count(*) FROM idempotency_keys WHERE idempotency_key='${PID}-LIMITS_RELEASE';" | xargs)
+        if [ "$LIMITS_COUNT" -eq 0 ]; then
+          echo "DB Validation Error: Limits were not released (idempotency key missing)"
+          exit 1
+        fi
+
+        echo "3. Checking 'wallet' table (via idempotency_keys)..."
+        WALLET_COUNT=$(psql -h postgres-postgresql.databases.svc.cluster.local -U $DB_USER -d titan_db -t -c "SELECT count(*) FROM idempotency_keys WHERE idempotency_key='${PID}-FEE_REFUND';" | xargs)
+        if [ "$WALLET_COUNT" -eq 0 ]; then
+          echo "DB Validation Error: Wallet fees were not refunded (idempotency key missing)"
+          exit 1
+        fi
+
+        echo "Success! Database (limits, wallet, payments) entities correctly reflect the compensation."
+      env:
+      - name: DB_USER
+        value: postgres
+      - name: DB_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            key: postgres-password
+            name: postgres-credentials
   - name: validate-kafka
     inputs:
       parameters:

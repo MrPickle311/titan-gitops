@@ -53,6 +53,14 @@ spec:
           parameters:
           - name: payment-id
             value: '{{steps.run-test.outputs.parameters.payment-id}}'
+    - - name: validate-db-compensation
+        templateRef:
+          name: common-test-steps
+          template: validate-db-compensation
+        arguments:
+          parameters:
+          - name: payment-id
+            value: '{{steps.run-test.outputs.parameters.payment-id}}'
   - container:
       args:
       - |
