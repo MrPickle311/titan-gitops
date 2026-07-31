@@ -474,7 +474,7 @@ spec:
         echo "Consuming Kafka topic payment-compensations to find messages for payment $PID..."
         sleep 5
         # The eventType or payload should contain the payment ID
-        MSG=$(kcat -C -b kafka.messaging.svc.cluster.local:9092 -t payment-compensations -o -100 -e -q | grep "\"$PID\"" || true)
+        MSG=$(kcat -C -b kafka.messaging.svc.cluster.local:9092 -t payment-compensations -o -100 -e -q | grep "\"paymentId\":$PID" || true)
         if [ -z "$MSG" ]; then
            echo "Error: Could not find Kafka message for payment $PID in payment-compensations topic!"
            exit 1
