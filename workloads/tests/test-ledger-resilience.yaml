@@ -1,0 +1,129 @@
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  labels:
+    workflows.argoproj.io/creator: system-serviceaccount-argo-argo-workflows-server
+  name: test-ledger-resilience
+  namespace: applications
+spec:
+  entrypoint: main
+  onExit: cleanup
+  templates:
+    - name: main
+      steps:
+        - - name: apply-chaos
+            template: apply-byteman-ledger-resilience
+        - - name: run-test
+            templateRef:
+              name: test-payment-template
+              template: test-payment
+        - - name: verify-no-ledger
+            template: verify-no-ledger
+            arguments:
+              parameters:
+                - name: payment-id
+                  value: '{{steps.run-test.outputs.parameters.payment-id}}'
+        - - name: remove-chaos
+            template: remove-byteman-ledger-resilience
+        - - name: wait-and-validate
+            template: wait-for-retry
+            arguments:
+              parameters:
+                - name: payment-id
+                  value: '{{steps.run-test.outputs.parameters.payment-id}}'
+        - - name: validate-db
+            templateRef:
+              name: common-test-steps
+              template: validate-db
+            arguments:
+              parameters:
+                - name: payment-id
+                  value: '{{steps.run-test.outputs.parameters.payment-id}}'
+                - name: expected-state
+                  value: 'COMPLETED'
+    - name: apply-byteman-ledger-resilience
+      container:
+        image: bitnami/kubectl:latest
+        command: [sh, -c]
+        args:
+          - |
+            kubectl exec -n applications deploy/ledger-service -- sh -c '
+            cat > /tmp/mock-ledger-resilience.btm << "EOF"
+            RULE fail ledger save
+            CLASS com.example.payments.ledger.api.event.LedgerListener
+            METHOD consume
+            AT ENTRY
+            IF true
+            DO throw new java.lang.RuntimeException("Simulated ledger DB failure");
+            ENDRULE
+            EOF
+            env -u JAVA_TOOL_OPTIONS /opt/byteman/bin/bmsubmit.sh -p 9288 -l /tmp/mock-ledger-resilience.btm
+            '
+    - name: remove-byteman-ledger-resilience
+      container:
+        image: bitnami/kubectl:latest
+        command: [sh, -c]
+        args:
+          - |
+            kubectl exec -n applications deploy/ledger-service -- env -u JAVA_TOOL_OPTIONS /opt/byteman/bin/bmsubmit.sh -p 9288 -u /tmp/mock-ledger-resilience.btm || true
+    - name: verify-no-ledger
+      inputs:
+        parameters:
+          - name: payment-id
+      container:
+        image: postgres:alpine
+        command: [sh, -c]
+        args:
+          - |
+            export PGPASSWORD=$DB_PASSWORD
+            PID={{inputs.parameters.payment-id}}
+            echo "Verifying no ledger entries exist yet for payment $PID..."
+            sleep 5
+            COUNT=$(psql -h postgres-postgresql.databases.svc.cluster.local -U $DB_USER -d titan_db -t -c "SELECT count(*) FROM ledger_entries WHERE payment_id=$PID;" | xargs)
+            if [ "$COUNT" -ne 0 ]; then
+              echo "Error: Found $COUNT ledger entries, expected 0 due to Byteman injection"
+              exit 1
+            fi
+            echo "OK: 0 ledger entries found."
+        env:
+          - name: DB_USER
+            value: postgres
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: postgres-password
+                name: postgres-credentials
+    - name: wait-for-retry
+      inputs:
+        parameters:
+          - name: payment-id
+      container:
+        image: postgres:alpine
+        command: [sh, -c]
+        args:
+          - |
+            export PGPASSWORD=$DB_PASSWORD
+            PID={{inputs.parameters.payment-id}}
+            echo "Waiting for ledger-service to retry and save the ledger entry for $PID..."
+            for i in $(seq 1 40); do
+              COUNT=$(psql -h postgres-postgresql.databases.svc.cluster.local -U $DB_USER -d titan_db -t -c "SELECT count(*) FROM ledger_entries WHERE payment_id=$PID;" | xargs)
+              if [ "$COUNT" -gt 0 ]; then
+                echo "Success: Found ledger entries after retry!"
+                exit 0
+              fi
+              sleep 2
+            done
+            echo "Error: Did not find ledger entries after waiting"
+            exit 1
+        env:
+          - name: DB_USER
+            value: postgres
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: postgres-password
+                name: postgres-credentials
+    - name: cleanup
+      steps:
+        - - name: remove-chaos
+            template: remove-byteman-ledger-resilience

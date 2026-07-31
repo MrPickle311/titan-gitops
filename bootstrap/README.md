@@ -20,7 +20,8 @@ ArgoCD
       ├── metrics-app.yaml        → deploys observability stack
       ├── localstack-app.yaml     → deploys LocalStack (AWS emulation)
       ├── httpbin-app.yaml        → deploys httpbin (HTTP testing)
-      └── rancher-app.yaml        → deploys Rancher cluster management
+      ├── rancher-app.yaml        → deploys Rancher cluster management
+      └── chaos-mesh-app.yaml     → deploys Chaos Mesh (chaos engineering)
 ```
 
 ## Adding a New Top-Level Application

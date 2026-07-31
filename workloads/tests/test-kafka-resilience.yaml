@@ -1,0 +1,127 @@
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  labels:
+    workflows.argoproj.io/creator: system-serviceaccount-argo-argo-workflows-server
+  name: test-kafka-resilience
+  namespace: applications
+spec:
+  entrypoint: main
+  onExit: cleanup
+  templates:
+    - name: main
+      steps:
+        - - name: apply-chaos
+            template: apply-chaos-kafka-network
+        - - name: run-test
+            templateRef:
+              name: test-payment-template
+              template: test-payment
+        - - name: validate-outbox-pending
+            template: validate-outbox-pending
+            arguments:
+              parameters:
+                - name: payment-id
+                  value: '{{steps.run-test.outputs.parameters.payment-id}}'
+        - - name: remove-chaos
+            template: remove-chaos-kafka-network
+        - - name: validate-outbox-published
+            template: validate-outbox-published
+            arguments:
+              parameters:
+                - name: payment-id
+                  value: '{{steps.run-test.outputs.parameters.payment-id}}'
+    - name: apply-chaos-kafka-network
+      container:
+        image: bitnami/kubectl:latest
+        command: [sh, -c]
+        args:
+          - |
+            cat <<EOF | kubectl apply -f -
+            apiVersion: chaos-mesh.org/v1alpha1
+            kind: NetworkChaos
+            metadata:
+              name: block-kafka
+              namespace: applications
+            spec:
+              action: partition
+              mode: all
+              selector:
+                namespaces:
+                  - applications
+                labelSelectors:
+                  app: outbox-relay-service
+              direction: to
+              target:
+                selector:
+                  namespaces:
+                    - messaging
+            EOF
+    - name: remove-chaos-kafka-network
+      container:
+        image: bitnami/kubectl:latest
+        command: [sh, -c]
+        args:
+          - "kubectl delete networkchaos block-kafka -n applications --ignore-not-found"
+    - name: validate-outbox-pending
+      inputs:
+        parameters:
+          - name: payment-id
+      container:
+        image: postgres:alpine
+        command: [sh, -c]
+        args:
+          - |
+            export PGPASSWORD=$DB_PASSWORD
+            PID={{inputs.parameters.payment-id}}
+            echo "Validating outbox_events table for payment $PID has published=false..."
+            # Wait a few seconds for outbox polling attempt
+            sleep 5
+            COUNT=$(psql -h postgres-postgresql.databases.svc.cluster.local -U $DB_USER -d titan_db -t -c "SELECT count(*) FROM outbox_events WHERE payload LIKE '%\"paymentId\":$PID%' AND published=false;" | xargs)
+            if [ "$COUNT" -eq 0 ]; then
+              echo "Error: Did not find pending outbox events for payment $PID."
+              exit 1
+            fi
+            echo "Success: Found $COUNT pending outbox events (blocked by NetworkChaos)."
+        env:
+          - name: DB_USER
+            value: postgres
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: postgres-password
+                name: postgres-credentials
+    - name: validate-outbox-published
+      inputs:
+        parameters:
+          - name: payment-id
+      container:
+        image: postgres:alpine
+        command: [sh, -c]
+        args:
+          - |
+            export PGPASSWORD=$DB_PASSWORD
+            PID={{inputs.parameters.payment-id}}
+            echo "Waiting for outbox-relay-service to recover and publish events..."
+            for i in $(seq 1 30); do
+              COUNT=$(psql -h postgres-postgresql.databases.svc.cluster.local -U $DB_USER -d titan_db -t -c "SELECT count(*) FROM outbox_events WHERE payload LIKE '%\"paymentId\":$PID%' AND published=false;" | xargs)
+              if [ "$COUNT" -eq 0 ]; then
+                echo "Success: All outbox events published!"
+                exit 0
+              fi
+              sleep 2
+            done
+            echo "Error: Events were not published after chaos removal."
+            exit 1
+        env:
+          - name: DB_USER
+            value: postgres
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: postgres-password
+                name: postgres-credentials
+    - name: cleanup
+      steps:
+        - - name: remove-chaos
+            template: remove-chaos-kafka-network

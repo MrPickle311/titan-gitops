@@ -46,6 +46,11 @@ kubectl create namespace messaging
 kubectl label namespace messaging \
   pod-security.kubernetes.io/enforce=privileged \
   pod-security.kubernetes.io/warn=privileged --overwrite
+
+kubectl create namespace chaos-mesh
+kubectl label namespace chaos-mesh \
+  pod-security.kubernetes.io/enforce=privileged \
+  pod-security.kubernetes.io/warn=privileged --overwrite
 ```
 
 > The `applications` namespace is created declaratively by `cluster-config` ArgoCD Application with the correct labels. No manual step needed.
