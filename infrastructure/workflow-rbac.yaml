@@ -5,7 +5,7 @@ metadata:
   namespace: applications
 rules:
 - apiGroups: [""]
-  resources: ["pods", "pods/exec"]
+  resources: ["pods", "pods/exec", "pods/log"]
   verbs: ["get", "list", "patch", "create"]
 - apiGroups: ["apps"]
   resources: ["deployments"]
