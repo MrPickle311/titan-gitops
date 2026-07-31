@@ -32,6 +32,14 @@ spec:
                   value: '{{steps.run-test.outputs.parameters.payment-id}}'
                 - name: expected-state
                   value: 'COMPLETED'
+        - - name: validate-webhook
+            templateRef:
+              name: common-test-steps
+              template: validate-webhook
+            arguments:
+              parameters:
+                - name: payment-id
+                  value: '{{steps.run-test.outputs.parameters.payment-id}}'
     - name: test-payment
       container:
         image: alpine:latest

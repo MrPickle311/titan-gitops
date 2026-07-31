@@ -580,3 +580,25 @@ spec:
       args:
       - |
         kubectl exec -n applications deploy/payment-service -- env -u JAVA_TOOL_OPTIONS /opt/byteman/bin/bmsubmit.sh -p 9288 -u /tmp/mock-comp.btm || true
+  - name: validate-webhook
+    inputs:
+      parameters:
+      - name: payment-id
+    container:
+      image: bitnami/kubectl:latest
+      command: [sh, -c]
+      args:
+      - |
+        PID={{inputs.parameters.payment-id}}
+        echo "Waiting for Webhook Service to process webhook for payment $PID..."
+        for i in $(seq 1 30); do
+          LOGS=$(kubectl logs -n applications deploy/webhooks-service --tail=500 | grep "\"paymentId\":$PID" || true)
+          if [ -n "$LOGS" ]; then
+            echo "Success: Found webhook logs for payment $PID!"
+            echo "$LOGS"
+            exit 0
+          fi
+          sleep 2
+        done
+        echo "Error: Did not find webhook logs for payment $PID"
+        exit 1

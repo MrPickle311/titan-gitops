@@ -61,6 +61,14 @@ spec:
           parameters:
           - name: payment-id
             value: '{{steps.run-test.outputs.parameters.payment-id}}'
+    - - name: validate-webhook
+        templateRef:
+          name: common-test-steps
+          template: validate-webhook
+        arguments:
+          parameters:
+            - name: payment-id
+              value: '{{steps.run-test.outputs.parameters.payment-id}}'
   - container:
       args:
       - |
