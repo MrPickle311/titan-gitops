@@ -17,12 +17,20 @@ spec:
             templateRef:
               name: test-payment-template
               template: test-payment
-        - - name: wait-for-job-failure
-            template: wait-for-job-failure
+        - - name: wait-for-export-failure
+            template: wait-for-export-failure
+            arguments:
+              parameters:
+                - name: payment-id
+                  value: '{{steps.run-test.outputs.parameters.payment-id}}'
         - - name: remove-chaos
             template: remove-chaos-regulatory
-        - - name: wait-for-job-success
-            template: wait-for-job-success
+        - - name: wait-for-export-success
+            template: wait-for-export-success
+            arguments:
+              parameters:
+                - name: payment-id
+                  value: '{{steps.run-test.outputs.parameters.payment-id}}'
     - name: apply-chaos-regulatory
       container:
         image: bitnami/kubectl:latest
@@ -50,24 +58,27 @@ spec:
         command: [sh, -c]
         args:
           - "kubectl delete podchaos regulatory-service-failure -n applications --ignore-not-found"
-    - name: wait-for-job-failure
+    - name: wait-for-export-failure
+      inputs:
+        parameters:
+          - name: payment-id
       container:
         image: postgres:alpine
         command: [sh, -c]
         args:
           - |
             export PGPASSWORD=$DB_PASSWORD
-            echo "Waiting for batch job to fail because mock-regulatory-service is down..."
-            # Wait up to 60s for a FAILED job execution
+            echo "Waiting for payment export to fail because mock-regulatory-service is down..."
+            # Wait up to 60s for a FAILED export staging row
             for i in $(seq 1 30); do
-              COUNT=$(psql -h postgres-postgresql.databases.svc.cluster.local -U $DB_USER -d titan_db -t -c "SELECT count(*) FROM batch_job_execution WHERE status='FAILED' AND create_time >= NOW() - INTERVAL '2 minutes';" | xargs)
+              COUNT=$(psql -h postgres-postgresql.databases.svc.cluster.local -U $DB_USER -d titan_db -t -c "SELECT count(*) FROM payment_export_staging WHERE status='FAILED' AND payment_id={{inputs.parameters.payment-id}} AND created_at >= NOW() - INTERVAL '2 minutes';" | xargs)
               if [ "$COUNT" -gt 0 ]; then
-                echo "Success: Found FAILED batch job execution!"
+                echo "Success: Found FAILED payment in staging!"
                 exit 0
               fi
               sleep 2
             done
-            echo "Error: Did not find FAILED batch job"
+            echo "Error: Did not find FAILED payment export"
             exit 1
         env:
           - name: DB_USER
@@ -77,24 +88,28 @@ spec:
               secretKeyRef:
                 key: postgres-password
                 name: postgres-credentials
-    - name: wait-for-job-success
+    - name: wait-for-export-success
+      inputs:
+        parameters:
+          - name: payment-id
       container:
         image: postgres:alpine
         command: [sh, -c]
         args:
           - |
             export PGPASSWORD=$DB_PASSWORD
-            echo "Waiting for next batch job to run successfully (reusing offset/parameters) after chaos is removed..."
-            # Wait up to 60s for a COMPLETED job execution
+            echo "Waiting for payment export to run successfully after chaos is removed..."
+            # Wait up to 60s for an EXPORTED staging row
             for i in $(seq 1 30); do
-              COUNT=$(psql -h postgres-postgresql.databases.svc.cluster.local -U $DB_USER -d titan_db -t -c "SELECT count(*) FROM batch_job_execution WHERE status='COMPLETED' AND create_time >= NOW() - INTERVAL '2 minutes';" | xargs)
+              COUNT=$(psql -h postgres-postgresql.databases.svc.cluster.local -U $DB_USER -d titan_db -t -c "SELECT count(*) FROM payment_export_staging WHERE status='EXPORTED' AND payment_id={{inputs.parameters.payment-id}} AND created_at >= NOW() - INTERVAL '2 minutes';" | xargs)
               if [ "$COUNT" -gt 0 ]; then
-                echo "Success: Found COMPLETED batch job execution!"
+                echo "Success: Found EXPORTED payment in staging!"
+                psql -h postgres-postgresql.databases.svc.cluster.local -U $DB_USER -d titan_db -c "SELECT id, payment_id, status, retry_count, created_at, exported_at FROM payment_export_staging WHERE payment_id={{inputs.parameters.payment-id}} AND created_at >= NOW() - INTERVAL '2 minutes';"
                 exit 0
               fi
               sleep 2
             done
-            echo "Error: Did not find COMPLETED batch job"
+            echo "Error: Did not find EXPORTED payment export"
             exit 1
         env:
           - name: DB_USER
