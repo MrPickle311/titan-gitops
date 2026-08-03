@@ -44,7 +44,7 @@ spec:
         - name: SERVER_PORT
           value: "8084"
         - name: REGULATORY_FAILURE_RATE
-          value: "0.1"
+          value: "0.0"
 ---
 apiVersion: v1
 kind: Service
