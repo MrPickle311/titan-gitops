@@ -1,0 +1,96 @@
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  labels:
+    workflows.argoproj.io/creator: system-serviceaccount-argo-argo-workflows-server
+  name: test-export-batch-nonhealable
+  namespace: applications
+spec:
+  entrypoint: main
+  onExit: cleanup
+  templates:
+    - name: main
+      steps:
+        - - name: apply-chaos
+            template: apply-chaos-regulatory
+
+        - - name: create-payment
+            templateRef:
+              name: test-payment-template
+              template: test-payment
+            
+        - - name: wait-for-nonhealable
+            template: wait-for-export-status
+            arguments:
+              parameters:
+                - name: payment-id
+                  value: '{{steps.create-payment.outputs.parameters.payment-id}}'
+                - name: expected-status
+                  value: 'NONHEALABLE'
+
+    - name: apply-chaos-regulatory
+      container:
+        image: bitnami/kubectl:latest
+        command: [sh, -c]
+        args:
+          - |
+            cat <<EOF | kubectl apply -f -
+            apiVersion: chaos-mesh.org/v1alpha1
+            kind: PodChaos
+            metadata:
+              name: regulatory-service-failure
+              namespace: applications
+            spec:
+              action: pod-failure
+              mode: all
+              selector:
+                namespaces:
+                  - applications
+                labelSelectors:
+                  app: mock-regulatory-service
+            EOF
+
+    - name: remove-chaos-regulatory
+      container:
+        image: bitnami/kubectl:latest
+        command: [sh, -c]
+        args:
+          - "kubectl delete podchaos regulatory-service-failure -n applications --ignore-not-found"
+
+    - name: wait-for-export-status
+      inputs:
+        parameters:
+          - name: payment-id
+          - name: expected-status
+      container:
+        image: postgres:alpine
+        command: [sh, -c]
+        args:
+          - |
+            export PGPASSWORD=$DB_PASSWORD
+            echo "Waiting for payment {{inputs.parameters.payment-id}} to reach {{inputs.parameters.expected-status}}..."
+            # Wait up to 240s to accommodate 3 retries (each 30s) + execution time
+            for i in $(seq 1 120); do
+              COUNT=$(psql -h postgres-postgresql.databases.svc.cluster.local -U $DB_USER -d titan_db -t -c "SELECT count(*) FROM payment_export_staging WHERE status='{{inputs.parameters.expected-status}}' AND payment_id={{inputs.parameters.payment-id}} AND created_at >= NOW() - INTERVAL '10 minutes';" | xargs)
+              if [ "$COUNT" -gt 0 ]; then
+                echo "Success: Found {{inputs.parameters.expected-status}} payment in staging!"
+                psql -h postgres-postgresql.databases.svc.cluster.local -U $DB_USER -d titan_db -c "SELECT id, payment_id, status, retry_count, created_at, exported_at, last_error FROM payment_export_staging WHERE payment_id={{inputs.parameters.payment-id}} AND created_at >= NOW() - INTERVAL '10 minutes';"
+                exit 0
+              fi
+              sleep 2
+            done
+            echo "Error: Did not find {{inputs.parameters.expected-status}} payment export"
+            exit 1
+        env:
+          - name: DB_USER
+            value: postgres
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: postgres-password
+                name: postgres-credentials
+
+    - name: cleanup
+      steps:
+        - - name: remove-chaos
+            template: remove-chaos-regulatory
