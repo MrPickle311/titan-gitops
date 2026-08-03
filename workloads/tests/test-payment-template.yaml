@@ -64,18 +64,19 @@ spec:
             echo "2. Execute payment..."
             curl -s -X POST http://payment-service:8080/api/payments/$ID/execute
 
-            echo "3. Wait 10s..."
-            sleep 10
-
-            echo "4. Validate state..."
-            STATE=$(curl -s http://payment-service:8080/api/payments/$ID | jq -r '.state')
-            echo "State: $STATE"
-
-            if [ "$STATE" != "COMPLETED" ]; then
-              echo "Error: Not completed"
-              exit 1
-            fi
-            echo "OK"
+            echo "3. Wait up to 60s for COMPLETED state..."
+            for i in $(seq 1 30); do
+              STATE=$(curl -s http://payment-service:8080/api/payments/$ID | jq -r '.state')
+              echo "State: $STATE"
+              if [ "$STATE" = "COMPLETED" ]; then
+                echo "OK"
+                exit 0
+              fi
+              sleep 2
+            done
+            
+            echo "Error: Not completed within timeout"
+            exit 1
       outputs:
         parameters:
           - name: payment-id
