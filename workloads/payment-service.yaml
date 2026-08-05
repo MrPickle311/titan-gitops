@@ -36,6 +36,13 @@ spec:
           volumeMounts:
             - name: pyroscope-agent
               mountPath: /agent
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node-role.kubernetes.io/control-plane
+                operator: DoesNotExist
       containers:
       - name: payment-service
         image: registry.homelab/payment-service:latest

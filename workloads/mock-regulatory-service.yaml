@@ -23,6 +23,13 @@ spec:
           labelSelector:
             matchLabels:
               app: mock-regulatory-service
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node-role.kubernetes.io/control-plane
+                operator: DoesNotExist
       containers:
       - name: mock-api
         image: registry.homelab/mock-regulatory-service:latest

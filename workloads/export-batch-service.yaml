@@ -37,6 +37,13 @@ spec:
           volumeMounts:
             - name: pyroscope-agent
               mountPath: /agent
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node-role.kubernetes.io/control-plane
+                operator: DoesNotExist
       containers:
       - name: batch-service
         image: registry.homelab/export-batch-service:latest
@@ -127,6 +134,13 @@ spec:
           volumeMounts:
             - name: pyroscope-agent
               mountPath: /agent
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node-role.kubernetes.io/control-plane
+                operator: DoesNotExist
       containers:
       - name: batch-service
         image: registry.homelab/export-batch-service:latest
@@ -217,6 +231,13 @@ spec:
           volumeMounts:
             - name: pyroscope-agent
               mountPath: /agent
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node-role.kubernetes.io/control-plane
+                operator: DoesNotExist
       containers:
       - name: batch-service
         image: registry.homelab/export-batch-service:latest
