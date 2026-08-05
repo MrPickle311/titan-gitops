@@ -128,11 +128,6 @@ data:
         - Prometheus:
             icon: prometheus
             href: https://prometheus.homelab
-        - Rancher:
-            icon: rancher
-            href: https://rancher.homelab/dashboard
-            podSelector: app=rancher
-            namespace: cattle-system
         - Docker Registry:
             icon: docker
             href: https://registry.homelab
