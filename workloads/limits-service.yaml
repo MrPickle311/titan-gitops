@@ -107,14 +107,20 @@ spec:
         - name: PYROSCOPE_LABELS
           value: "pod=$(POD_NAME),service_name=limits-service"
         - name: SPRING_DATASOURCE_URL
-          value: jdbc:postgresql://postgres-postgresql.databases.svc.cluster.local:5432/titan_db
+          valueFrom:
+            secretKeyRef:
+              name: limits-db-cluster-app
+              key: jdbc-uri
         - name: SPRING_DATASOURCE_USERNAME
-          value: postgres
+          valueFrom:
+            secretKeyRef:
+              name: limits-db-cluster-app
+              key: username
         - name: SPRING_DATASOURCE_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: postgres-credentials
-              key: postgres-password
+              name: limits-db-cluster-app
+              key: password
 ---
 apiVersion: v1
 kind: Service
