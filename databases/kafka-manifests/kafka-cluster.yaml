@@ -53,6 +53,8 @@ spec:
         port: 9094
         type: loadbalancer
         tls: false
+        authentication:
+          type: scram-sha-512
         configuration:
           bootstrap:
             loadBalancerIP: 10.0.0.160
