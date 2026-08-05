@@ -15,11 +15,13 @@ spec:
           type: topic
           name: "*"
           patternType: literal
-        operation: All
+        operations:
+          - All
         host: "*"
       - resource:
           type: group
           name: "*"
           patternType: literal
-        operation: All
+        operations:
+          - All
         host: "*"
