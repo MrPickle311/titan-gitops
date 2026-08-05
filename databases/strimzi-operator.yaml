@@ -13,7 +13,16 @@ spec:
     chart: strimzi-kafka-operator
     helm:
       values: |
-        watchAnyNamespace: true
+        watchAnyNamespace: false
+        watchNamespaces:
+          - messaging
+        resources:
+          limits:
+            memory: 1024Mi
+            cpu: 1000m
+          requests:
+            memory: 512Mi
+            cpu: 200m
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: operators
