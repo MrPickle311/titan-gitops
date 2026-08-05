@@ -134,7 +134,7 @@ spec:
         - name: WALLET_SERVICE_URL
           value: http://wallet-service:8081
         - name: KAFKA_BOOTSTRAP_SERVERS
-          value: kafka.messaging.svc.cluster.local:9092
+          value: kafka-kafka-bootstrap.messaging.svc.cluster.local:9092
         - name: GRPC_AUTHORIZATION_SERVICE_ADDRESS
           value: static://authorization-service:9091
         - name: GRPC_AUTHORIZATION_SERVICE_NEGOTIATION_TYPE

@@ -89,7 +89,7 @@ spec:
               name: postgres-credentials
               key: postgres-password
         - name: KAFKA_BOOTSTRAP_SERVERS
-          value: kafka.messaging.svc.cluster.local:9092
+          value: kafka-kafka-bootstrap.messaging.svc.cluster.local:9092
         - name: EXPORT_REGULATORY_URL
           value: "http://mock-regulatory-service:8084/api/v1/regulatory/report"
         - name: MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE
@@ -186,7 +186,7 @@ spec:
               name: postgres-credentials
               key: postgres-password
         - name: KAFKA_BOOTSTRAP_SERVERS
-          value: kafka.messaging.svc.cluster.local:9092
+          value: kafka-kafka-bootstrap.messaging.svc.cluster.local:9092
         - name: EXPORT_REGULATORY_URL
           value: "http://mock-regulatory-service:8084/api/v1/regulatory/report"
         - name: MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE
@@ -283,7 +283,7 @@ spec:
               name: postgres-credentials
               key: postgres-password
         - name: KAFKA_BOOTSTRAP_SERVERS
-          value: kafka.messaging.svc.cluster.local:9092
+          value: kafka-kafka-bootstrap.messaging.svc.cluster.local:9092
         - name: EXPORT_REGULATORY_URL
           value: "http://mock-regulatory-service:8084/api/v1/regulatory/report"
         - name: MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE
