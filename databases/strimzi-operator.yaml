@@ -13,9 +13,7 @@ spec:
     chart: strimzi-kafka-operator
     helm:
       values: |
-        watchAnyNamespace: false
-        watchNamespaces:
-          - messaging
+        watchAnyNamespace: true
         resources:
           limits:
             memory: 1024Mi
