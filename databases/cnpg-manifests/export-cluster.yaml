@@ -1,14 +1,14 @@
 apiVersion: postgresql.k8s.enterprisedb.io/v1
 kind: Cluster
 metadata:
-  name: titan-db-cluster
+  name: export-db-cluster
   namespace: databases
 spec:
-  instances: 3
+  instances: 2
   storage:
-    size: 50Gi
+    size: 20Gi
     storageClass: "openebs-hostpath"
   bootstrap:
     initdb:
-      database: titan_db
+      database: payment_batch_db
       owner: app

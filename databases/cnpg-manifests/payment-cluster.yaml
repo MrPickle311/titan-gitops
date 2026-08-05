@@ -1,0 +1,14 @@
+apiVersion: postgresql.k8s.enterprisedb.io/v1
+kind: Cluster
+metadata:
+  name: payment-db-cluster
+  namespace: databases
+spec:
+  instances: 3
+  storage:
+    size: 20Gi
+    storageClass: "openebs-hostpath"
+  bootstrap:
+    initdb:
+      database: titan_db
+      owner: app
