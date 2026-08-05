@@ -1,0 +1,25 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaUser
+metadata:
+  name: payments-app
+  namespace: messaging
+  labels:
+    strimzi.io/cluster: kafka
+spec:
+  authentication:
+    type: scram-sha-512
+  authorization:
+    type: simple
+    acls:
+      - resource:
+          type: topic
+          name: "*"
+          patternType: literal
+        operation: All
+        host: "*"
+      - resource:
+          type: group
+          name: "*"
+          patternType: literal
+        operation: All
+        host: "*"

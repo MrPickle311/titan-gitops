@@ -28,7 +28,9 @@ metadata:
   name: homelab-ca-issuer
 spec:
   ca:
-    secretName: homelab-ca-secretapiVersion: v1
+    secretName:
+      homelab-ca-secretapiVersion: v1
+---
 kind: Namespace
 metadata:
   name: applications

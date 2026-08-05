@@ -1,19 +1,23 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: kafka
+  name: strimzi-operator
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   source:
-    repoURL: 'https://github.com/MrPickle311/titan-gitops.git'
-    targetRevision: HEAD
-    path: databases/kafka-manifests
+    repoURL: 'https://strimzi.io/charts/'
+    targetRevision: 0.43.0
+    chart: strimzi-kafka-operator
+    helm:
+      values: |
+        watchAnyNamespace: true
+        featureGates: +UseKRaft,+KafkaNodePools
   destination:
     server: 'https://kubernetes.default.svc'
-    namespace: messaging
+    namespace: operators
   syncPolicy:
     automated:
       prune: true
