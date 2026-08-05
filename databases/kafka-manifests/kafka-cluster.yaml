@@ -40,6 +40,8 @@ spec:
     metadataVersion: 3.8-IV0
     authorization:
       type: simple
+      superUsers:
+        - ANONYMOUS
     listeners:
       - name: plain
         port: 9092
