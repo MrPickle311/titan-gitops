@@ -14,7 +14,6 @@ spec:
     helm:
       values: |
         watchAnyNamespace: true
-        featureGates: +UseKRaft,+KafkaNodePools
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: operators
