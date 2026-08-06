@@ -31,7 +31,6 @@ spec:
             storage: 5Gi
   redisExporter:
     enabled: true
-    image: bitnamilegacy/redis-exporter:1.76.0-debian-12-r0
   externalService:
     enabled: true
     serviceType: LoadBalancer
