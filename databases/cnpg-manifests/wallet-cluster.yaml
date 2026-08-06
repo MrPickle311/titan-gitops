@@ -5,6 +5,19 @@ metadata:
   namespace: databases
 spec:
   instances: 2
+  managed:
+    services:
+      additional:
+        - selectorType: rw
+          serviceTemplate:
+            metadata:
+              name: wallet-db-cluster-rw-lb
+            spec:
+              type: LoadBalancer
+              ports:
+                - name: postgres
+                  port: 5432
+                  targetPort: 5432
   storage:
     size: 10Gi
     storageClass: "openebs-hostpath"
