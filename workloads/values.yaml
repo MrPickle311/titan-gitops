@@ -82,11 +82,11 @@ apps:
         - name: PYROSCOPE_LABELS
           value: pod=$(POD_NAME),service_name=fx-service
         - name: REDIS_HOST
-          value: redis-cluster-leader.databases.svc.cluster.local
+          value: redis-redis-cluster.databases.svc.cluster.local
         - name: REDIS_PORT
           value: '6379'
         - name: REDIS_CLUSTER_NODES
-          value: redis-cluster-leader.databases.svc.cluster.local:6379
+          value: redis-redis-cluster.databases.svc.cluster.local:6379
         - name: REDIS_PASSWORD
           valueFrom:
             secretKeyRef:
@@ -859,7 +859,7 @@ apps:
               name: payment-db-cluster-app
               key: password
         - name: REDIS_HOST
-          value: redis-cluster-leader.databases.svc.cluster.local
+          value: redis-redis-cluster.databases.svc.cluster.local
         - name: REDIS_PORT
           value: '6379'
         - name: REDIS_PASSWORD
