@@ -24,7 +24,7 @@ spec:
             enabled: true
             service:
               type: LoadBalancer
-              loadBalancerIP: ["10.0.0.151", "10.0.0.152", "10.0.0.153", "10.0.0.154", "10.0.0.155", "10.0.0.156"]
+              loadBalancerIP: ["10.0.0.161", "10.0.0.162", "10.0.0.163", "10.0.0.164", "10.0.0.165", "10.0.0.166"]
 
         usePassword: true
         existingSecret: "redis-cluster-credentials"
