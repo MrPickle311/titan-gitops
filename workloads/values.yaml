@@ -198,10 +198,7 @@ apps:
         - name: PYROSCOPE_APPLICATION_NAME
           value: export-batch-service-manager
         - name: SPRING_DATASOURCE_URL
-          valueFrom:
-            secretKeyRef:
-              name: export-db-cluster-app
-              key: jdbc-uri
+          value: jdbc:postgresql://export-db-cluster-rw.databases:5432/payment_batch_db
         - name: SPRING_DATASOURCE_USERNAME
           valueFrom:
             secretKeyRef:
@@ -239,10 +236,7 @@ apps:
         - name: PYROSCOPE_APPLICATION_NAME
           value: export-batch-service-listener
         - name: SPRING_DATASOURCE_URL
-          valueFrom:
-            secretKeyRef:
-              name: export-db-cluster-app
-              key: jdbc-uri
+          value: jdbc:postgresql://export-db-cluster-rw.databases:5432/payment_batch_db
         - name: SPRING_DATASOURCE_USERNAME
           valueFrom:
             secretKeyRef:
@@ -280,10 +274,7 @@ apps:
         - name: PYROSCOPE_APPLICATION_NAME
           value: export-batch-service-retry-manager
         - name: SPRING_DATASOURCE_URL
-          valueFrom:
-            secretKeyRef:
-              name: export-db-cluster-app
-              key: jdbc-uri
+          value: jdbc:postgresql://export-db-cluster-rw.databases:5432/payment_batch_db
         - name: SPRING_DATASOURCE_USERNAME
           valueFrom:
             secretKeyRef:
@@ -367,10 +358,7 @@ apps:
         - name: PYROSCOPE_LABELS
           value: pod=$(POD_NAME),service_name=limits-service
         - name: SPRING_DATASOURCE_URL
-          valueFrom:
-            secretKeyRef:
-              name: limits-db-cluster-app
-              key: jdbc-uri
+          value: jdbc:postgresql://limits-db-cluster-rw.databases:5432/limits_db
         - name: SPRING_DATASOURCE_USERNAME
           valueFrom:
             secretKeyRef:
@@ -443,10 +431,7 @@ apps:
         - name: PYROSCOPE_LABELS
           value: pod=$(POD_NAME),service_name=wallet-service
         - name: SPRING_DATASOURCE_URL
-          valueFrom:
-            secretKeyRef:
-              name: wallet-db-cluster-app
-              key: jdbc-uri
+          value: jdbc:postgresql://wallet-db-cluster-rw.databases:5432/wallet_db
         - name: SPRING_DATASOURCE_USERNAME
           valueFrom:
             secretKeyRef:
@@ -529,10 +514,7 @@ apps:
         - name: PYROSCOPE_LABELS
           value: pod=$(POD_NAME),service_name=ledger-service
         - name: SPRING_DATASOURCE_URL
-          valueFrom:
-            secretKeyRef:
-              name: ledger-db-cluster-app
-              key: jdbc-uri
+          value: jdbc:postgresql://ledger-db-cluster-rw.databases:5432/ledger_db
         - name: SPRING_DATASOURCE_USERNAME
           valueFrom:
             secretKeyRef:
@@ -611,10 +593,7 @@ apps:
         - name: PYROSCOPE_LABELS
           value: pod=$(POD_NAME),service_name=outbox-relay-service
         - name: SPRING_DATASOURCE_URL
-          valueFrom:
-            secretKeyRef:
-              name: payment-db-cluster-app
-              key: jdbc-uri
+          value: jdbc:postgresql://payment-db-cluster-rw.databases:5432/titan_db
         - name: SPRING_DATASOURCE_USERNAME
           valueFrom:
             secretKeyRef:
@@ -862,10 +841,7 @@ apps:
         - name: PYROSCOPE_LABELS
           value: pod=$(POD_NAME),service_name=payment-service
         - name: SPRING_DATASOURCE_URL
-          valueFrom:
-            secretKeyRef:
-              name: payment-db-cluster-app
-              key: jdbc-uri
+          value: jdbc:postgresql://payment-db-cluster-rw.databases:5432/titan_db
         - name: SPRING_DATASOURCE_USERNAME
           valueFrom:
             secretKeyRef:
@@ -984,10 +960,7 @@ apps:
         - name: PYROSCOPE_LABELS
           value: pod=$(POD_NAME),service_name=webhooks-service
         - name: SPRING_DATASOURCE_URL
-          valueFrom:
-            secretKeyRef:
-              name: payment-db-cluster-app
-              key: jdbc-uri
+          value: jdbc:postgresql://payment-db-cluster-rw.databases:5432/titan_db
         - name: SPRING_DATASOURCE_USERNAME
           valueFrom:
             secretKeyRef:
