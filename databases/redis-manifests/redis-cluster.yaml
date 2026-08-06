@@ -6,6 +6,7 @@ metadata:
 spec:
   clusterSize: 3
   clusterVersion: v7
+  persistenceEnabled: true
   kubernetesConfig:
     image: quay.io/opstree/redis:v7.0.12
     imagePullPolicy: IfNotPresent
@@ -19,9 +20,6 @@ spec:
       limits:
         cpu: 500m
         memory: 512Mi
-  redisExporter:
-    enabled: true
-    image: bitnamilegacy/redis-exporter:1.76.0-debian-12-r0
   storage:
     volumeClaimTemplate:
       spec:
@@ -31,6 +29,9 @@ spec:
         resources:
           requests:
             storage: 5Gi
+  redisExporter:
+    enabled: true
+    image: bitnamilegacy/redis-exporter:1.76.0-debian-12-r0
   externalService:
     enabled: true
     serviceType: LoadBalancer
