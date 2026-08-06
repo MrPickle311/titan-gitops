@@ -1,0 +1,21 @@
+{{- range $appKey, $app := .Values.apps }}
+{{- if $app.serviceMonitor }}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ $app.serviceMonitor.name | default (print $appKey $app.serviceMonitor._name_suffix) }}
+  namespace: applications
+  labels:
+    app: {{ $appKey }}
+{{- if $app.serviceMonitor.labels }}
+{{ toYaml $app.serviceMonitor.labels | indent 4 }}
+{{- end }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ $appKey }}
+  endpoints:
+{{ toYaml $app.serviceMonitor.endpoints | indent 2 }}
+{{- end }}
+{{- end }}

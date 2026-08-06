@@ -1,0 +1,21 @@
+{{- range $appKey, $app := .Values.apps }}
+{{- if $app.ingress }}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ $app.ingress.name | default (print $appKey $app.ingress._name_suffix) }}
+  namespace: applications
+  {{- if $app.ingress.annotations }}
+  annotations:
+{{ toYaml $app.ingress.annotations | indent 4 }}
+  {{- end }}
+spec:
+  {{- if $app.ingress.tls }}
+  tls:
+{{ toYaml $app.ingress.tls | indent 4 }}
+  {{- end }}
+  rules:
+{{ toYaml $app.ingress.rules | indent 2 }}
+{{- end }}
+{{- end }}

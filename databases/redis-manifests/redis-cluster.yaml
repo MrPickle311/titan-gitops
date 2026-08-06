@@ -1,0 +1,39 @@
+apiVersion: redis.redis.opstreelabs.in/v1beta2
+kind: RedisCluster
+metadata:
+  name: redis-cluster
+  namespace: databases
+spec:
+  clusterSize: 3
+  clusterVersion: v7
+  kubernetesConfig:
+    image: quay.io/opstree/redis:v7.0.12
+    imagePullPolicy: IfNotPresent
+    redisSecret:
+      name: redis-cluster-credentials
+      key: redis-password
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+  redisExporter:
+    enabled: true
+    image: bitnamilegacy/redis-exporter:1.76.0-debian-12-r0
+  storage:
+    volumeClaimTemplate:
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        storageClassName: openebs-hostpath
+        resources:
+          requests:
+            storage: 5Gi
+  externalService:
+    enabled: true
+    serviceType: LoadBalancer
+    port: 6379
+    annotations:
+      metallb.universe.tf/loadBalancerIPs: "10.0.0.151,10.0.0.152,10.0.0.153,10.0.0.154,10.0.0.155,10.0.0.156"

@@ -1,0 +1,84 @@
+{{- range $appKey, $app := .Values.apps }}
+{{- range $depName, $dep := $app.deployments }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $depName }}
+  namespace: applications
+  labels:
+    app: {{ $appKey }}
+{{- if $dep.labels }}
+{{ toYaml $dep.labels | indent 4 }}
+{{- end }}
+spec:
+  replicas: {{ $dep.replicas | default 1 }}
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      app: {{ $appKey }}
+{{- if $dep.labels }}
+{{ toYaml $dep.labels | indent 6 }}
+{{- end }}
+  template:
+    metadata:
+      labels:
+        app: {{ $appKey }}
+{{- if $dep.labels }}
+{{ toYaml $dep.labels | indent 8 }}
+{{- end }}
+    spec:
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app: {{ $appKey }}
+{{- if $dep.labels }}
+{{ toYaml $dep.labels | indent 14 }}
+{{- end }}
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node-role.kubernetes.io/control-plane
+                operator: DoesNotExist
+      {{- if $app.telemetry }}
+      volumes:
+        - name: pyroscope-agent
+          emptyDir: {}
+      initContainers:
+        - name: fetch-otel-pyroscope
+          image: busybox:latest
+          command:
+            - sh
+            - -c
+            - "wget -O /agent/opentelemetry-javaagent.jar https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/latest/download/opentelemetry-javaagent.jar && wget -O /agent/pyroscope-otel.jar https://github.com/grafana/otel-profiling-java/releases/latest/download/pyroscope-otel.jar && wget -O /agent/pyroscope.jar https://github.com/grafana/pyroscope-java/releases/latest/download/pyroscope.jar"
+          volumeMounts:
+            - name: pyroscope-agent
+              mountPath: /agent
+      {{- end }}
+      containers:
+      - name: {{ $depName }}
+        image: {{ $dep.image }}
+        imagePullPolicy: Always
+        resources:
+{{ toYaml $dep.resources | indent 10 }}
+        ports:
+        - containerPort: {{ $dep.port }}
+        {{- if $app.telemetry }}
+        volumeMounts:
+          - name: pyroscope-agent
+            mountPath: /agent
+        {{- end }}
+        env:
+{{- if $.Values.commonEnv }}
+{{ toYaml $.Values.commonEnv | indent 8 }}
+{{- end }}
+{{- if $dep.env }}
+{{ toYaml $dep.env | indent 8 }}
+{{- end }}
+{{- end }}
+{{- end }}

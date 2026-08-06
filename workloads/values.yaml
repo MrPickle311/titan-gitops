@@ -1,0 +1,1068 @@
+apps:
+  sanctions-service:
+    telemetry: true
+    deployments:
+      sanctions-service:
+        replicas: 1
+        image: registry.homelab/sanctions-service:latest
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        port: 9091
+        env:
+        - name: JAVA_TOOL_OPTIONS
+          value: -javaagent:/opt/byteman/lib/byteman.jar=listener:true,port:9288,address:0.0.0.0
+            -javaagent:/agent/pyroscope.jar -javaagent:/agent/opentelemetry-javaagent.jar
+        - name: OTEL_SERVICE_NAME
+          value: sanctions-service
+        - name: PYROSCOPE_APPLICATION_NAME
+          value: sanctions-service
+        - name: PYROSCOPE_PROFILING_INTERVAL
+          value: 1ms
+        - name: PYROSCOPE_PROFILER_ALLOC
+          value: 128k
+        - name: PYROSCOPE_LABELS
+          value: pod=$(POD_NAME),service_name=sanctions-service
+    service:
+      ports:
+      - name: grpc
+        port: 9091
+        targetPort: 9091
+    ingress:
+      annotations:
+        kubernetes.io/ingress.class: nginx
+        cert-manager.io/cluster-issuer: homelab-ca-issuer
+        nginx.ingress.kubernetes.io/backend-protocol: GRPC
+      tls:
+      - hosts:
+        - sanctions.homelab
+        secretName: sanctions-tls-secret
+      rules:
+      - host: sanctions.homelab
+        http:
+          paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: sanctions-service
+                port:
+                  number: 9091
+      _name_suffix: -ingress
+    serviceMonitor: null
+  fx-service:
+    telemetry: true
+    deployments:
+      fx-service:
+        replicas: 1
+        image: registry.homelab/fx-service:latest
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        port: 9091
+        env:
+        - name: JAVA_TOOL_OPTIONS
+          value: -javaagent:/agent/pyroscope.jar -javaagent:/agent/opentelemetry-javaagent.jar
+        - name: OTEL_SERVICE_NAME
+          value: fx-service
+        - name: PYROSCOPE_APPLICATION_NAME
+          value: fx-service
+        - name: PYROSCOPE_PROFILING_INTERVAL
+          value: 1ms
+        - name: PYROSCOPE_PROFILER_ALLOC
+          value: 128k
+        - name: PYROSCOPE_LABELS
+          value: pod=$(POD_NAME),service_name=fx-service
+        - name: REDIS_HOST
+          value: redis-redis-cluster.databases.svc.cluster.local
+        - name: REDIS_PORT
+          value: '6379'
+        - name: REDIS_CLUSTER_NODES
+          value: redis-redis-cluster.databases.svc.cluster.local:6379
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: redis-cluster-credentials
+              key: redis-password
+              optional: false
+    service:
+      ports:
+      - name: grpc
+        port: 9091
+        targetPort: 9091
+    ingress:
+      annotations:
+        kubernetes.io/ingress.class: nginx
+        cert-manager.io/cluster-issuer: homelab-ca-issuer
+        nginx.ingress.kubernetes.io/backend-protocol: GRPC
+      tls:
+      - hosts:
+        - fx.homelab
+        secretName: fx-tls-secret
+      rules:
+      - host: fx.homelab
+        http:
+          paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: fx-service
+                port:
+                  number: 9091
+      _name_suffix: -ingress
+    serviceMonitor: null
+  fee-service:
+    telemetry: true
+    deployments:
+      fee-service:
+        replicas: 1
+        image: registry.homelab/fee-service:latest
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        port: 9091
+        env:
+        - name: JAVA_TOOL_OPTIONS
+          value: -javaagent:/agent/pyroscope.jar -javaagent:/agent/opentelemetry-javaagent.jar
+        - name: OTEL_SERVICE_NAME
+          value: fee-service
+        - name: PYROSCOPE_APPLICATION_NAME
+          value: fee-service
+        - name: PYROSCOPE_PROFILING_INTERVAL
+          value: 1ms
+        - name: PYROSCOPE_PROFILER_ALLOC
+          value: 128k
+        - name: PYROSCOPE_LABELS
+          value: pod=$(POD_NAME),service_name=fee-service
+    service:
+      ports:
+      - name: grpc
+        port: 9091
+        targetPort: 9091
+    ingress:
+      annotations:
+        kubernetes.io/ingress.class: nginx
+        cert-manager.io/cluster-issuer: homelab-ca-issuer
+        nginx.ingress.kubernetes.io/backend-protocol: GRPC
+      tls:
+      - hosts:
+        - fee.homelab
+        secretName: fee-tls-secret
+      rules:
+      - host: fee.homelab
+        http:
+          paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: fee-service
+                port:
+                  number: 9091
+      _name_suffix: -ingress
+    serviceMonitor: null
+  export-batch-service:
+    telemetry: true
+    deployments:
+      export-batch-manager:
+        labels:
+          component: manager
+        replicas: 1
+        image: registry.homelab/export-batch-service:latest
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        port: 8083
+        env:
+        - name: JAVA_TOOL_OPTIONS
+          value: -javaagent:/agent/pyroscope.jar -javaagent:/agent/opentelemetry-javaagent.jar
+        - name: OTEL_SERVICE_NAME
+          value: export-batch-service-manager
+        - name: PYROSCOPE_APPLICATION_NAME
+          value: export-batch-service-manager
+        - name: SPRING_DATASOURCE_URL
+          valueFrom:
+            secretKeyRef:
+              name: export-db-cluster-app
+              key: jdbc-uri
+        - name: SPRING_DATASOURCE_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: export-db-cluster-app
+              key: username
+        - name: SPRING_PROFILES_ACTIVE
+          value: manager
+        - name: SPRING_DATASOURCE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: export-db-cluster-app
+              key: password
+        - name: KAFKA_BOOTSTRAP_SERVERS
+          value: kafka-kafka-bootstrap.messaging.svc.cluster.local:9092
+        - name: EXPORT_REGULATORY_URL
+          value: http://mock-regulatory-service:8084/api/v1/regulatory/report
+      export-batch-listener:
+        labels:
+          component: listener
+        replicas: 1
+        image: registry.homelab/export-batch-service:latest
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        port: 8083
+        env:
+        - name: JAVA_TOOL_OPTIONS
+          value: -javaagent:/agent/pyroscope.jar -javaagent:/agent/opentelemetry-javaagent.jar
+        - name: OTEL_SERVICE_NAME
+          value: export-batch-service-listener
+        - name: PYROSCOPE_APPLICATION_NAME
+          value: export-batch-service-listener
+        - name: SPRING_DATASOURCE_URL
+          valueFrom:
+            secretKeyRef:
+              name: export-db-cluster-app
+              key: jdbc-uri
+        - name: SPRING_DATASOURCE_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: export-db-cluster-app
+              key: username
+        - name: SPRING_PROFILES_ACTIVE
+          value: listener
+        - name: SPRING_DATASOURCE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: export-db-cluster-app
+              key: password
+        - name: KAFKA_BOOTSTRAP_SERVERS
+          value: kafka-kafka-bootstrap.messaging.svc.cluster.local:9092
+        - name: EXPORT_REGULATORY_URL
+          value: http://mock-regulatory-service:8084/api/v1/regulatory/report
+      export-batch-retry-manager:
+        labels:
+          component: retry-manager
+        replicas: 1
+        image: registry.homelab/export-batch-service:latest
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        port: 8083
+        env:
+        - name: JAVA_TOOL_OPTIONS
+          value: -javaagent:/agent/pyroscope.jar -javaagent:/agent/opentelemetry-javaagent.jar
+        - name: OTEL_SERVICE_NAME
+          value: export-batch-service-retry-manager
+        - name: PYROSCOPE_APPLICATION_NAME
+          value: export-batch-service-retry-manager
+        - name: SPRING_DATASOURCE_URL
+          valueFrom:
+            secretKeyRef:
+              name: export-db-cluster-app
+              key: jdbc-uri
+        - name: SPRING_DATASOURCE_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: export-db-cluster-app
+              key: username
+        - name: SPRING_PROFILES_ACTIVE
+          value: retry-manager
+        - name: SPRING_DATASOURCE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: export-db-cluster-app
+              key: password
+        - name: KAFKA_BOOTSTRAP_SERVERS
+          value: kafka-kafka-bootstrap.messaging.svc.cluster.local:9092
+        - name: EXPORT_REGULATORY_URL
+          value: http://mock-regulatory-service:8084/api/v1/regulatory/report
+    service:
+      ports:
+      - name: http
+        port: 8083
+        targetPort: 8083
+    ingress:
+      annotations:
+        kubernetes.io/ingress.class: nginx
+        cert-manager.io/cluster-issuer: homelab-ca-issuer
+        nginx.ingress.kubernetes.io/configuration-snippet: 'proxy_hide_header X-Frame-Options;
+
+          proxy_hide_header Content-Security-Policy;
+
+          '
+      tls:
+      - hosts:
+        - export-batch.homelab
+        secretName: export-batch-tls-secret
+      rules:
+      - host: export-batch.homelab
+        http:
+          paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: export-batch-service
+                port:
+                  number: 8083
+      _name_suffix: -ingress
+    serviceMonitor:
+      name: export-batch-monitor
+      labels:
+        release: kube-prometheus-stack
+      endpoints:
+      - port: http
+        path: /actuator/prometheus
+        interval: 15s
+  limits-service:
+    telemetry: true
+    deployments:
+      limits-service:
+        replicas: 1
+        image: registry.homelab/limits-service:latest
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        port: 9091
+        env:
+        - name: JAVA_TOOL_OPTIONS
+          value: -javaagent:/opt/byteman/lib/byteman.jar=listener:true,port:9288,address:0.0.0.0
+            -javaagent:/agent/pyroscope.jar -javaagent:/agent/opentelemetry-javaagent.jar
+        - name: OTEL_SERVICE_NAME
+          value: limits-service
+        - name: PYROSCOPE_APPLICATION_NAME
+          value: limits-service
+        - name: PYROSCOPE_PROFILING_INTERVAL
+          value: 1ms
+        - name: PYROSCOPE_PROFILER_ALLOC
+          value: 128k
+        - name: PYROSCOPE_LABELS
+          value: pod=$(POD_NAME),service_name=limits-service
+        - name: SPRING_DATASOURCE_URL
+          valueFrom:
+            secretKeyRef:
+              name: limits-db-cluster-app
+              key: jdbc-uri
+        - name: SPRING_DATASOURCE_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: limits-db-cluster-app
+              key: username
+        - name: SPRING_DATASOURCE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: limits-db-cluster-app
+              key: password
+    service:
+      ports:
+      - name: grpc
+        port: 9091
+        targetPort: 9091
+    ingress:
+      annotations:
+        kubernetes.io/ingress.class: nginx
+        cert-manager.io/cluster-issuer: homelab-ca-issuer
+        nginx.ingress.kubernetes.io/backend-protocol: GRPC
+      tls:
+      - hosts:
+        - limits.homelab
+        secretName: limits-tls-secret
+      rules:
+      - host: limits.homelab
+        http:
+          paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: limits-service
+                port:
+                  number: 9091
+      _name_suffix: -ingress
+    serviceMonitor: null
+  wallet-service:
+    telemetry: true
+    deployments:
+      wallet-service:
+        replicas: 1
+        image: registry.homelab/wallet-service:latest
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        port: 8081
+        env:
+        - name: JAVA_TOOL_OPTIONS
+          value: -javaagent:/opt/byteman/lib/byteman.jar=listener:true,port:9288,address:0.0.0.0
+            -javaagent:/agent/pyroscope.jar -javaagent:/agent/opentelemetry-javaagent.jar
+        - name: OTEL_SERVICE_NAME
+          value: wallet-service
+        - name: OTEL_INSTRUMENTATION_KAFKA_ENABLED
+          value: 'true'
+        - name: SPRING_KAFKA_LISTENER_OBSERVATION_ENABLED
+          value: 'true'
+        - name: SPRING_KAFKA_TEMPLATE_OBSERVATION_ENABLED
+          value: 'true'
+        - name: PYROSCOPE_APPLICATION_NAME
+          value: wallet-service
+        - name: PYROSCOPE_PROFILING_INTERVAL
+          value: 1ms
+        - name: PYROSCOPE_PROFILER_ALLOC
+          value: 512k
+        - name: PYROSCOPE_LABELS
+          value: pod=$(POD_NAME),service_name=wallet-service
+        - name: SPRING_DATASOURCE_URL
+          valueFrom:
+            secretKeyRef:
+              name: wallet-db-cluster-app
+              key: jdbc-uri
+        - name: SPRING_DATASOURCE_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: wallet-db-cluster-app
+              key: username
+        - name: SPRING_DATASOURCE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: wallet-db-cluster-app
+              key: password
+    service:
+      ports:
+      - name: http
+        port: 8081
+        targetPort: 8081
+      - name: grpc
+        port: 9090
+        targetPort: 9090
+    ingress:
+      annotations:
+        kubernetes.io/ingress.class: nginx
+        cert-manager.io/cluster-issuer: homelab-ca-issuer
+        nginx.ingress.kubernetes.io/backend-protocol: GRPC
+      tls:
+      - hosts:
+        - wallet.homelab
+        secretName: wallet-tls-secret
+      rules:
+      - host: wallet.homelab
+        http:
+          paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: wallet-service
+                port:
+                  number: 9090
+      _name_suffix: -ingress
+    serviceMonitor:
+      labels:
+        release: kube-prometheus-stack
+      endpoints:
+      - port: http
+        path: /actuator/prometheus
+        interval: 15s
+      _name_suffix: -monitor
+  ledger-service:
+    telemetry: true
+    deployments:
+      ledger-service:
+        replicas: 1
+        image: registry.homelab/ledger-service:latest
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        port: 8082
+        env:
+        - name: JAVA_TOOL_OPTIONS
+          value: -javaagent:/opt/byteman/lib/byteman.jar=listener:true,port:9288,address:0.0.0.0
+            -javaagent:/agent/pyroscope.jar -javaagent:/agent/opentelemetry-javaagent.jar
+        - name: OTEL_SERVICE_NAME
+          value: ledger-service
+        - name: OTEL_INSTRUMENTATION_KAFKA_ENABLED
+          value: 'true'
+        - name: SPRING_KAFKA_LISTENER_OBSERVATION_ENABLED
+          value: 'true'
+        - name: SPRING_KAFKA_TEMPLATE_OBSERVATION_ENABLED
+          value: 'true'
+        - name: PYROSCOPE_APPLICATION_NAME
+          value: ledger-service
+        - name: PYROSCOPE_PROFILING_INTERVAL
+          value: 1ms
+        - name: PYROSCOPE_PROFILER_ALLOC
+          value: 512k
+        - name: PYROSCOPE_LABELS
+          value: pod=$(POD_NAME),service_name=ledger-service
+        - name: SPRING_DATASOURCE_URL
+          valueFrom:
+            secretKeyRef:
+              name: ledger-db-cluster-app
+              key: jdbc-uri
+        - name: SPRING_DATASOURCE_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: ledger-db-cluster-app
+              key: username
+        - name: SPRING_DATASOURCE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: ledger-db-cluster-app
+              key: password
+        - name: KAFKA_BOOTSTRAP_SERVERS
+          value: kafka-kafka-bootstrap.messaging.svc.cluster.local:9092
+    service:
+      ports:
+      - name: http
+        port: 8082
+        targetPort: 8082
+    ingress:
+      annotations:
+        kubernetes.io/ingress.class: nginx
+        cert-manager.io/cluster-issuer: homelab-ca-issuer
+        nginx.ingress.kubernetes.io/configuration-snippet: 'proxy_hide_header X-Frame-Options;
+
+          proxy_hide_header Content-Security-Policy;
+
+          '
+      tls:
+      - hosts:
+        - ledger.homelab
+        secretName: ledger-tls-secret
+      rules:
+      - host: ledger.homelab
+        http:
+          paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ledger-service
+                port:
+                  number: 8082
+      _name_suffix: -ingress
+    serviceMonitor:
+      labels:
+        release: kube-prometheus-stack
+      endpoints:
+      - port: http
+        path: /actuator/prometheus
+        interval: 15s
+      _name_suffix: -monitor
+  outbox-relay-service:
+    telemetry: true
+    deployments:
+      outbox-relay-service:
+        replicas: 1
+        image: registry.homelab/outbox-relay-service:latest
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        port: 8089
+        env:
+        - name: JAVA_TOOL_OPTIONS
+          value: -javaagent:/agent/pyroscope.jar -javaagent:/agent/opentelemetry-javaagent.jar
+        - name: OTEL_SERVICE_NAME
+          value: outbox-relay-service
+        - name: PYROSCOPE_APPLICATION_NAME
+          value: outbox-relay-service
+        - name: PYROSCOPE_PROFILING_INTERVAL
+          value: 10ms
+        - name: PYROSCOPE_PROFILER_ALLOC
+          value: 128k
+        - name: PYROSCOPE_LABELS
+          value: pod=$(POD_NAME),service_name=outbox-relay-service
+        - name: SPRING_DATASOURCE_URL
+          valueFrom:
+            secretKeyRef:
+              name: payment-db-cluster-app
+              key: jdbc-uri
+        - name: SPRING_DATASOURCE_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: payment-db-cluster-app
+              key: username
+        - name: SPRING_DATASOURCE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: payment-db-cluster-app
+              key: password
+        - name: KAFKA_BOOTSTRAP_SERVERS
+          value: kafka-kafka-bootstrap.messaging.svc.cluster.local:9092
+        - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
+          value: kafka-kafka-bootstrap.messaging.svc.cluster.local:9092
+    service:
+      ports:
+      - name: http
+        port: 8089
+        targetPort: 8089
+    ingress:
+      annotations:
+        kubernetes.io/ingress.class: nginx
+        cert-manager.io/cluster-issuer: homelab-ca-issuer
+        nginx.ingress.kubernetes.io/configuration-snippet: 'proxy_hide_header X-Frame-Options;
+
+          proxy_hide_header Content-Security-Policy;
+
+          '
+      tls:
+      - hosts:
+        - outbox-relay.homelab
+        secretName: outbox-relay-tls-secret
+      rules:
+      - host: outbox-relay.homelab
+        http:
+          paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: outbox-relay-service
+                port:
+                  number: 8089
+      _name_suffix: -ingress
+    serviceMonitor:
+      labels:
+        release: kube-prometheus-stack
+      endpoints:
+      - port: http
+        path: /actuator/prometheus
+        interval: 15s
+      _name_suffix: -monitor
+  mock-regulatory-service:
+    telemetry: false
+    deployments:
+      mock-regulatory-service:
+        replicas: 1
+        image: registry.homelab/mock-regulatory-service:latest
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        port: 8084
+        env:
+        - name: SERVER_PORT
+          value: '8084'
+        - name: REGULATORY_FAILURE_RATE
+          value: '0.0'
+    service:
+      ports:
+      - name: http
+        port: 8084
+        targetPort: 8084
+    ingress:
+      name: mock-regulatory-ingress
+      annotations:
+        kubernetes.io/ingress.class: nginx
+        cert-manager.io/cluster-issuer: homelab-ca-issuer
+        nginx.ingress.kubernetes.io/configuration-snippet: 'proxy_hide_header X-Frame-Options;
+
+          proxy_hide_header Content-Security-Policy;
+
+          '
+      tls:
+      - hosts:
+        - regulatory.homelab
+        secretName: regulatory-tls-secret
+      rules:
+      - host: regulatory.homelab
+        http:
+          paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: mock-regulatory-service
+                port:
+                  number: 8084
+    serviceMonitor: null
+  authorization-service:
+    telemetry: true
+    deployments:
+      authorization-service:
+        replicas: 1
+        image: registry.homelab/authorization-service:latest
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        port: 9091
+        env:
+        - name: JAVA_TOOL_OPTIONS
+          value: -javaagent:/opt/byteman/lib/byteman.jar=listener:true,port:9288,address:0.0.0.0
+            -javaagent:/agent/pyroscope.jar -javaagent:/agent/opentelemetry-javaagent.jar
+        - name: OTEL_SERVICE_NAME
+          value: authorization-service
+        - name: PYROSCOPE_APPLICATION_NAME
+          value: authorization-service
+        - name: PYROSCOPE_PROFILING_INTERVAL
+          value: 1ms
+        - name: PYROSCOPE_PROFILER_ALLOC
+          value: 128k
+        - name: PYROSCOPE_LABELS
+          value: pod=$(POD_NAME),service_name=authorization-service
+    service:
+      ports:
+      - name: grpc
+        port: 9091
+        targetPort: 9091
+    ingress:
+      annotations:
+        kubernetes.io/ingress.class: nginx
+        cert-manager.io/cluster-issuer: homelab-ca-issuer
+        nginx.ingress.kubernetes.io/backend-protocol: GRPC
+      tls:
+      - hosts:
+        - authorization.homelab
+        secretName: authorization-tls-secret
+      rules:
+      - host: authorization.homelab
+        http:
+          paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: authorization-service
+                port:
+                  number: 9091
+      _name_suffix: -ingress
+    serviceMonitor: null
+  fraud-service:
+    telemetry: true
+    deployments:
+      fraud-service:
+        replicas: 1
+        image: registry.homelab/fraud-service:latest
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        port: 9091
+        env:
+        - name: JAVA_TOOL_OPTIONS
+          value: -javaagent:/opt/byteman/lib/byteman.jar=listener:true,port:9288,address:0.0.0.0
+            -javaagent:/agent/pyroscope.jar -javaagent:/agent/opentelemetry-javaagent.jar
+        - name: OTEL_SERVICE_NAME
+          value: fraud-service
+        - name: PYROSCOPE_APPLICATION_NAME
+          value: fraud-service
+        - name: PYROSCOPE_PROFILING_INTERVAL
+          value: 1ms
+        - name: PYROSCOPE_PROFILER_ALLOC
+          value: 128k
+        - name: PYROSCOPE_LABELS
+          value: pod=$(POD_NAME),service_name=fraud-service
+    service:
+      ports:
+      - name: grpc
+        port: 9091
+        targetPort: 9091
+    ingress:
+      annotations:
+        kubernetes.io/ingress.class: nginx
+        cert-manager.io/cluster-issuer: homelab-ca-issuer
+        nginx.ingress.kubernetes.io/backend-protocol: GRPC
+      tls:
+      - hosts:
+        - fraud.homelab
+        secretName: fraud-tls-secret
+      rules:
+      - host: fraud.homelab
+        http:
+          paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: fraud-service
+                port:
+                  number: 9091
+      _name_suffix: -ingress
+    serviceMonitor: null
+  payment-service:
+    telemetry: true
+    deployments:
+      payment-service:
+        replicas: 1
+        image: registry.homelab/payment-service:latest
+        resources:
+          requests:
+            cpu: 500m
+            memory: 768Mi
+          limits:
+            cpu: 1000m
+            memory: 1500Mi
+        port: 8080
+        env:
+        - name: JAVA_TOOL_OPTIONS
+          value: -javaagent:/opt/byteman/lib/byteman.jar=listener:true,port:9288,address:0.0.0.0
+            -javaagent:/agent/pyroscope.jar -javaagent:/agent/opentelemetry-javaagent.jar
+        - name: OTEL_SERVICE_NAME
+          value: payment-service
+        - name: OTEL_INSTRUMENTATION_KAFKA_ENABLED
+          value: 'true'
+        - name: SPRING_KAFKA_LISTENER_OBSERVATION_ENABLED
+          value: 'true'
+        - name: SPRING_KAFKA_TEMPLATE_OBSERVATION_ENABLED
+          value: 'true'
+        - name: PYROSCOPE_APPLICATION_NAME
+          value: payment-service
+        - name: PYROSCOPE_PROFILING_INTERVAL
+          value: 1ms
+        - name: PYROSCOPE_PROFILER_ALLOC
+          value: 128k
+        - name: PYROSCOPE_LABELS
+          value: pod=$(POD_NAME),service_name=payment-service
+        - name: SPRING_DATASOURCE_URL
+          valueFrom:
+            secretKeyRef:
+              name: payment-db-cluster-app
+              key: jdbc-uri
+        - name: SPRING_DATASOURCE_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: payment-db-cluster-app
+              key: username
+        - name: SPRING_DATASOURCE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: payment-db-cluster-app
+              key: password
+        - name: REDIS_HOST
+          value: redis-redis-cluster.databases.svc.cluster.local
+        - name: REDIS_PORT
+          value: '6379'
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: redis-cluster-credentials
+              key: redis-password
+              optional: true
+        - name: WALLET_SERVICE_URL
+          value: http://wallet-service:8081
+        - name: KAFKA_BOOTSTRAP_SERVERS
+          value: kafka-kafka-bootstrap.messaging.svc.cluster.local:9092
+        - name: GRPC_AUTHORIZATION_SERVICE_ADDRESS
+          value: static://authorization-service:9091
+        - name: GRPC_AUTHORIZATION_SERVICE_NEGOTIATION_TYPE
+          value: plaintext
+        - name: GRPC_FEE_SERVICE_ADDRESS
+          value: static://fee-service:9091
+        - name: GRPC_FEE_SERVICE_NEGOTIATION_TYPE
+          value: plaintext
+        - name: GRPC_FRAUD_SERVICE_ADDRESS
+          value: static://fraud-service:9091
+        - name: GRPC_FRAUD_SERVICE_NEGOTIATION_TYPE
+          value: plaintext
+        - name: GRPC_FX_SERVICE_ADDRESS
+          value: static://fx-service:9091
+        - name: GRPC_FX_SERVICE_NEGOTIATION_TYPE
+          value: plaintext
+        - name: GRPC_LIMITS_SERVICE_ADDRESS
+          value: static://limits-service:9091
+        - name: GRPC_LIMITS_SERVICE_NEGOTIATION_TYPE
+          value: plaintext
+        - name: GRPC_SANCTIONS_SERVICE_ADDRESS
+          value: static://sanctions-service:9091
+        - name: GRPC_SANCTIONS_SERVICE_NEGOTIATION_TYPE
+          value: plaintext
+        - name: GRPC_WALLET_SERVICE_ADDRESS
+          value: static://wallet-service:9090
+        - name: GRPC_WALLET_SERVICE_NEGOTIATION_TYPE
+          value: plaintext
+    service:
+      ports:
+      - name: http
+        port: 8080
+        targetPort: 8080
+    ingress:
+      annotations:
+        kubernetes.io/ingress.class: nginx
+        cert-manager.io/cluster-issuer: homelab-ca-issuer
+        nginx.ingress.kubernetes.io/configuration-snippet: 'proxy_hide_header X-Frame-Options;
+
+          proxy_hide_header Content-Security-Policy;
+
+          '
+      tls:
+      - hosts:
+        - payment.homelab
+        secretName: payment-tls-secret
+      rules:
+      - host: payment.homelab
+        http:
+          paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: payment-service
+                port:
+                  number: 8080
+      _name_suffix: -ingress
+    serviceMonitor:
+      labels:
+        release: kube-prometheus-stack
+      endpoints:
+      - port: http
+        path: /actuator/prometheus
+        interval: 15s
+      _name_suffix: -monitor
+  webhooks-service:
+    telemetry: true
+    deployments:
+      webhooks-service:
+        replicas: 1
+        image: registry.homelab/webhooks-service:latest
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        port: 8085
+        env:
+        - name: JAVA_TOOL_OPTIONS
+          value: -javaagent:/agent/pyroscope.jar -javaagent:/agent/opentelemetry-javaagent.jar
+        - name: OTEL_SERVICE_NAME
+          value: webhooks-service
+        - name: PYROSCOPE_APPLICATION_NAME
+          value: webhooks-service
+        - name: PYROSCOPE_PROFILING_INTERVAL
+          value: 1ms
+        - name: PYROSCOPE_PROFILER_ALLOC
+          value: 128k
+        - name: PYROSCOPE_LABELS
+          value: pod=$(POD_NAME),service_name=webhooks-service
+        - name: SPRING_DATASOURCE_URL
+          valueFrom:
+            secretKeyRef:
+              name: payment-db-cluster-app
+              key: jdbc-uri
+        - name: SPRING_DATASOURCE_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: payment-db-cluster-app
+              key: username
+        - name: SPRING_DATASOURCE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: payment-db-cluster-app
+              key: password
+        - name: KAFKA_BOOTSTRAP_SERVERS
+          value: kafka-kafka-bootstrap.messaging.svc.cluster.local:9092
+    service:
+      ports:
+      - name: http
+        port: 8085
+        targetPort: 8085
+    ingress:
+      annotations:
+        kubernetes.io/ingress.class: nginx
+        cert-manager.io/cluster-issuer: homelab-ca-issuer
+        nginx.ingress.kubernetes.io/configuration-snippet: 'proxy_hide_header X-Frame-Options;
+
+          proxy_hide_header Content-Security-Policy;
+
+          '
+      tls:
+      - hosts:
+        - webhooks.homelab
+        secretName: webhooks-tls-secret
+      rules:
+      - host: webhooks.homelab
+        http:
+          paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: webhooks-service
+                port:
+                  number: 8085
+      _name_suffix: -ingress
+    serviceMonitor: null
+commonEnv:
+- name: MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE
+  value: '*'
+- name: MANAGEMENT_ENDPOINT_ENV_SHOW_VALUES
+  value: ALWAYS
+- name: OTEL_JAVAAGENT_EXTENSIONS
+  value: /agent/pyroscope-otel.jar
+- name: OTEL_PYROSCOPE_START_PROFILING
+  value: 'true'
+- name: OTEL_PYROSCOPE_ADD_PROFILE_URL
+  value: 'false'
+- name: OTEL_PYROSCOPE_ADD_PROFILE_BASELINE_URL
+  value: 'false'
+- name: OTEL_EXPORTER_OTLP_ENDPOINT
+  value: http://tempo.monitoring.svc.cluster.local:4318
+- name: OTEL_LOGS_EXPORTER
+  value: none
+- name: OTEL_METRICS_EXPORTER
+  value: none
+- name: LOGGING_PATTERN_LEVEL
+  value: trace_id=%X{trace_id} span_id=%X{span_id} %5p
+- name: PYROSCOPE_SERVER_ADDRESS
+  value: http://pyroscope.monitoring.svc.cluster.local:4040
+- name: PYROSCOPE_FORMAT
+  value: jfr
+- name: PYROSCOPE_PROFILER_EVENT
+  value: wall
+- name: PYROSCOPE_PROFILER_LOCK
+  value: 10ms
+- name: PYROSCOPE_LOG_LEVEL
+  value: info
+- name: POD_NAME
+  valueFrom:
+    fieldRef:
+      fieldPath: metadata.name

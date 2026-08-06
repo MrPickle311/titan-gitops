@@ -1,0 +1,29 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: redis-operator
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+spec:
+  project: default
+  source:
+    repoURL: 'https://ot-container-kit.github.io/helm-charts/'
+    targetRevision: 0.24.0
+    chart: redis-operator
+    helm:
+      values: |
+        redisOperator:
+          watchNamespace: ""
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: redis-operator
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true

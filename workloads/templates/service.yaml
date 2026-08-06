@@ -1,0 +1,20 @@
+{{- range $appKey, $app := .Values.apps }}
+{{- if $app.service }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $app.service.name | default $appKey }}
+  namespace: applications
+  labels:
+    app: {{ $appKey }}
+{{- if $app.service.labels }}
+{{ toYaml $app.service.labels | indent 4 }}
+{{- end }}
+spec:
+  selector:
+    app: {{ $appKey }}
+  ports:
+{{ toYaml $app.service.ports | indent 2 }}
+{{- end }}
+{{- end }}
