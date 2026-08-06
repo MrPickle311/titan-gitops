@@ -44,9 +44,3 @@ spec:
   redisExporter:
     enabled: true
     image: quay.io/opstree/redis-exporter:latest
-  externalService:
-    enabled: true
-    serviceType: LoadBalancer
-    port: 6379
-    annotations:
-      metallb.universe.tf/loadBalancerIPs: "10.0.0.156"
