@@ -96,7 +96,11 @@ spec:
             export PGPASSWORD=$DB_PASSWORD
             echo "Waiting for payment {{inputs.parameters.payment-id}} to reach {{inputs.parameters.expected-status}}..."
             for i in $(seq 1 120); do
-              COUNT=$(psql -h export-db-cluster-rw.databases.svc.cluster.local -U $DB_USER -d payment_batch_db -t -c "SELECT count(*) FROM payment_export_staging WHERE status='{{inputs.parameters.expected-status}}' AND payment_id={{inputs.parameters.payment-id}} AND created_at >= NOW() - INTERVAL '5 minutes';" | xargs)
+              if [ "{{inputs.parameters.expected-status}}" = "FAILED" ]; then
+                COUNT=$(psql -h export-db-cluster-rw.databases.svc.cluster.local -U $DB_USER -d payment_batch_db -t -c "SELECT count(*) FROM payment_export_staging WHERE (status='FAILED' OR retry_count > 0) AND payment_id={{inputs.parameters.payment-id}} AND created_at >= NOW() - INTERVAL '5 minutes';" | xargs)
+              else
+                COUNT=$(psql -h export-db-cluster-rw.databases.svc.cluster.local -U $DB_USER -d payment_batch_db -t -c "SELECT count(*) FROM payment_export_staging WHERE status='{{inputs.parameters.expected-status}}' AND payment_id={{inputs.parameters.payment-id}} AND created_at >= NOW() - INTERVAL '5 minutes';" | xargs)
+              fi
               if [ "$COUNT" -gt 0 ]; then
                 echo "Success: Found {{inputs.parameters.expected-status}} payment in staging!"
                 psql -h export-db-cluster-rw.databases.svc.cluster.local -U $DB_USER -d payment_batch_db -c "SELECT id, payment_id, status, retry_count, created_at, exported_at FROM payment_export_staging WHERE payment_id={{inputs.parameters.payment-id}} AND created_at >= NOW() - INTERVAL '5 minutes';"
