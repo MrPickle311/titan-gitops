@@ -215,6 +215,8 @@ apps:
           value: kafka-kafka-bootstrap.messaging.svc.cluster.local:9092
         - name: EXPORT_REGULATORY_URL
           value: http://mock-regulatory-service:8084/api/v1/regulatory/report
+        - name: EXPORT_MAX_RETRY_COUNT
+          value: "50"
       export-batch-listener:
         labels:
           component: listener
@@ -253,6 +255,8 @@ apps:
           value: kafka-kafka-bootstrap.messaging.svc.cluster.local:9092
         - name: EXPORT_REGULATORY_URL
           value: http://mock-regulatory-service:8084/api/v1/regulatory/report
+        - name: EXPORT_MAX_RETRY_COUNT
+          value: "50"
       export-batch-retry-manager:
         labels:
           component: retry-manager
@@ -291,6 +295,8 @@ apps:
           value: kafka-kafka-bootstrap.messaging.svc.cluster.local:9092
         - name: EXPORT_REGULATORY_URL
           value: http://mock-regulatory-service:8084/api/v1/regulatory/report
+        - name: EXPORT_MAX_RETRY_COUNT
+          value: "50"
     service:
       ports:
       - name: http
