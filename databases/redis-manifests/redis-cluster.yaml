@@ -43,6 +43,7 @@ spec:
             storage: 5Gi
   redisExporter:
     enabled: true
+    image: quay.io/opstree/redis-exporter:latest
   externalService:
     enabled: true
     serviceType: LoadBalancer
