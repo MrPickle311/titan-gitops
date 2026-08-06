@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: applications
+  name: workflow-tests
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
@@ -10,7 +10,9 @@ spec:
   source:
     repoURL: 'https://github.com/MrPickle311/titan-gitops.git'
     targetRevision: HEAD
-    path: workloads
+    path: workloads/tests
+    directory:
+      recurse: true
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: applications
