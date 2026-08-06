@@ -71,10 +71,10 @@ spec:
             echo "Waiting for payment {{inputs.parameters.payment-id}} to reach {{inputs.parameters.expected-status}}..."
             # Wait up to 240s to accommodate 3 retries (each 30s) + execution time
             for i in $(seq 1 120); do
-              COUNT=$(psql -h postgres-postgresql.databases.svc.cluster.local -U $DB_USER -d titan_db -t -c "SELECT count(*) FROM payment_export_staging WHERE status='{{inputs.parameters.expected-status}}' AND payment_id={{inputs.parameters.payment-id}} AND created_at >= NOW() - INTERVAL '10 minutes';" | xargs)
+              COUNT=$(psql -h export-db-cluster-rw.databases.svc.cluster.local -U $DB_USER -d payment_batch_db -t -c "SELECT count(*) FROM payment_export_staging WHERE status='{{inputs.parameters.expected-status}}' AND payment_id={{inputs.parameters.payment-id}} AND created_at >= NOW() - INTERVAL '10 minutes';" | xargs)
               if [ "$COUNT" -gt 0 ]; then
                 echo "Success: Found {{inputs.parameters.expected-status}} payment in staging!"
-                psql -h postgres-postgresql.databases.svc.cluster.local -U $DB_USER -d titan_db -c "SELECT id, payment_id, status, retry_count, created_at, exported_at, last_error FROM payment_export_staging WHERE payment_id={{inputs.parameters.payment-id}} AND created_at >= NOW() - INTERVAL '10 minutes';"
+                psql -h export-db-cluster-rw.databases.svc.cluster.local -U $DB_USER -d payment_batch_db -c "SELECT id, payment_id, status, retry_count, created_at, exported_at, last_error FROM payment_export_staging WHERE payment_id={{inputs.parameters.payment-id}} AND created_at >= NOW() - INTERVAL '10 minutes';"
                 exit 0
               fi
               sleep 2
@@ -83,12 +83,15 @@ spec:
             exit 1
         env:
           - name: DB_USER
-            value: postgres
+            valueFrom:
+              secretKeyRef:
+                key: username
+                name: export-db-cluster-app
           - name: DB_PASSWORD
             valueFrom:
               secretKeyRef:
-                key: postgres-password
-                name: postgres-credentials
+                key: password
+                name: export-db-cluster-app
 
     - name: cleanup
       steps:

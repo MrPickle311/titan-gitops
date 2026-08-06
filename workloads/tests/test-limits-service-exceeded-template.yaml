@@ -50,8 +50,8 @@ spec:
         
         echo "0. Inject limit exceeded for $SRC_USER"
         export PGPASSWORD=$DB_PASSWORD
-        psql -h postgres-postgresql.databases.svc.cluster.local -U $DB_USER -d titan_db -c "DELETE FROM daily_limit_records WHERE user_id = $SRC_USER;"
-        psql -h postgres-postgresql.databases.svc.cluster.local -U $DB_USER -d titan_db -c "INSERT INTO daily_limit_records (id, amount_used, date, user_id) VALUES ($RANDOM$RANDOM, 1000000.00, CURRENT_DATE, $SRC_USER);"
+        psql -h limits-db-cluster-rw.databases.svc.cluster.local -U $DB_USER -d limits_db -c "DELETE FROM daily_limit_records WHERE user_id = $SRC_USER;"
+        psql -h limits-db-cluster-rw.databases.svc.cluster.local -U $DB_USER -d limits_db -c "INSERT INTO daily_limit_records (id, amount_used, date, user_id) VALUES ($RANDOM$RANDOM, 1000000.00, CURRENT_DATE, $SRC_USER);"
 
         echo "1. Create payment..."
         RES=$(curl -s -X POST http://payment-service:8080/api/payments \
@@ -84,12 +84,15 @@ spec:
       name: ''
       env:
       - name: DB_USER
-        value: postgres
+        valueFrom:
+          secretKeyRef:
+            key: username
+            name: limits-db-cluster-app
       - name: DB_PASSWORD
         valueFrom:
           secretKeyRef:
-            key: postgres-password
-            name: postgres-credentials
+            key: password
+            name: limits-db-cluster-app
       resources: {}
     inputs: {}
     metadata: {}
@@ -115,12 +118,15 @@ spec:
       args:
       - |
         export PGPASSWORD=$DB_PASSWORD
-        psql -h postgres-postgresql.databases.svc.cluster.local -U $DB_USER -d titan_db -c "DELETE FROM daily_limit_records WHERE user_id = 999999999;"
+        psql -h limits-db-cluster-rw.databases.svc.cluster.local -U $DB_USER -d limits_db -c "DELETE FROM daily_limit_records WHERE user_id = 999999999;"
       env:
       - name: DB_USER
-        value: postgres
+        valueFrom:
+          secretKeyRef:
+            key: username
+            name: limits-db-cluster-app
       - name: DB_PASSWORD
         valueFrom:
           secretKeyRef:
-            key: postgres-password
-            name: postgres-credentials
+            key: password
+            name: limits-db-cluster-app

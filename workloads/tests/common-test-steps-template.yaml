@@ -20,7 +20,7 @@ spec:
       args:
       - |
         echo "Connecting to Postgres to verify payment {{inputs.parameters.payment-id}}..."
-        export PGPASSWORD=$DB_PASSWORD
+        export PGPASSWORD=$PAYMENT_DB_PASSWORD
         PID={{inputs.parameters.payment-id}}
         EXPECTED={{inputs.parameters.expected-state}}
         EXPECTED_HISTORY="{{inputs.parameters.expected-history-state}}"
@@ -29,21 +29,22 @@ spec:
         fi
 
         echo "1. Checking 'payments' table..."
-        STATE=$(psql -h postgres-postgresql.databases.svc.cluster.local -U $DB_USER -d titan_db -t -c "SELECT state FROM payments WHERE id=$PID;" | xargs)
+        STATE=$(psql -h payment-db-cluster-rw.databases.svc.cluster.local -U $PAYMENT_DB_USER -d titan_db -t -c "SELECT state FROM payments WHERE id=$PID;" | xargs)
         if [ "$STATE" != "$EXPECTED" ]; then
           echo "DB Validation Error: payments state is '$STATE', expected '$EXPECTED'"
           exit 1
         fi
 
         echo "2. Checking 'payment_history' table for $EXPECTED_HISTORY..."
-        HISTORY_COUNT=$(psql -h postgres-postgresql.databases.svc.cluster.local -U $DB_USER -d titan_db -t -c "SELECT count(*) FROM payment_history WHERE payment_id=$PID AND to_state='$EXPECTED_HISTORY';" | xargs)
+        HISTORY_COUNT=$(psql -h payment-db-cluster-rw.databases.svc.cluster.local -U $PAYMENT_DB_USER -d titan_db -t -c "SELECT count(*) FROM payment_history WHERE payment_id=$PID AND to_state='$EXPECTED_HISTORY';" | xargs)
         if [ "$HISTORY_COUNT" -eq 0 ]; then
           echo "DB Validation Error: payment_history has no $EXPECTED_HISTORY record for this payment."
           exit 1
         fi
 
         echo "3. Checking 'ledger_entries' table..."
-        LEDGER_COUNT=$(psql -h postgres-postgresql.databases.svc.cluster.local -U $DB_USER -d titan_db -t -c "SELECT count(*) FROM ledger_entries WHERE payment_id=$PID;" | xargs)
+        export PGPASSWORD=$LEDGER_DB_PASSWORD
+        LEDGER_COUNT=$(psql -h ledger-db-cluster-rw.databases.svc.cluster.local -U $LEDGER_DB_USER -d ledger_db -t -c "SELECT count(*) FROM ledger_entries WHERE payment_id=$PID;" | xargs)
         if [ "$EXPECTED" = "FAILED" ] || [ "$EXPECTED_HISTORY" = "LEDGER_NOTIFICATION_FAILED" ]; then
           if [ "$LEDGER_COUNT" -ne 0 ]; then
             echo "DB Validation Error: ledger_entries has $LEDGER_COUNT records, expected 0 (since it failed or ledger notification failed)"
@@ -58,13 +59,26 @@ spec:
 
         echo "Success! Database entities correctly reflect the $EXPECTED payment."
       env:
-      - name: DB_USER
-        value: postgres
-      - name: DB_PASSWORD
+      - name: PAYMENT_DB_USER
         valueFrom:
           secretKeyRef:
-            key: postgres-password
-            name: postgres-credentials
+            key: username
+            name: payment-db-cluster-app
+      - name: PAYMENT_DB_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            key: password
+            name: payment-db-cluster-app
+      - name: LEDGER_DB_USER
+        valueFrom:
+          secretKeyRef:
+            key: username
+            name: ledger-db-cluster-app
+      - name: LEDGER_DB_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            key: password
+            name: ledger-db-cluster-app
   - name: validate-db-compensation
     inputs:
       parameters:
@@ -77,25 +91,27 @@ spec:
       args:
       - |
         echo "Connecting to Postgres to verify compensation for payment {{inputs.parameters.payment-id}}..."
-        export PGPASSWORD=$DB_PASSWORD
+        export PGPASSWORD=$PAYMENT_DB_PASSWORD
         PID={{inputs.parameters.payment-id}}
 
         echo "1. Checking 'payments' table..."
-        STATE=$(psql -h postgres-postgresql.databases.svc.cluster.local -U $DB_USER -d titan_db -t -c "SELECT state FROM payments WHERE id=$PID;" | xargs)
+        STATE=$(psql -h payment-db-cluster-rw.databases.svc.cluster.local -U $PAYMENT_DB_USER -d titan_db -t -c "SELECT state FROM payments WHERE id=$PID;" | xargs)
         if [ "$STATE" != "FAILED" ]; then
           echo "DB Validation Error: payments state is '$STATE', expected 'FAILED'"
           exit 1
         fi
 
         echo "2. Checking 'limits' table (via idempotency_keys)..."
-        LIMITS_COUNT=$(psql -h postgres-postgresql.databases.svc.cluster.local -U $DB_USER -d titan_db -t -c "SELECT count(*) FROM idempotency_keys WHERE idempotency_key='${PID}-LIMITS_RELEASE';" | xargs)
+        export PGPASSWORD=$LIMITS_DB_PASSWORD
+        LIMITS_COUNT=$(psql -h limits-db-cluster-rw.databases.svc.cluster.local -U $LIMITS_DB_USER -d limits_db -t -c "SELECT count(*) FROM idempotency_keys WHERE idempotency_key='${PID}-LIMITS_RELEASE';" | xargs)
         if [ "$LIMITS_COUNT" -eq 0 ]; then
           echo "DB Validation Error: Limits were not released (idempotency key missing)"
           exit 1
         fi
 
         echo "3. Checking 'wallet' table (via idempotency_keys)..."
-        WALLET_COUNT=$(psql -h postgres-postgresql.databases.svc.cluster.local -U $DB_USER -d titan_db -t -c "SELECT count(*) FROM idempotency_keys WHERE idempotency_key='${PID}-FEE_REFUND';" | xargs)
+        export PGPASSWORD=$WALLET_DB_PASSWORD
+        WALLET_COUNT=$(psql -h wallet-db-cluster-rw.databases.svc.cluster.local -U $WALLET_DB_USER -d wallet_db -t -c "SELECT count(*) FROM idempotency_keys WHERE idempotency_key='${PID}-FEE_REFUND';" | xargs)
         if [ "$WALLET_COUNT" -eq 0 ]; then
           echo "DB Validation Error: Wallet fees were not refunded (idempotency key missing)"
           exit 1
@@ -103,13 +119,36 @@ spec:
 
         echo "Success! Database (limits, wallet, payments) entities correctly reflect the compensation."
       env:
-      - name: DB_USER
-        value: postgres
-      - name: DB_PASSWORD
+      - name: PAYMENT_DB_USER
         valueFrom:
           secretKeyRef:
-            key: postgres-password
-            name: postgres-credentials
+            key: username
+            name: payment-db-cluster-app
+      - name: PAYMENT_DB_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            key: password
+            name: payment-db-cluster-app
+      - name: LIMITS_DB_USER
+        valueFrom:
+          secretKeyRef:
+            key: username
+            name: limits-db-cluster-app
+      - name: LIMITS_DB_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            key: password
+            name: limits-db-cluster-app
+      - name: WALLET_DB_USER
+        valueFrom:
+          secretKeyRef:
+            key: username
+            name: wallet-db-cluster-app
+      - name: WALLET_DB_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            key: password
+            name: wallet-db-cluster-app
   - name: validate-kafka
     inputs:
       parameters:

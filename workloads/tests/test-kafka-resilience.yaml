@@ -78,7 +78,7 @@ spec:
             echo "Validating outbox_events table for payment $PID has processed=false..."
             # Wait a few seconds for outbox polling attempt
             sleep 5
-            COUNT=$(psql -h postgres-postgresql.databases.svc.cluster.local -U $DB_USER -d titan_db -t -c "SELECT count(*) FROM outbox_events WHERE payload LIKE '%\"paymentId\":$PID%' AND processed=false;" | xargs)
+            COUNT=$(psql -h payment-db-cluster-rw.databases.svc.cluster.local -U $DB_USER -d titan_db -t -c "SELECT count(*) FROM outbox_events WHERE payload LIKE '%\"paymentId\":$PID%' AND processed=false;" | xargs)
             if [ "$COUNT" -eq 0 ]; then
               echo "Error: Did not find pending outbox events for payment $PID."
               exit 1
@@ -86,12 +86,15 @@ spec:
             echo "Success: Found $COUNT pending outbox events (blocked by NetworkChaos)."
         env:
           - name: DB_USER
-            value: postgres
+            valueFrom:
+              secretKeyRef:
+                key: username
+                name: payment-db-cluster-app
           - name: DB_PASSWORD
             valueFrom:
               secretKeyRef:
-                key: postgres-password
-                name: postgres-credentials
+                key: password
+                name: payment-db-cluster-app
     - name: validate-outbox-published
       inputs:
         parameters:
@@ -105,7 +108,7 @@ spec:
             PID={{inputs.parameters.payment-id}}
             echo "Waiting for outbox-relay-service to recover and publish events..."
             for i in $(seq 1 30); do
-              COUNT=$(psql -h postgres-postgresql.databases.svc.cluster.local -U $DB_USER -d titan_db -t -c "SELECT count(*) FROM outbox_events WHERE payload LIKE '%\"paymentId\":$PID%' AND processed=false;" | xargs)
+              COUNT=$(psql -h payment-db-cluster-rw.databases.svc.cluster.local -U $DB_USER -d titan_db -t -c "SELECT count(*) FROM outbox_events WHERE payload LIKE '%\"paymentId\":$PID%' AND processed=false;" | xargs)
               if [ "$COUNT" -eq 0 ]; then
                 echo "Success: All outbox events published!"
                 exit 0
@@ -116,12 +119,15 @@ spec:
             exit 1
         env:
           - name: DB_USER
-            value: postgres
+            valueFrom:
+              secretKeyRef:
+                key: username
+                name: payment-db-cluster-app
           - name: DB_PASSWORD
             valueFrom:
               secretKeyRef:
-                key: postgres-password
-                name: postgres-credentials
+                key: password
+                name: payment-db-cluster-app
     - name: cleanup
       steps:
         - - name: remove-chaos

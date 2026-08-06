@@ -79,7 +79,7 @@ spec:
             PID={{inputs.parameters.payment-id}}
             echo "Verifying no ledger entries exist yet for payment $PID..."
             sleep 5
-            COUNT=$(psql -h postgres-postgresql.databases.svc.cluster.local -U $DB_USER -d titan_db -t -c "SELECT count(*) FROM ledger_entries WHERE payment_id=$PID;" | xargs)
+            COUNT=$(psql -h ledger-db-cluster-rw.databases.svc.cluster.local -U $DB_USER -d ledger_db -t -c "SELECT count(*) FROM ledger_entries WHERE payment_id=$PID;" | xargs)
             if [ "$COUNT" -ne 0 ]; then
               echo "Error: Found $COUNT ledger entries, expected 0 due to Byteman injection"
               exit 1
@@ -87,12 +87,15 @@ spec:
             echo "OK: 0 ledger entries found."
         env:
           - name: DB_USER
-            value: postgres
+            valueFrom:
+              secretKeyRef:
+                key: username
+                name: ledger-db-cluster-app
           - name: DB_PASSWORD
             valueFrom:
               secretKeyRef:
-                key: postgres-password
-                name: postgres-credentials
+                key: password
+                name: ledger-db-cluster-app
     - name: wait-for-retry
       inputs:
         parameters:
@@ -106,7 +109,7 @@ spec:
             PID={{inputs.parameters.payment-id}}
             echo "Waiting for ledger-service to retry and save the ledger entry for $PID..."
             for i in $(seq 1 40); do
-              COUNT=$(psql -h postgres-postgresql.databases.svc.cluster.local -U $DB_USER -d titan_db -t -c "SELECT count(*) FROM ledger_entries WHERE payment_id=$PID;" | xargs)
+              COUNT=$(psql -h ledger-db-cluster-rw.databases.svc.cluster.local -U $DB_USER -d ledger_db -t -c "SELECT count(*) FROM ledger_entries WHERE payment_id=$PID;" | xargs)
               if [ "$COUNT" -gt 0 ]; then
                 echo "Success: Found ledger entries after retry!"
                 exit 0
@@ -117,12 +120,15 @@ spec:
             exit 1
         env:
           - name: DB_USER
-            value: postgres
+            valueFrom:
+              secretKeyRef:
+                key: username
+                name: ledger-db-cluster-app
           - name: DB_PASSWORD
             valueFrom:
               secretKeyRef:
-                key: postgres-password
-                name: postgres-credentials
+                key: password
+                name: ledger-db-cluster-app
     - name: cleanup
       steps:
         - - name: remove-chaos
