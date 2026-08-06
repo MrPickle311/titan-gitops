@@ -6,6 +6,12 @@ metadata:
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
+  ignoreDifferences:
+    - group: admissionregistration.k8s.io
+      kind: MutatingWebhookConfiguration
+      name: vault-agent-injector-cfg
+      jqPathExpressions:
+        - '.webhooks[].clientConfig.caBundle'
   project: default
   source:
     repoURL: 'https://helm.releases.hashicorp.com'
@@ -20,6 +26,17 @@ spec:
             storageClass: openebs-hostpath
           standalone:
             enabled: true
+          ingress:
+            enabled: true
+            ingressClassName: "nginx"
+            annotations:
+              cert-manager.io/cluster-issuer: "homelab-ca-issuer"
+            hosts:
+              - host: vault.homelab
+            tls:
+              - secretName: vault-tls
+                hosts:
+                  - vault.homelab
         ui:
           enabled: true
           serviceType: ClusterIP
