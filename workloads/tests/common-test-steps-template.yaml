@@ -187,15 +187,15 @@ spec:
 
         echo "Backing up dynamic FX rates from Redis..."
         # Get the current dynamic rates and format them into a single string
-        RATES=$(redis-cli -c -h redis-redis-cluster.databases.svc.cluster.local -p 6379 -a $REDIS_PASSWORD --raw HGETALL fx-conversion-rates | tr '\n' ' ')
+        RATES=$(redis-cli -c -h redis-cluster-leader.databases.svc.cluster.local -p 6379 -a $REDIS_PASSWORD --raw HGETALL fx-conversion-rates | tr '\n' ' ')
 
         # Store the backed up string safely in a temporary Redis String key (redis-cli -c handles cluster redirects automatically)
-        redis-cli -c -h redis-redis-cluster.databases.svc.cluster.local -p 6379 -a $REDIS_PASSWORD SET fx-rates-backup "$RATES"
+        redis-cli -c -h redis-cluster-leader.databases.svc.cluster.local -p 6379 -a $REDIS_PASSWORD SET fx-rates-backup "$RATES"
 
         echo "Rates saved to fx-rates-backup: $RATES"
 
         echo "Clearing the actual FX rates table..."
-        redis-cli -c -h redis-redis-cluster.databases.svc.cluster.local -p 6379 -a $REDIS_PASSWORD DEL fx-conversion-rates
+        redis-cli -c -h redis-cluster-leader.databases.svc.cluster.local -p 6379 -a $REDIS_PASSWORD DEL fx-conversion-rates
       command:
       - /bin/sh
       - -c
@@ -219,15 +219,15 @@ spec:
       args:
       - |
         echo "Retrieving backed up rates from fx-rates-backup string key..."
-        RATES=$(redis-cli -c -h redis-redis-cluster.databases.svc.cluster.local -p 6379 -a $REDIS_PASSWORD GET fx-rates-backup)
+        RATES=$(redis-cli -c -h redis-cluster-leader.databases.svc.cluster.local -p 6379 -a $REDIS_PASSWORD GET fx-rates-backup)
 
         if [ -n "$RATES" ] && [ "$RATES" != "nil" ]; then
           echo "Restoring dynamically fetched rates back to fx-conversion-rates hash..."
           # Use xargs to pass the space-separated string as arguments to HSET
-          echo "$RATES" | xargs redis-cli -c -h redis-redis-cluster.databases.svc.cluster.local -p 6379 -a $REDIS_PASSWORD HSET fx-conversion-rates
+          echo "$RATES" | xargs redis-cli -c -h redis-cluster-leader.databases.svc.cluster.local -p 6379 -a $REDIS_PASSWORD HSET fx-conversion-rates
           
           echo "Cleaning up backup key..."
-          redis-cli -c -h redis-redis-cluster.databases.svc.cluster.local -p 6379 -a $REDIS_PASSWORD DEL fx-rates-backup
+          redis-cli -c -h redis-cluster-leader.databases.svc.cluster.local -p 6379 -a $REDIS_PASSWORD DEL fx-rates-backup
           echo "Dynamic restoration complete!"
         else
           echo "No backup found in fx-rates-backup, skipping restore."
