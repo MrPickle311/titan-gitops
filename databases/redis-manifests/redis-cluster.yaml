@@ -20,7 +20,19 @@ spec:
       limits:
         cpu: 500m
         memory: 512Mi
+  podSecurityContext:
+    fsGroup: 1001
+    runAsUser: 1001
   storage:
+    nodeConfVolume: true
+    nodeConfVolumeClaimTemplate:
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        storageClassName: openebs-hostpath
+        resources:
+          requests:
+            storage: 100Mi
     volumeClaimTemplate:
       spec:
         accessModes:
