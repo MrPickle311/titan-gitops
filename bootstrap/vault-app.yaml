@@ -27,16 +27,7 @@ spec:
           standalone:
             enabled: true
           ingress:
-            enabled: true
-            ingressClassName: "nginx"
-            annotations:
-              cert-manager.io/cluster-issuer: "homelab-ca-issuer"
-            hosts:
-              - host: vault.homelab
-            tls:
-              - secretName: vault-tls
-                hosts:
-                  - vault.homelab
+            enabled: false
         ui:
           enabled: true
           serviceType: ClusterIP

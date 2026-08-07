@@ -25,16 +25,7 @@ spec:
             passwordKey: admin-password
           
           ingress:
-            enabled: true
-            ingressClassName: "nginx"
-            annotations:
-              cert-manager.io/cluster-issuer: "homelab-ca-issuer"
-            hosts:
-              - grafana.homelab
-            tls:
-              - secretName: grafana-tls-secret
-                hosts:
-                  - grafana.homelab
+            enabled: false
           
           persistence:
             enabled: true

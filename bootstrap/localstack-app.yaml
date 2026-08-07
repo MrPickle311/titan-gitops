@@ -30,15 +30,7 @@ spec:
                 name: localstack-pro-token
                 key: token
         ingress:
-          enabled: true
-          ingressClassName: "nginx"
-          annotations:
-            nginx.ingress.kubernetes.io/proxy-body-size: "0"
-          hosts:
-            - host: localstack.homelab
-              paths:
-                - path: /
-                  pathType: Prefix
+          enabled: false
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: localstack

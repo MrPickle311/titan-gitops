@@ -16,16 +16,7 @@ spec:
           authModes:
             - server
           ingress:
-            enabled: true
-            ingressClassName: nginx
-            annotations:
-              cert-manager.io/cluster-issuer: "homelab-ca-issuer"
-            hosts:
-              - workflows.homelab
-            tls:
-              - secretName: workflows-tls
-                hosts:
-                  - workflows.homelab
+            enabled: false
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: argo
