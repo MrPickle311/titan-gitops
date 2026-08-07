@@ -14,7 +14,7 @@ spec:
     helm:
       values: |
         cni:
-          cniBinDir: /opt/cni/bin
+          cniBinDir: /var/lib/cni/bin
           cniConfDir: /etc/cni/net.d
   destination:
     server: 'https://kubernetes.default.svc'
