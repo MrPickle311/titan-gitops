@@ -70,7 +70,8 @@ apps:
         port: 9091
         env:
         - name: JAVA_TOOL_OPTIONS
-          value: -javaagent:/agent/pyroscope.jar -javaagent:/agent/opentelemetry-javaagent.jar
+          value: -javaagent:/opt/byteman/lib/byteman.jar=listener:true,port:9288,address:0.0.0.0
+            -javaagent:/agent/pyroscope.jar -javaagent:/agent/opentelemetry-javaagent.jar
         - name: OTEL_SERVICE_NAME
           value: fx-service
         - name: PYROSCOPE_APPLICATION_NAME
@@ -136,7 +137,8 @@ apps:
         port: 9091
         env:
         - name: JAVA_TOOL_OPTIONS
-          value: -javaagent:/agent/pyroscope.jar -javaagent:/agent/opentelemetry-javaagent.jar
+          value: -javaagent:/opt/byteman/lib/byteman.jar=listener:true,port:9288,address:0.0.0.0
+            -javaagent:/agent/pyroscope.jar -javaagent:/agent/opentelemetry-javaagent.jar
         - name: OTEL_SERVICE_NAME
           value: fee-service
         - name: PYROSCOPE_APPLICATION_NAME
@@ -192,7 +194,8 @@ apps:
         port: 8083
         env:
         - name: JAVA_TOOL_OPTIONS
-          value: -javaagent:/agent/pyroscope.jar -javaagent:/agent/opentelemetry-javaagent.jar
+          value: -javaagent:/opt/byteman/lib/byteman.jar=listener:true,port:9288,address:0.0.0.0
+            -javaagent:/agent/pyroscope.jar -javaagent:/agent/opentelemetry-javaagent.jar
         - name: OTEL_SERVICE_NAME
           value: export-batch-service-manager
         - name: PYROSCOPE_APPLICATION_NAME
@@ -216,7 +219,7 @@ apps:
         - name: EXPORT_REGULATORY_URL
           value: http://mock-regulatory-service:8084/api/v1/regulatory/report
         - name: EXPORT_MAX_RETRY_COUNT
-          value: "50"
+          value: '50'
       export-batch-listener:
         labels:
           component: listener
@@ -232,7 +235,8 @@ apps:
         port: 8083
         env:
         - name: JAVA_TOOL_OPTIONS
-          value: -javaagent:/agent/pyroscope.jar -javaagent:/agent/opentelemetry-javaagent.jar
+          value: -javaagent:/opt/byteman/lib/byteman.jar=listener:true,port:9288,address:0.0.0.0
+            -javaagent:/agent/pyroscope.jar -javaagent:/agent/opentelemetry-javaagent.jar
         - name: OTEL_SERVICE_NAME
           value: export-batch-service-listener
         - name: PYROSCOPE_APPLICATION_NAME
@@ -256,7 +260,7 @@ apps:
         - name: EXPORT_REGULATORY_URL
           value: http://mock-regulatory-service:8084/api/v1/regulatory/report
         - name: EXPORT_MAX_RETRY_COUNT
-          value: "50"
+          value: '50'
       export-batch-retry-manager:
         labels:
           component: retry-manager
@@ -272,7 +276,8 @@ apps:
         port: 8083
         env:
         - name: JAVA_TOOL_OPTIONS
-          value: -javaagent:/agent/pyroscope.jar -javaagent:/agent/opentelemetry-javaagent.jar
+          value: -javaagent:/opt/byteman/lib/byteman.jar=listener:true,port:9288,address:0.0.0.0
+            -javaagent:/agent/pyroscope.jar -javaagent:/agent/opentelemetry-javaagent.jar
         - name: OTEL_SERVICE_NAME
           value: export-batch-service-retry-manager
         - name: PYROSCOPE_APPLICATION_NAME
@@ -296,7 +301,7 @@ apps:
         - name: EXPORT_REGULATORY_URL
           value: http://mock-regulatory-service:8084/api/v1/regulatory/report
         - name: EXPORT_MAX_RETRY_COUNT
-          value: "50"
+          value: '50'
     service:
       ports:
       - name: http
@@ -587,7 +592,8 @@ apps:
         port: 8089
         env:
         - name: JAVA_TOOL_OPTIONS
-          value: -javaagent:/agent/pyroscope.jar -javaagent:/agent/opentelemetry-javaagent.jar
+          value: -javaagent:/opt/byteman/lib/byteman.jar=listener:true,port:9288,address:0.0.0.0
+            -javaagent:/agent/pyroscope.jar -javaagent:/agent/opentelemetry-javaagent.jar
         - name: OTEL_SERVICE_NAME
           value: outbox-relay-service
         - name: PYROSCOPE_APPLICATION_NAME
@@ -954,7 +960,8 @@ apps:
         port: 8085
         env:
         - name: JAVA_TOOL_OPTIONS
-          value: -javaagent:/agent/pyroscope.jar -javaagent:/agent/opentelemetry-javaagent.jar
+          value: -javaagent:/opt/byteman/lib/byteman.jar=listener:true,port:9288,address:0.0.0.0
+            -javaagent:/agent/pyroscope.jar -javaagent:/agent/opentelemetry-javaagent.jar
         - name: OTEL_SERVICE_NAME
           value: webhooks-service
         - name: PYROSCOPE_APPLICATION_NAME
