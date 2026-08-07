@@ -82,6 +82,10 @@ apps:
           value: 128k
         - name: PYROSCOPE_LABELS
           value: pod=$(POD_NAME),service_name=fx-service
+        - name: LANG
+          value: C.UTF-8
+        - name: LC_ALL
+          value: C.UTF-8
         - name: REDIS_HOST
           value: redis-redis-cluster.databases.svc.cluster.local
         - name: REDIS_PORT
