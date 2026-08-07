@@ -11,7 +11,7 @@ apps:
             memory: 256Mi
           limits:
             cpu: 500m
-            memory: 512Mi
+            memory: 1024Mi
         port: 9091
         env:
         - name: JAVA_TOOL_OPTIONS
@@ -66,7 +66,7 @@ apps:
             memory: 256Mi
           limits:
             cpu: 500m
-            memory: 512Mi
+            memory: 1024Mi
         port: 9091
         env:
         - name: JAVA_TOOL_OPTIONS
@@ -133,7 +133,7 @@ apps:
             memory: 256Mi
           limits:
             cpu: 500m
-            memory: 512Mi
+            memory: 1024Mi
         port: 9091
         env:
         - name: JAVA_TOOL_OPTIONS
@@ -190,7 +190,7 @@ apps:
             memory: 256Mi
           limits:
             cpu: 500m
-            memory: 512Mi
+            memory: 1024Mi
         port: 8083
         env:
         - name: JAVA_TOOL_OPTIONS
@@ -231,7 +231,7 @@ apps:
             memory: 256Mi
           limits:
             cpu: 500m
-            memory: 512Mi
+            memory: 1024Mi
         port: 8083
         env:
         - name: JAVA_TOOL_OPTIONS
@@ -272,7 +272,7 @@ apps:
             memory: 256Mi
           limits:
             cpu: 500m
-            memory: 512Mi
+            memory: 1024Mi
         port: 8083
         env:
         - name: JAVA_TOOL_OPTIONS
@@ -352,7 +352,7 @@ apps:
             memory: 256Mi
           limits:
             cpu: 500m
-            memory: 512Mi
+            memory: 1024Mi
         port: 9091
         env:
         - name: JAVA_TOOL_OPTIONS
@@ -419,7 +419,7 @@ apps:
             memory: 256Mi
           limits:
             cpu: 500m
-            memory: 512Mi
+            memory: 1024Mi
         port: 8081
         env:
         - name: JAVA_TOOL_OPTIONS
@@ -502,7 +502,7 @@ apps:
             memory: 256Mi
           limits:
             cpu: 500m
-            memory: 512Mi
+            memory: 1024Mi
         port: 8082
         env:
         - name: JAVA_TOOL_OPTIONS
@@ -588,7 +588,7 @@ apps:
             memory: 256Mi
           limits:
             cpu: 500m
-            memory: 512Mi
+            memory: 1024Mi
         port: 8089
         env:
         - name: JAVA_TOOL_OPTIONS
@@ -670,7 +670,7 @@ apps:
             memory: 256Mi
           limits:
             cpu: 500m
-            memory: 512Mi
+            memory: 1024Mi
         port: 8084
         env:
         - name: SERVER_PORT
@@ -720,7 +720,7 @@ apps:
             memory: 256Mi
           limits:
             cpu: 500m
-            memory: 512Mi
+            memory: 1024Mi
         port: 9091
         env:
         - name: JAVA_TOOL_OPTIONS
@@ -775,7 +775,7 @@ apps:
             memory: 256Mi
           limits:
             cpu: 500m
-            memory: 512Mi
+            memory: 1024Mi
         port: 9091
         env:
         - name: JAVA_TOOL_OPTIONS
@@ -956,7 +956,7 @@ apps:
             memory: 256Mi
           limits:
             cpu: 500m
-            memory: 512Mi
+            memory: 1024Mi
         port: 8085
         env:
         - name: JAVA_TOOL_OPTIONS
