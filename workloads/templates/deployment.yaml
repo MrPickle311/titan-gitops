@@ -45,11 +45,24 @@ spec:
             - matchExpressions:
               - key: node-role.kubernetes.io/control-plane
                 operator: DoesNotExist
-      {{- if $app.telemetry }}
       volumes:
+        - name: byteman-volume
+          emptyDir: {}
+      {{- if $app.telemetry }}
         - name: pyroscope-agent
           emptyDir: {}
+      {{- end }}
       initContainers:
+        - name: byteman-downloader
+          image: alpine:latest
+          command:
+            - sh
+            - -c
+            - "apk add --no-cache curl unzip && curl -LO https://downloads.jboss.org/byteman/4.0.26/byteman-download-4.0.26-bin.zip && unzip byteman-download-4.0.26-bin.zip && mv byteman-download-4.0.26/* /opt/byteman/"
+          volumeMounts:
+            - name: byteman-volume
+              mountPath: /opt/byteman
+      {{- if $app.telemetry }}
         - name: fetch-otel-pyroscope
           image: busybox:latest
           command:
@@ -68,12 +81,16 @@ spec:
 {{ toYaml $dep.resources | indent 10 }}
         ports:
         - containerPort: {{ $dep.port }}
-        {{- if $app.telemetry }}
         volumeMounts:
+          - name: byteman-volume
+            mountPath: /opt/byteman
+        {{- if $app.telemetry }}
           - name: pyroscope-agent
             mountPath: /agent
         {{- end }}
         env:
+        - name: BYTEMAN_HOME
+          value: /opt/byteman
 {{- if $.Values.commonEnv }}
 {{ toYaml $.Values.commonEnv | indent 8 }}
 {{- end }}
