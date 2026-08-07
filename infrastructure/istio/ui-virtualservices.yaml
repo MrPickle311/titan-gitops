@@ -13,7 +13,7 @@ spec:
     - destination:
         host: argocd-server.argocd.svc.cluster.local
         port:
-          number: 80
+          number: 443
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
@@ -99,3 +99,14 @@ spec:
         host: vault-ui.security.svc.cluster.local
         port:
           number: 8200
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: argocd-server-tls
+  namespace: istio-system
+spec:
+  host: argocd-server.argocd.svc.cluster.local
+  trafficPolicy:
+    tls:
+      mode: SIMPLE
