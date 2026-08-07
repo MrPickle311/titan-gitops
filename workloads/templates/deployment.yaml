@@ -78,7 +78,7 @@ spec:
         image: {{ $dep.image }}
         imagePullPolicy: Always
         resources:
-{{ toYaml $dep.resources | indent 10 }}
+{{ toYaml (default $.Values.global.resources $dep.resources) | indent 10 }}
         ports:
         - containerPort: {{ $dep.port }}
         volumeMounts:
@@ -91,6 +91,9 @@ spec:
         env:
         - name: BYTEMAN_HOME
           value: /opt/byteman
+{{- if $app.telemetry }}
+{{ include "workloads.telemetry.env" $depName | indent 8 }}
+{{- end }}
 {{- if $.Values.commonEnv }}
 {{ toYaml $.Values.commonEnv | indent 8 }}
 {{- end }}

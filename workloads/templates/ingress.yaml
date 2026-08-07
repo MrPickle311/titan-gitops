@@ -6,8 +6,13 @@ kind: Ingress
 metadata:
   name: {{ $app.ingress.name | default (print $appKey $app.ingress._name_suffix) }}
   namespace: applications
-  {{- if $app.ingress.annotations }}
   annotations:
+  {{- if eq $app.ingress.ingressType "grpc" }}
+{{ toYaml $.Values.global.ingressAnnotations | indent 4 }}
+  {{- else if eq $app.ingress.ingressType "http" }}
+{{ toYaml $.Values.global.ingressAnnotationsHttp | indent 4 }}
+  {{- end }}
+  {{- if $app.ingress.annotations }}
 {{ toYaml $app.ingress.annotations | indent 4 }}
   {{- end }}
 spec:
