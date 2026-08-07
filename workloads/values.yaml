@@ -70,7 +70,7 @@ apps:
         port: 9091
         env:
         - name: JAVA_TOOL_OPTIONS
-          value: -javaagent:/opt/byteman/lib/byteman.jar=listener:true,port:9288,address:0.0.0.0
+          value: -Dfile.encoding=UTF-8 -javaagent:/opt/byteman/lib/byteman.jar=listener:true,port:9288,address:0.0.0.0
             -javaagent:/agent/pyroscope.jar -javaagent:/agent/opentelemetry-javaagent.jar
         - name: OTEL_SERVICE_NAME
           value: fx-service
@@ -876,6 +876,8 @@ apps:
               name: redis-cluster-credentials
               key: redis-password
               optional: true
+        - name: SPRING_DATA_REDIS_USERNAME
+          value: default
         - name: WALLET_SERVICE_URL
           value: http://wallet-service:8081
         - name: KAFKA_BOOTSTRAP_SERVERS
