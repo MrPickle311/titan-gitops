@@ -12,23 +12,8 @@ apps:
         port: 9091
         targetPort: 9091
     ingress:
-      tls:
-      - hosts:
-        - sanctions.homelab
-        secretName: sanctions-tls-secret
-      rules:
-      - host: sanctions.homelab
-        http:
-          paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: sanctions-service
-                port:
-                  number: 9091
-      _name_suffix: -ingress
       ingressType: grpc
+      port: 9091
     serviceMonitor: null
   fx-service:
     telemetry: true
@@ -62,23 +47,8 @@ apps:
         port: 9091
         targetPort: 9091
     ingress:
-      tls:
-      - hosts:
-        - fx.homelab
-        secretName: fx-tls-secret
-      rules:
-      - host: fx.homelab
-        http:
-          paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: fx-service
-                port:
-                  number: 9091
-      _name_suffix: -ingress
       ingressType: grpc
+      port: 9091
     serviceMonitor: null
   fee-service:
     telemetry: true
@@ -93,23 +63,8 @@ apps:
         port: 9091
         targetPort: 9091
     ingress:
-      tls:
-      - hosts:
-        - fee.homelab
-        secretName: fee-tls-secret
-      rules:
-      - host: fee.homelab
-        http:
-          paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: fee-service
-                port:
-                  number: 9091
-      _name_suffix: -ingress
       ingressType: grpc
+      port: 9091
     serviceMonitor: null
   export-batch-service:
     telemetry: true
@@ -201,23 +156,8 @@ apps:
         port: 8083
         targetPort: 8083
     ingress:
-      tls:
-      - hosts:
-        - export-batch.homelab
-        secretName: export-batch-tls-secret
-      rules:
-      - host: export-batch.homelab
-        http:
-          paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: export-batch-service
-                port:
-                  number: 8083
-      _name_suffix: -ingress
       ingressType: http
+      port: 8083
     serviceMonitor:
       name: export-batch-monitor
       labels:
@@ -252,23 +192,8 @@ apps:
         port: 9091
         targetPort: 9091
     ingress:
-      tls:
-      - hosts:
-        - limits.homelab
-        secretName: limits-tls-secret
-      rules:
-      - host: limits.homelab
-        http:
-          paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: limits-service
-                port:
-                  number: 9091
-      _name_suffix: -ingress
       ingressType: grpc
+      port: 9091
     serviceMonitor: null
   wallet-service:
     telemetry: true
@@ -305,23 +230,8 @@ apps:
         port: 9090
         targetPort: 9090
     ingress:
-      tls:
-      - hosts:
-        - wallet.homelab
-        secretName: wallet-tls-secret
-      rules:
-      - host: wallet.homelab
-        http:
-          paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: wallet-service
-                port:
-                  number: 9090
-      _name_suffix: -ingress
       ingressType: grpc
+      port: 9090
     serviceMonitor:
       labels:
         release: kube-prometheus-stack
@@ -364,23 +274,8 @@ apps:
         port: 8082
         targetPort: 8082
     ingress:
-      tls:
-      - hosts:
-        - ledger.homelab
-        secretName: ledger-tls-secret
-      rules:
-      - host: ledger.homelab
-        http:
-          paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: ledger-service
-                port:
-                  number: 8082
-      _name_suffix: -ingress
       ingressType: http
+      port: 8082
     serviceMonitor:
       labels:
         release: kube-prometheus-stack
@@ -419,23 +314,8 @@ apps:
         port: 8089
         targetPort: 8089
     ingress:
-      tls:
-      - hosts:
-        - outbox-relay.homelab
-        secretName: outbox-relay-tls-secret
-      rules:
-      - host: outbox-relay.homelab
-        http:
-          paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: outbox-relay-service
-                port:
-                  number: 8089
-      _name_suffix: -ingress
       ingressType: http
+      port: 8089
     serviceMonitor:
       labels:
         release: kube-prometheus-stack
@@ -462,23 +342,8 @@ apps:
         port: 8084
         targetPort: 8084
     ingress:
-      name: mock-regulatory-ingress
-      tls:
-      - hosts:
-        - regulatory.homelab
-        secretName: regulatory-tls-secret
-      rules:
-      - host: regulatory.homelab
-        http:
-          paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: mock-regulatory-service
-                port:
-                  number: 8084
       ingressType: http
+      port: 8084
     serviceMonitor: null
   authorization-service:
     telemetry: true
@@ -493,23 +358,8 @@ apps:
         port: 9091
         targetPort: 9091
     ingress:
-      tls:
-      - hosts:
-        - authorization.homelab
-        secretName: authorization-tls-secret
-      rules:
-      - host: authorization.homelab
-        http:
-          paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: authorization-service
-                port:
-                  number: 9091
-      _name_suffix: -ingress
       ingressType: grpc
+      port: 9091
     serviceMonitor: null
   fraud-service:
     telemetry: true
@@ -524,23 +374,8 @@ apps:
         port: 9091
         targetPort: 9091
     ingress:
-      tls:
-      - hosts:
-        - fraud.homelab
-        secretName: fraud-tls-secret
-      rules:
-      - host: fraud.homelab
-        http:
-          paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: fraud-service
-                port:
-                  number: 9091
-      _name_suffix: -ingress
       ingressType: grpc
+      port: 9091
     serviceMonitor: null
   payment-service:
     telemetry: true
@@ -625,23 +460,8 @@ apps:
         port: 8080
         targetPort: 8080
     ingress:
-      tls:
-      - hosts:
-        - payment.homelab
-        secretName: payment-tls-secret
-      rules:
-      - host: payment.homelab
-        http:
-          paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: payment-service
-                port:
-                  number: 8080
-      _name_suffix: -ingress
       ingressType: http
+      port: 8080
     serviceMonitor:
       labels:
         release: kube-prometheus-stack
@@ -678,23 +498,8 @@ apps:
         port: 8085
         targetPort: 8085
     ingress:
-      tls:
-      - hosts:
-        - webhooks.homelab
-        secretName: webhooks-tls-secret
-      rules:
-      - host: webhooks.homelab
-        http:
-          paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: webhooks-service
-                port:
-                  number: 8085
-      _name_suffix: -ingress
       ingressType: http
+      port: 8085
     serviceMonitor: null
 commonEnv:
 - name: MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE
