@@ -9,8 +9,29 @@ spec:
     name: homelab-ca-issuer
     kind: ClusterIssuer
   dnsNames:
-    - "*.homelab"
     - "homelab"
+    - "argocd.homelab"
+    - "authorization.homelab"
+    - "chaos.homelab"
+    - "export-batch.homelab"
+    - "fee.homelab"
+    - "fraud.homelab"
+    - "fx.homelab"
+    - "grafana.homelab"
+    - "homepage.homelab"
+    - "ledger.homelab"
+    - "limits.homelab"
+    - "localstack.homelab"
+    - "outbox-relay.homelab"
+    - "payment.homelab"
+    - "registry.homelab"
+    - "registry-ui.homelab"
+    - "regulatory.homelab"
+    - "sanctions.homelab"
+    - "vault.homelab"
+    - "wallet.homelab"
+    - "webhooks.homelab"
+    - "workflows.homelab"
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: Gateway
