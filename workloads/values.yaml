@@ -94,6 +94,8 @@ apps:
               name: redis-cluster-credentials
               key: redis-password
               optional: false
+        - name: SPRING_DATA_REDIS_USERNAME
+          value: default
     service:
       ports:
       - name: grpc
