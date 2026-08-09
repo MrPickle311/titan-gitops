@@ -27,6 +27,9 @@ spec:
 {{- if $dep.labels }}
 {{ toYaml $dep.labels | indent 8 }}
 {{- end }}
+{{- if $dep.podLabels }}
+{{ toYaml $dep.podLabels | indent 8 }}
+{{- end }}
     spec:
       topologySpreadConstraints:
         - maxSkew: 1
