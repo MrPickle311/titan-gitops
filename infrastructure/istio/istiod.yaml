@@ -15,6 +15,9 @@ spec:
       valuesObject:
         global:
           nativeNftables: true
+        pilot:
+          cni:
+            enabled: true
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: istio-system
