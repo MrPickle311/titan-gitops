@@ -32,15 +32,14 @@ machine:
         #     key: value
 
         # # The `extraMounts` field is used to add additional mounts to the kubelet container.
-        # extraMounts:
-        #     - destination: /var/lib/example # Destination is the absolute path where the mount will be placed in the container.
-        #       type: bind # Type specifies the mount kind.
-        #       source: /var/lib/example # Source specifies the source path of the mount.
-        #       # Options are fstab style mount options.
-        #       options:
-        #         - bind
-        #         - rshared
-        #         - rw
+        extraMounts:
+            - destination: /var/openebs
+              type: bind
+              source: /var/openebs
+              options:
+                  - rbind
+                  - rshared
+                  - rw
 
         # # The `extraConfig` field is used to provide kubelet configuration overrides.
         # extraConfig:
@@ -70,6 +69,18 @@ machine:
         #         - fdc7::/16
     # Provides machine specific network configuration options.
     network: {}
+    # Configures the kernel.
+    kernel:
+        # Kernel modules to load.
+        modules:
+            - name: ip_tables
+            - name: iptable_mangle
+            - name: iptable_nat
+            - name: iptable_filter
+            - name: xt_owner
+            - name: xt_conntrack
+            - name: xt_REDIRECT
+            - name: nf_nat
     # # Configures KubeSpan feature.
     # kubespan:
     #     enabled: true # Enable the KubeSpan feature.
@@ -86,6 +97,15 @@ machine:
         #     size: 4GB # Disk size.
         #     model: WDC* # Disk model `/sys/block/<dev>/device/model`.
         #     busPath: /pci0000:00/0000:00:17.0/ata1/host0/target0:0:0/0:0:0:0 # Disk bus path.
+    registries:
+        mirrors:
+            registry.homelab:
+                endpoints:
+                    - http://10.96.100.1
+        config:
+            registry.homelab:
+                tls:
+                    insecureSkipVerify: true
     # Features describe individual Talos features that can be switched on or off.
     features:
         diskQuotaSupport: true # Enable XFS project quota support for EPHEMERAL partition and user disks.
@@ -274,6 +294,7 @@ cluster:
                 exemptions:
                     namespaces:
                         - kube-system
+                        - openebs
                     runtimeClasses: []
                     usernames: []
                 kind: PodSecurityConfiguration
@@ -388,7 +409,7 @@ cluster:
     #     certLifetime: 1h0m0s # Admin kubeconfig certificate lifetime (default is 1 year).
 
     # # Allows running workload on control-plane nodes.
-    # allowSchedulingOnControlPlanes: true
+    allowSchedulingOnControlPlanes: true
 ---
 apiVersion: v1alpha1
 kind: HostnameConfig

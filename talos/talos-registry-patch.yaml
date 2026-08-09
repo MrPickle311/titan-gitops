@@ -1,6 +1,0 @@
-machine:
-  registries:
-    mirrors:
-      registry.homelab:
-        endpoints:
-          - http://10.96.100.1
