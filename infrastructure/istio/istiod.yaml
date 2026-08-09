@@ -18,6 +18,8 @@ spec:
         pilot:
           cni:
             enabled: true
+          env:
+            ENABLE_NATIVE_SIDECARS: "true"
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: istio-system
