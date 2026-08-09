@@ -52,7 +52,7 @@ spec:
         - name: byteman-volume
           emptyDir: {}
       {{- if $app.telemetry }}
-        - name: pyroscope-agent
+        - name: otel-agent
           emptyDir: {}
       {{- end }}
       initContainers:
@@ -66,14 +66,14 @@ spec:
             - name: byteman-volume
               mountPath: /opt/byteman
       {{- if $app.telemetry }}
-        - name: fetch-otel-pyroscope
+        - name: fetch-otel-agent
           image: busybox:latest
           command:
             - sh
             - -c
-            - "wget -O /agent/opentelemetry-javaagent.jar https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/latest/download/opentelemetry-javaagent.jar && wget -O /agent/pyroscope-otel.jar https://github.com/grafana/otel-profiling-java/releases/latest/download/pyroscope-otel.jar && wget -O /agent/pyroscope.jar https://github.com/grafana/pyroscope-java/releases/latest/download/pyroscope.jar"
+            - "wget -O /agent/opentelemetry-javaagent.jar https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/latest/download/opentelemetry-javaagent.jar"
           volumeMounts:
-            - name: pyroscope-agent
+            - name: otel-agent
               mountPath: /agent
       {{- end }}
       containers:
@@ -88,12 +88,14 @@ spec:
           - name: byteman-volume
             mountPath: /opt/byteman
         {{- if $app.telemetry }}
-          - name: pyroscope-agent
+          - name: otel-agent
             mountPath: /agent
         {{- end }}
         env:
         - name: BYTEMAN_HOME
           value: /opt/byteman
+        - name: JAVA_TOOL_OPTIONS
+          value: "-XX:+UseCompactObjectHeaders -javaagent:/opt/byteman/lib/byteman.jar=listener:true,port:9288,address:0.0.0.0{{ if $app.telemetry }} -javaagent:/agent/opentelemetry-javaagent.jar{{ end }}"
 {{- if $app.telemetry }}
 {{ include "workloads.telemetry.env" $depName | indent 8 }}
 {{- end }}

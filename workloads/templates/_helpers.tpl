@@ -1,8 +1,8 @@
 {{- define "workloads.telemetry.env" -}}
-- name: JAVA_TOOL_OPTIONS
-  value: -javaagent:/opt/byteman/lib/byteman.jar=listener:true,port:9288,address:0.0.0.0 -javaagent:/agent/pyroscope.jar -javaagent:/agent/opentelemetry-javaagent.jar
-- name: OTEL_SERVICE_NAME
-  value: {{ . }}
+- name: OTEL_INSTRUMENTATION_COMMON_DEFAULT_ENABLED
+  value: "false"
+- name: OTEL_INSTRUMENTATION_GRPC_ENABLED
+  value: "true"
 - name: PYROSCOPE_APPLICATION_NAME
   value: {{ . }}
 - name: PYROSCOPE_PROFILING_INTERVAL

@@ -510,14 +510,6 @@ commonEnv:
   value: '*'
 - name: MANAGEMENT_ENDPOINT_ENV_SHOW_VALUES
   value: ALWAYS
-- name: OTEL_JAVAAGENT_EXTENSIONS
-  value: /agent/pyroscope-otel.jar
-- name: OTEL_PYROSCOPE_START_PROFILING
-  value: 'true'
-- name: OTEL_PYROSCOPE_ADD_PROFILE_URL
-  value: 'false'
-- name: OTEL_PYROSCOPE_ADD_PROFILE_BASELINE_URL
-  value: 'false'
 - name: OTEL_EXPORTER_OTLP_ENDPOINT
   value: http://tempo.monitoring.svc.cluster.local:4318
 - name: OTEL_LOGS_EXPORTER
