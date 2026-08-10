@@ -5,6 +5,8 @@ metadata:
   namespace: databases
 spec:
   instances: 2
+  monitoring:
+    enablePodMonitor: true
   managed:
     services:
       additional:

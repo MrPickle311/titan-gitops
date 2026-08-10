@@ -1,0 +1,51 @@
+{{/*
+Mesh-internal VirtualServices (no `gateways:` field => defaults to `mesh`, sidecar-to-sidecar
+traffic only, does not affect the ingress-gateway VirtualServices in virtualservice.yaml).
+
+Istio synthesizes an implicit default route for every in-mesh Service, including its own
+default retry_policy (num_retries: 2) - invisible to and stacked on top of any application-level
+retry logic (e.g. resilience4j). For services whose clients already retry safely at the
+application layer (idempotency-key backed), that stacked mesh-level retry only adds redundant
+load without adding safety, so it's disabled here (retries.attempts: 0) to make the
+application-level retry the single source of retry truth.
+*/}}
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: wallet-service-internal
+  namespace: applications
+spec:
+  hosts:
+  - wallet-service
+  - wallet-service.applications.svc.cluster.local
+  http:
+  - match:
+    - port: 9090
+    route:
+    - destination:
+        host: wallet-service
+        port:
+          number: 9090
+    retries:
+      attempts: 0
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: limits-service-internal
+  namespace: applications
+spec:
+  hosts:
+  - limits-service
+  - limits-service.applications.svc.cluster.local
+  http:
+  - match:
+    - port: 9091
+    route:
+    - destination:
+        host: limits-service
+        port:
+          number: 9091
+    retries:
+      attempts: 0

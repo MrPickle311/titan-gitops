@@ -3,6 +3,10 @@
   value: "false"
 - name: OTEL_INSTRUMENTATION_GRPC_ENABLED
   value: "true"
+- name: OTEL_INSTRUMENTATION_JDBC_ENABLED
+  value: "true"
+- name: OTEL_INSTRUMENTATION_HIKARICP_ENABLED
+  value: "true"
 - name: PYROSCOPE_APPLICATION_NAME
   value: {{ . }}
 - name: PYROSCOPE_PROFILING_INTERVAL

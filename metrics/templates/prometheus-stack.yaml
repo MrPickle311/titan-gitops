@@ -102,6 +102,9 @@ spec:
         prometheus:
           prometheusSpec:
             enableRemoteWriteReceiver: true
+            podMonitorSelectorNilUsesHelmValues: false
+            podMonitorSelector: {}
+            podMonitorNamespaceSelector: {}
             storageSpec:
               volumeClaimTemplate:
                 spec:
