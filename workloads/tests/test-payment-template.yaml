@@ -41,6 +41,11 @@ spec:
                 - name: payment-id
                   value: '{{steps.run-test.outputs.parameters.payment-id}}'
     - name: test-payment
+      metadata:
+        labels:
+          sidecar.istio.io/inject: "true"
+        annotations:
+          workflows.argoproj.io/kill-cmd-istio-proxy: '["pilot-agent", "request", "POST", "quitquitquit"]'
       container:
         image: alpine:latest
         command:

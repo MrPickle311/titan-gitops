@@ -95,7 +95,11 @@ spec:
             name: limits-db-cluster-app
       resources: {}
     inputs: {}
-    metadata: {}
+    metadata:
+      labels:
+        sidecar.istio.io/inject: "true"
+      annotations:
+        workflows.argoproj.io/kill-cmd-istio-proxy: '["pilot-agent", "request", "POST", "quitquitquit"]'
     name: test-payment
     outputs:
       parameters:
