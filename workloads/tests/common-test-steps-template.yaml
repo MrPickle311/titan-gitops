@@ -44,13 +44,21 @@ spec:
 
         echo "3. Checking 'ledger_entries' table..."
         export PGPASSWORD=$LEDGER_DB_PASSWORD
-        LEDGER_COUNT=$(psql -h ledger-db-cluster-rw.databases.svc.cluster.local -U $LEDGER_DB_USER -d ledger_db -t -c "SELECT count(*) FROM ledger_entries WHERE payment_id=$PID;" | xargs)
         if [ "$EXPECTED" = "FAILED" ] || [ "$EXPECTED_HISTORY" = "LEDGER_NOTIFICATION_FAILED" ]; then
+          LEDGER_COUNT=$(psql -h ledger-db-cluster-rw.databases.svc.cluster.local -U $LEDGER_DB_USER -d ledger_db -t -c "SELECT count(*) FROM ledger_entries WHERE payment_id=$PID;" | xargs)
           if [ "$LEDGER_COUNT" -ne 0 ]; then
             echo "DB Validation Error: ledger_entries has $LEDGER_COUNT records, expected 0 (since it failed or ledger notification failed)"
             exit 1
           fi
         else
+          LEDGER_COUNT=0
+          for i in $(seq 1 30); do
+            LEDGER_COUNT=$(psql -h ledger-db-cluster-rw.databases.svc.cluster.local -U $LEDGER_DB_USER -d ledger_db -t -c "SELECT count(*) FROM ledger_entries WHERE payment_id=$PID;" | xargs)
+            if [ "$LEDGER_COUNT" -ne 0 ]; then
+              break
+            fi
+            sleep 2
+          done
           if [ "$LEDGER_COUNT" -eq 0 ]; then
             echo "DB Validation Error: ledger_entries has 0 records, expected some for a COMPLETED payment"
             exit 1
