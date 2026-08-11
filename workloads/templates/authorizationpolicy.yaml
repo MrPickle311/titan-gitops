@@ -1,9 +1,9 @@
 {{/*
-Services with a serviceMonitor also get an open rule for /actuator/prometheus: that
-endpoint shares the app's main port, and Prometheus itself is unmeshed (no mTLS
-identity to allow-list by principal), so it's scoped open by path instead - the
-endpoint is read-only, non-sensitive, and everything else on the service stays
-restricted to allowedCallers.
+Services with a serviceMonitor also get a rule scoped to /actuator/prometheus,
+restricted to Prometheus's own identity (it's meshed - see
+metrics/templates/prometheus-stack.yaml podMetadata - so it has a real principal
+to allow-list, same as everything else here). Everything else on the service
+stays restricted to allowedCallers.
 */}}
 {{- range $appKey, $app := .Values.apps }}
 {{- if $app.authz }}
@@ -32,7 +32,11 @@ spec:
         {{- end }}
   {{- end }}
   {{- if $app.serviceMonitor }}
-  - to:
+  - from:
+    - source:
+        principals:
+        - "cluster.local/ns/monitoring/sa/kube-prometheus-stack-prometheus"
+    to:
     - operation:
         paths:
         - /actuator/prometheus

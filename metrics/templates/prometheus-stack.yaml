@@ -101,6 +101,9 @@ spec:
 
         prometheus:
           prometheusSpec:
+            podMetadata:
+              labels:
+                sidecar.istio.io/inject: "true"
             enableRemoteWriteReceiver: true
             podMonitorSelectorNilUsesHelmValues: false
             podMonitorSelector: {}
