@@ -455,6 +455,7 @@ apps:
     authz:
       allowedCallers:
       - istio-ingressgateway
+      - test-runner
     deployments:
       payment-service:
         replicas: 1

@@ -100,6 +100,7 @@ spec:
       annotations:
         workflows.argoproj.io/kill-cmd-istio-proxy: '["pilot-agent", "request", "POST", "quitquitquit"]'
     name: test-payment
+    serviceAccountName: test-runner
     outputs:
       parameters:
       - name: payment-id
