@@ -166,7 +166,7 @@ spec:
         echo "Consuming Kafka topic payment-webhooks to find message for payment $PID..."
         sleep 3
 
-        MSG=$(kcat -C -b kafka-kafka-bootstrap.messaging.svc.cluster.local:9092 -t payment-webhooks -o -100 -e -q | grep "\"paymentId\":$PID" || true)
+        MSG=$(kcat -C -b kafka-kafka-bootstrap.messaging.svc.cluster.local:9092 -t payment-webhooks -o -100 -e -q -X auto.offset.reset=earliest | grep "\"paymentId\":$PID" || true)
 
         if [ -z "$MSG" ]; then
            echo "Error: Could not find Kafka message for payment $PID in payment-webhooks topic!"
@@ -558,7 +558,7 @@ spec:
         echo "Consuming Kafka topic payment-compensations to find messages for payment $PID..."
         sleep 5
         # The eventType or payload should contain the payment ID
-        MSG=$(kcat -C -b kafka-kafka-bootstrap.messaging.svc.cluster.local:9092 -t payment-compensations -o -100 -e -q | grep "\"paymentId\":$PID" || true)
+        MSG=$(kcat -C -b kafka-kafka-bootstrap.messaging.svc.cluster.local:9092 -t payment-compensations -o -100 -e -q -X auto.offset.reset=earliest | grep "\"paymentId\":$PID" || true)
         if [ -z "$MSG" ]; then
            echo "Error: Could not find Kafka message for payment $PID in payment-compensations topic!"
            exit 1
