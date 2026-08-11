@@ -1,0 +1,37 @@
+{{/*
+Dry-run only (istio.io/dry-run: "true"): Envoy evaluates and logs a shadow ALLOW/DENY
+verdict per request but never rejects real traffic. Left in dry-run because the
+~24 Argo WorkflowTemplate test pods in this namespace (test-payment-template and
+friends) aren't sidecar-injected and call these services directly - enforcing would
+break them today. Flip to enforced once those pods are meshed (separate follow-up).
+*/}}
+{{- range $appKey, $app := .Values.apps }}
+{{- if $app.authz }}
+---
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: {{ $appKey }}
+  namespace: applications
+  annotations:
+    istio.io/dry-run: "true"
+spec:
+  selector:
+    matchLabels:
+      app: {{ $appKey }}
+  action: ALLOW
+  rules:
+  {{- if $app.authz.allowedCallers }}
+  - from:
+    - source:
+        principals:
+        {{- range $app.authz.allowedCallers }}
+        {{- if eq . "istio-ingressgateway" }}
+        - "cluster.local/ns/istio-system/sa/istio-ingressgateway"
+        {{- else }}
+        - "cluster.local/ns/applications/sa/{{ . }}"
+        {{- end }}
+        {{- end }}
+  {{- end }}
+{{- end }}
+{{- end }}

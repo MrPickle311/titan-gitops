@@ -225,3 +225,21 @@ spec:
             host: homepage
             port:
               number: 80
+---
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: homepage
+  namespace: applications
+  annotations:
+    istio.io/dry-run: "true"
+spec:
+  selector:
+    matchLabels:
+      app: homepage
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        principals:
+        - "cluster.local/ns/istio-system/sa/istio-ingressgateway"

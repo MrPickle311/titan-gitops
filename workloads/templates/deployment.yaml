@@ -31,6 +31,7 @@ spec:
 {{ toYaml $dep.podLabels | indent 8 }}
 {{- end }}
     spec:
+      serviceAccountName: {{ $appKey }}
       topologySpreadConstraints:
         - maxSkew: 1
           topologyKey: kubernetes.io/hostname
