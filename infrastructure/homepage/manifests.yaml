@@ -168,7 +168,6 @@ spec:
     metadata:
       labels:
         app: homepage
-      annotations:
         sidecar.istio.io/inject: "true"
     spec:
       serviceAccountName: homepage-sa
