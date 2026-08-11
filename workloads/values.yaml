@@ -6,6 +6,8 @@ apps:
         replicas: 1
         image: registry.homelab/sanctions-service:latest
         port: 9091
+        podLabels:
+          sidecar.istio.io/inject: "true"
     service:
       ports:
       - name: grpc
@@ -22,6 +24,8 @@ apps:
         replicas: 1
         image: registry.homelab/fx-service:latest
         port: 9091
+        podLabels:
+          sidecar.istio.io/inject: "true"
         env:
         - name: LANG
           value: C.UTF-8
@@ -57,6 +61,8 @@ apps:
         replicas: 1
         image: registry.homelab/fee-service:latest
         port: 9091
+        podLabels:
+          sidecar.istio.io/inject: "true"
     service:
       ports:
       - name: grpc
@@ -75,6 +81,8 @@ apps:
         replicas: 1
         image: registry.homelab/export-batch-service:latest
         port: 8083
+        podLabels:
+          sidecar.istio.io/inject: "true"
         env:
         - name: SPRING_DATASOURCE_URL
           value: jdbc:postgresql://export-db-cluster-rw.databases:5432/payment_batch_db
@@ -102,6 +110,8 @@ apps:
         replicas: 1
         image: registry.homelab/export-batch-service:latest
         port: 8083
+        podLabels:
+          sidecar.istio.io/inject: "true"
         env:
         - name: SPRING_DATASOURCE_URL
           value: jdbc:postgresql://export-db-cluster-rw.databases:5432/payment_batch_db
@@ -129,6 +139,8 @@ apps:
         replicas: 1
         image: registry.homelab/export-batch-service:latest
         port: 8083
+        podLabels:
+          sidecar.istio.io/inject: "true"
         env:
         - name: SPRING_DATASOURCE_URL
           value: jdbc:postgresql://export-db-cluster-rw.databases:5432/payment_batch_db
@@ -173,6 +185,8 @@ apps:
         replicas: 1
         image: registry.homelab/limits-service:latest
         port: 9091
+        podLabels:
+          sidecar.istio.io/inject: "true"
         resources:
           requests:
             cpu: 250m
@@ -263,6 +277,8 @@ apps:
         replicas: 1
         image: registry.homelab/ledger-service:latest
         port: 8082
+        podLabels:
+          sidecar.istio.io/inject: "true"
         env:
         - name: OTEL_INSTRUMENTATION_KAFKA_ENABLED
           value: 'true'
@@ -307,6 +323,8 @@ apps:
         replicas: 1
         image: registry.homelab/outbox-relay-service:latest
         port: 8089
+        podLabels:
+          sidecar.istio.io/inject: "true"
         env:
         - name: SPRING_DATASOURCE_URL
           value: jdbc:postgresql://payment-db-cluster-rw.databases:5432/titan_db
@@ -347,6 +365,8 @@ apps:
         replicas: 1
         image: registry.homelab/mock-regulatory-service:latest
         port: 8084
+        podLabels:
+          sidecar.istio.io/inject: "true"
         env:
         - name: SERVER_PORT
           value: '8084'
@@ -368,6 +388,8 @@ apps:
         replicas: 1
         image: registry.homelab/authorization-service:latest
         port: 9091
+        podLabels:
+          sidecar.istio.io/inject: "true"
     service:
       ports:
       - name: grpc
@@ -384,6 +406,8 @@ apps:
         replicas: 1
         image: registry.homelab/fraud-service:latest
         port: 9091
+        podLabels:
+          sidecar.istio.io/inject: "true"
     service:
       ports:
       - name: grpc
@@ -495,6 +519,8 @@ apps:
         replicas: 1
         image: registry.homelab/webhooks-service:latest
         port: 8085
+        podLabels:
+          sidecar.istio.io/inject: "true"
         env:
         - name: SPRING_DATASOURCE_URL
           value: jdbc:postgresql://payment-db-cluster-rw.databases:5432/titan_db
