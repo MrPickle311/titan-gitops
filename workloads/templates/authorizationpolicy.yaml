@@ -1,7 +1,4 @@
 {{/*
-Dry-run only (istio.io/dry-run: "true"): Envoy evaluates and logs a shadow ALLOW/DENY
-verdict per request but never rejects real traffic.
-
 Services with a serviceMonitor also get an open rule for /actuator/prometheus: that
 endpoint shares the app's main port, and Prometheus itself is unmeshed (no mTLS
 identity to allow-list by principal), so it's scoped open by path instead - the
@@ -16,8 +13,6 @@ kind: AuthorizationPolicy
 metadata:
   name: {{ $appKey }}
   namespace: applications
-  annotations:
-    istio.io/dry-run: "true"
 spec:
   selector:
     matchLabels:

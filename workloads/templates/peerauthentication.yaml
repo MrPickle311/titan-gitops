@@ -4,8 +4,5 @@ metadata:
   name: applications-mtls
   namespace: applications
 spec:
-  # PERMISSIVE, not STRICT: Argo WorkflowTemplate test pods in this namespace
-  # (test-payment-template and friends) aren't sidecar-injected and call into
-  # these services directly. Flip to STRICT once those are meshed too.
   mtls:
-    mode: PERMISSIVE
+    mode: STRICT

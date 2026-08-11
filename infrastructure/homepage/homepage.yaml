@@ -226,8 +226,6 @@ kind: AuthorizationPolicy
 metadata:
   name: homepage
   namespace: applications
-  annotations:
-    istio.io/dry-run: "true"
 spec:
   selector:
     matchLabels:
