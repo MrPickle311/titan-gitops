@@ -26,6 +26,9 @@ subjects:
 - kind: ServiceAccount
   name: default
   namespace: applications
+- kind: ServiceAccount
+  name: test-runner
+  namespace: applications
 roleRef:
   kind: Role
   name: workflow-patcher
