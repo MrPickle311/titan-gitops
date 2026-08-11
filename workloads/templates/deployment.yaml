@@ -30,10 +30,6 @@ spec:
 {{- if $dep.podLabels }}
 {{ toYaml $dep.podLabels | indent 8 }}
 {{- end }}
-{{- if $dep.podAnnotations }}
-      annotations:
-{{ toYaml $dep.podAnnotations | indent 8 }}
-{{- end }}
     spec:
       serviceAccountName: {{ $appKey }}
       topologySpreadConstraints:

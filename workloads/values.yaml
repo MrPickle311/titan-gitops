@@ -95,10 +95,6 @@ apps:
         port: 8083
         podLabels:
           sidecar.istio.io/inject: "true"
-        podAnnotations:
-          prometheus.io/scrape: "true"
-          prometheus.io/port: "8083"
-          prometheus.io/path: /actuator/prometheus
         env:
         - name: SPRING_DATASOURCE_URL
           value: jdbc:postgresql://export-db-cluster-rw.databases:5432/payment_batch_db
@@ -128,10 +124,6 @@ apps:
         port: 8083
         podLabels:
           sidecar.istio.io/inject: "true"
-        podAnnotations:
-          prometheus.io/scrape: "true"
-          prometheus.io/port: "8083"
-          prometheus.io/path: /actuator/prometheus
         env:
         - name: SPRING_DATASOURCE_URL
           value: jdbc:postgresql://export-db-cluster-rw.databases:5432/payment_batch_db
@@ -161,10 +153,6 @@ apps:
         port: 8083
         podLabels:
           sidecar.istio.io/inject: "true"
-        podAnnotations:
-          prometheus.io/scrape: "true"
-          prometheus.io/port: "8083"
-          prometheus.io/path: /actuator/prometheus
         env:
         - name: SPRING_DATASOURCE_URL
           value: jdbc:postgresql://export-db-cluster-rw.databases:5432/payment_batch_db
@@ -194,7 +182,14 @@ apps:
     ingress:
       ingressType: http
       port: 8083
-    serviceMonitor: null
+    serviceMonitor:
+      name: export-batch-monitor
+      labels:
+        release: kube-prometheus-stack
+      endpoints:
+      - port: http
+        path: /actuator/prometheus
+        interval: 15s
   limits-service:
     telemetry: true
     authz:
@@ -249,10 +244,6 @@ apps:
         port: 8081
         podLabels:
           sidecar.istio.io/inject: "true"
-        podAnnotations:
-          prometheus.io/scrape: "true"
-          prometheus.io/port: "8081"
-          prometheus.io/path: /actuator/prometheus
         resources:
           requests:
             cpu: 250m
@@ -290,7 +281,14 @@ apps:
     ingress:
       ingressType: grpc
       port: 9090
-    serviceMonitor: null
+    serviceMonitor:
+      labels:
+        release: kube-prometheus-stack
+      endpoints:
+      - port: http
+        path: /actuator/prometheus
+        interval: 15s
+      _name_suffix: -monitor
   ledger-service:
     telemetry: true
     authz:
@@ -303,10 +301,6 @@ apps:
         port: 8082
         podLabels:
           sidecar.istio.io/inject: "true"
-        podAnnotations:
-          prometheus.io/scrape: "true"
-          prometheus.io/port: "8082"
-          prometheus.io/path: /actuator/prometheus
         env:
         - name: OTEL_INSTRUMENTATION_KAFKA_ENABLED
           value: 'true'
@@ -336,7 +330,14 @@ apps:
     ingress:
       ingressType: http
       port: 8082
-    serviceMonitor: null
+    serviceMonitor:
+      labels:
+        release: kube-prometheus-stack
+      endpoints:
+      - port: http
+        path: /actuator/prometheus
+        interval: 15s
+      _name_suffix: -monitor
   outbox-relay-service:
     telemetry: true
     authz:
@@ -348,10 +349,6 @@ apps:
         port: 8089
         podLabels:
           sidecar.istio.io/inject: "true"
-        podAnnotations:
-          prometheus.io/scrape: "true"
-          prometheus.io/port: "8089"
-          prometheus.io/path: /actuator/prometheus
         env:
         - name: SPRING_DATASOURCE_URL
           value: jdbc:postgresql://payment-db-cluster-rw.databases:5432/titan_db
@@ -377,7 +374,14 @@ apps:
     ingress:
       ingressType: http
       port: 8089
-    serviceMonitor: null
+    serviceMonitor:
+      labels:
+        release: kube-prometheus-stack
+      endpoints:
+      - port: http
+        path: /actuator/prometheus
+        interval: 15s
+      _name_suffix: -monitor
   mock-regulatory-service:
     telemetry: false
     authz:
@@ -466,10 +470,6 @@ apps:
         port: 8080
         podLabels:
           sidecar.istio.io/inject: "true"
-        podAnnotations:
-          prometheus.io/scrape: "true"
-          prometheus.io/port: "8080"
-          prometheus.io/path: /actuator/prometheus
         env:
         - name: OTEL_INSTRUMENTATION_KAFKA_ENABLED
           value: 'true'
@@ -541,7 +541,14 @@ apps:
     ingress:
       ingressType: http
       port: 8080
-    serviceMonitor: null
+    serviceMonitor:
+      labels:
+        release: kube-prometheus-stack
+      endpoints:
+      - port: http
+        path: /actuator/prometheus
+        interval: 15s
+      _name_suffix: -monitor
   webhooks-service:
     telemetry: true
     authz:
