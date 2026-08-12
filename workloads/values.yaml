@@ -83,6 +83,7 @@ apps:
     serviceMonitor: null
   export-batch-service:
     telemetry: true
+    prometheusScrape: true
     authz:
       allowedCallers:
       - istio-ingressgateway
@@ -182,14 +183,7 @@ apps:
     ingress:
       ingressType: http
       port: 8083
-    serviceMonitor:
-      name: export-batch-monitor
-      labels:
-        release: kube-prometheus-stack
-      endpoints:
-      - port: http
-        path: /actuator/prometheus
-        interval: 15s
+    serviceMonitor: null
   limits-service:
     telemetry: true
     authz:
@@ -233,6 +227,7 @@ apps:
     serviceMonitor: null
   wallet-service:
     telemetry: true
+    prometheusScrape: true
     authz:
       allowedCallers:
       - payment-service
@@ -281,16 +276,10 @@ apps:
     ingress:
       ingressType: grpc
       port: 9090
-    serviceMonitor:
-      labels:
-        release: kube-prometheus-stack
-      endpoints:
-      - port: http
-        path: /actuator/prometheus
-        interval: 15s
-      _name_suffix: -monitor
+    serviceMonitor: null
   ledger-service:
     telemetry: true
+    prometheusScrape: true
     authz:
       allowedCallers:
       - istio-ingressgateway
@@ -330,16 +319,10 @@ apps:
     ingress:
       ingressType: http
       port: 8082
-    serviceMonitor:
-      labels:
-        release: kube-prometheus-stack
-      endpoints:
-      - port: http
-        path: /actuator/prometheus
-        interval: 15s
-      _name_suffix: -monitor
+    serviceMonitor: null
   outbox-relay-service:
     telemetry: true
+    prometheusScrape: true
     authz:
       allowedCallers: []
     deployments:
@@ -374,14 +357,7 @@ apps:
     ingress:
       ingressType: http
       port: 8089
-    serviceMonitor:
-      labels:
-        release: kube-prometheus-stack
-      endpoints:
-      - port: http
-        path: /actuator/prometheus
-        interval: 15s
-      _name_suffix: -monitor
+    serviceMonitor: null
   mock-regulatory-service:
     telemetry: false
     authz:
@@ -452,6 +428,7 @@ apps:
     serviceMonitor: null
   payment-service:
     telemetry: true
+    prometheusScrape: true
     authz:
       allowedCallers:
       - istio-ingressgateway
@@ -541,14 +518,7 @@ apps:
     ingress:
       ingressType: http
       port: 8080
-    serviceMonitor:
-      labels:
-        release: kube-prometheus-stack
-      endpoints:
-      - port: http
-        path: /actuator/prometheus
-        interval: 15s
-      _name_suffix: -monitor
+    serviceMonitor: null
   webhooks-service:
     telemetry: true
     authz:

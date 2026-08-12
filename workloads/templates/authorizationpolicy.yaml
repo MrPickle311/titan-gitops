@@ -1,9 +1,13 @@
 {{/*
-Services with a serviceMonitor also get a rule scoped to /actuator/prometheus,
-restricted to Prometheus's own identity (it's meshed - see
-metrics/templates/prometheus-stack.yaml podMetadata - so it has a real principal
-to allow-list, same as everything else here). Everything else on the service
-stays restricted to allowedCallers.
+Services with prometheusScrape: true also get a rule scoped to
+/actuator/prometheus, restricted to Prometheus's own identity (it's meshed -
+see metrics/templates/prometheus-stack.yaml podMetadata - so it has a real
+principal to allow-list, same as everything else here). Prometheus reaches
+these via the static scrape config in prometheus-stack.yaml (Service DNS name,
+not ServiceMonitor's default pod-IP/Endpoints discovery - Istio's outbound mTLS
+auto-origination doesn't reliably apply to direct-pod-IP passthrough traffic
+under STRICT). Everything else on the service stays restricted to
+allowedCallers.
 */}}
 {{- range $appKey, $app := .Values.apps }}
 {{- if $app.authz }}
@@ -31,7 +35,7 @@ spec:
         {{- end }}
         {{- end }}
   {{- end }}
-  {{- if $app.serviceMonitor }}
+  {{- if $app.prometheusScrape }}
   - from:
     - source:
         principals:

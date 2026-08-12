@@ -108,6 +108,23 @@ spec:
             podMonitorSelectorNilUsesHelmValues: false
             podMonitorSelector: {}
             podMonitorNamespaceSelector: {}
+            # ServiceMonitor scrapes pod IPs directly (via Endpoints) - Istio's
+            # outbound mTLS auto-origination doesn't reliably apply to that
+            # passthrough traffic under STRICT mTLS (confirmed: same request
+            # works fine via the Service DNS name, fails via raw pod IP with a
+            # 503 and zero RBAC evaluations on the destination side). Static
+            # config targeting the Service name instead, proven to work.
+            additionalScrapeConfigs:
+              - job_name: app-actuator-metrics
+                metrics_path: /actuator/prometheus
+                scrape_interval: 15s
+                static_configs:
+                  - targets:
+                      - payment-service.applications.svc.cluster.local:8080
+                      - wallet-service.applications.svc.cluster.local:8081
+                      - ledger-service.applications.svc.cluster.local:8082
+                      - export-batch-service.applications.svc.cluster.local:8083
+                      - outbox-relay-service.applications.svc.cluster.local:8089
             storageSpec:
               volumeClaimTemplate:
                 spec:
