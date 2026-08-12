@@ -1,6 +1,7 @@
 apps:
   sanctions-service:
     telemetry: true
+    prometheusScrape: true
     authz:
       allowedCallers:
       - payment-service
@@ -16,12 +17,16 @@ apps:
       - name: grpc
         port: 9091
         targetPort: 9091
+      - name: http
+        port: 8080
+        targetPort: 8080
     ingress:
       ingressType: grpc
       port: 9091
     serviceMonitor: null
   fx-service:
     telemetry: true
+    prometheusScrape: true
     authz:
       allowedCallers:
       - payment-service
@@ -56,12 +61,16 @@ apps:
       - name: grpc
         port: 9091
         targetPort: 9091
+      - name: http
+        port: 8080
+        targetPort: 8080
     ingress:
       ingressType: grpc
       port: 9091
     serviceMonitor: null
   fee-service:
     telemetry: true
+    prometheusScrape: true
     authz:
       allowedCallers:
       - payment-service
@@ -77,6 +86,9 @@ apps:
       - name: grpc
         port: 9091
         targetPort: 9091
+      - name: http
+        port: 8080
+        targetPort: 8080
     ingress:
       ingressType: grpc
       port: 9091
@@ -186,6 +198,7 @@ apps:
     serviceMonitor: null
   limits-service:
     telemetry: true
+    prometheusScrape: true
     authz:
       allowedCallers:
       - payment-service
@@ -221,6 +234,9 @@ apps:
       - name: grpc
         port: 9091
         targetPort: 9091
+      - name: http
+        port: 8080
+        targetPort: 8080
     ingress:
       ingressType: grpc
       port: 9091
@@ -360,6 +376,7 @@ apps:
     serviceMonitor: null
   mock-regulatory-service:
     telemetry: false
+    prometheusScrape: true
     authz:
       allowedCallers:
       - export-batch-service
@@ -386,6 +403,7 @@ apps:
     serviceMonitor: null
   authorization-service:
     telemetry: true
+    prometheusScrape: true
     authz:
       allowedCallers:
       - payment-service
@@ -401,12 +419,16 @@ apps:
       - name: grpc
         port: 9091
         targetPort: 9091
+      - name: http
+        port: 8080
+        targetPort: 8080
     ingress:
       ingressType: grpc
       port: 9091
     serviceMonitor: null
   fraud-service:
     telemetry: true
+    prometheusScrape: true
     authz:
       allowedCallers:
       - payment-service
@@ -422,6 +444,9 @@ apps:
       - name: grpc
         port: 9091
         targetPort: 9091
+      - name: http
+        port: 8080
+        targetPort: 8080
     ingress:
       ingressType: grpc
       port: 9091
@@ -521,6 +546,7 @@ apps:
     serviceMonitor: null
   webhooks-service:
     telemetry: true
+    prometheusScrape: true
     authz:
       allowedCallers: []
     deployments:

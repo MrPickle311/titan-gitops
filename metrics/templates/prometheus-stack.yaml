@@ -114,6 +114,11 @@ spec:
             # works fine via the Service DNS name, fails via raw pod IP with a
             # 503 and zero RBAC evaluations on the destination side). Static
             # config targeting the Service name instead, proven to work.
+            # Covers every service in applications - the six grpc-only ones
+            # (sanctions/fx/fee/authorization/fraud/limits) also run a Spring
+            # Boot actuator on 8080 despite the Service only ever exposing
+            # their grpc port; confirmed by probing pod IPs directly and
+            # added an "http" port to each Service so the DNS name resolves.
             additionalScrapeConfigs:
               - job_name: app-actuator-metrics
                 metrics_path: /actuator/prometheus
@@ -125,6 +130,14 @@ spec:
                       - ledger-service.applications.svc.cluster.local:8082
                       - export-batch-service.applications.svc.cluster.local:8083
                       - outbox-relay-service.applications.svc.cluster.local:8089
+                      - mock-regulatory-service.applications.svc.cluster.local:8084
+                      - webhooks-service.applications.svc.cluster.local:8085
+                      - sanctions-service.applications.svc.cluster.local:8080
+                      - fx-service.applications.svc.cluster.local:8080
+                      - fee-service.applications.svc.cluster.local:8080
+                      - authorization-service.applications.svc.cluster.local:8080
+                      - fraud-service.applications.svc.cluster.local:8080
+                      - limits-service.applications.svc.cluster.local:8080
             storageSpec:
               volumeClaimTemplate:
                 spec:
