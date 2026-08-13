@@ -314,6 +314,13 @@ apps:
         replicas: 1
         image: registry.homelab/ledger-service:latest
         port: 8082
+        resources:
+          requests:
+            cpu: 250m
+            memory: 384Mi
+          limits:
+            cpu: 1500m
+            memory: 1024Mi
         podLabels:
           sidecar.istio.io/inject: "true"
         env:
