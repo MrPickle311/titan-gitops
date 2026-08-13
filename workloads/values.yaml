@@ -12,6 +12,13 @@ apps:
         port: 9091
         podLabels:
           sidecar.istio.io/inject: "true"
+        resources:
+          requests:
+            cpu: 150m
+            memory: 320Mi
+          limits:
+            cpu: 750m
+            memory: 768Mi
         env:
         - name: SERVER_PORT
           value: '8080'
@@ -40,6 +47,13 @@ apps:
         port: 9091
         podLabels:
           sidecar.istio.io/inject: "true"
+        resources:
+          requests:
+            cpu: 150m
+            memory: 320Mi
+          limits:
+            cpu: 750m
+            memory: 768Mi
         env:
         - name: SERVER_PORT
           value: '8080'
@@ -86,6 +100,13 @@ apps:
         port: 9091
         podLabels:
           sidecar.istio.io/inject: "true"
+        resources:
+          requests:
+            cpu: 150m
+            memory: 320Mi
+          limits:
+            cpu: 750m
+            memory: 768Mi
         env:
         - name: SERVER_PORT
           value: '8080'
@@ -116,6 +137,13 @@ apps:
         port: 8083
         podLabels:
           sidecar.istio.io/inject: "true"
+        resources:
+          requests:
+            cpu: 250m
+            memory: 448Mi
+          limits:
+            cpu: 1500m
+            memory: 1280Mi
         env:
         - name: SPRING_DATASOURCE_URL
           value: jdbc:postgresql://export-db-cluster-rw.databases:5432/payment_batch_db
@@ -145,6 +173,13 @@ apps:
         port: 8083
         podLabels:
           sidecar.istio.io/inject: "true"
+        resources:
+          requests:
+            cpu: 250m
+            memory: 448Mi
+          limits:
+            cpu: 1500m
+            memory: 1280Mi
         env:
         - name: SPRING_DATASOURCE_URL
           value: jdbc:postgresql://export-db-cluster-rw.databases:5432/payment_batch_db
@@ -174,6 +209,13 @@ apps:
         port: 8083
         podLabels:
           sidecar.istio.io/inject: "true"
+        resources:
+          requests:
+            cpu: 250m
+            memory: 448Mi
+          limits:
+            cpu: 1500m
+            memory: 1280Mi
         env:
         - name: SPRING_DATASOURCE_URL
           value: jdbc:postgresql://export-db-cluster-rw.databases:5432/payment_batch_db
@@ -365,6 +407,13 @@ apps:
         port: 8089
         podLabels:
           sidecar.istio.io/inject: "true"
+        resources:
+          requests:
+            cpu: 200m
+            memory: 384Mi
+          limits:
+            cpu: 1000m
+            memory: 1024Mi
         env:
         - name: SPRING_DATASOURCE_URL
           value: jdbc:postgresql://payment-db-cluster-rw.databases:5432/titan_db
@@ -404,6 +453,13 @@ apps:
         port: 8084
         podLabels:
           sidecar.istio.io/inject: "true"
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 640Mi
         env:
         - name: SERVER_PORT
           value: '8084'
@@ -431,6 +487,13 @@ apps:
         port: 9091
         podLabels:
           sidecar.istio.io/inject: "true"
+        resources:
+          requests:
+            cpu: 150m
+            memory: 320Mi
+          limits:
+            cpu: 750m
+            memory: 768Mi
         env:
         - name: SERVER_PORT
           value: '8080'
@@ -459,6 +522,13 @@ apps:
         port: 9091
         podLabels:
           sidecar.istio.io/inject: "true"
+        resources:
+          requests:
+            cpu: 150m
+            memory: 320Mi
+          limits:
+            cpu: 750m
+            memory: 768Mi
         env:
         - name: SERVER_PORT
           value: '8080'
@@ -579,6 +649,13 @@ apps:
         port: 8085
         podLabels:
           sidecar.istio.io/inject: "true"
+        resources:
+          requests:
+            cpu: 200m
+            memory: 384Mi
+          limits:
+            cpu: 1000m
+            memory: 1024Mi
         env:
         - name: SPRING_DATASOURCE_URL
           value: jdbc:postgresql://payment-db-cluster-rw.databases:5432/titan_db
