@@ -431,7 +431,7 @@ apps:
       allowedCallers: []
     deployments:
       outbox-relay-service:
-        replicas: 2
+        replicas: 1
         image: registry.homelab/outbox-relay-service:latest
         port: 8089
         podLabels:
