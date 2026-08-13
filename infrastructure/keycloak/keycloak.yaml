@@ -1,0 +1,28 @@
+apiVersion: k8s.keycloak.org/v2beta1
+kind: Keycloak
+metadata:
+  name: titan-keycloak
+  namespace: security
+spec:
+  instances: 1
+  db:
+    vendor: postgres
+    host: keycloak-db-cluster-rw.databases
+    database: keycloak
+    usernameSecret:
+      name: keycloak-db-cluster-app
+      key: username
+    passwordSecret:
+      name: keycloak-db-cluster-app
+      key: password
+  http:
+    httpEnabled: true
+  hostname:
+    hostname: keycloak.homelab
+  resources:
+    requests:
+      cpu: 250m
+      memory: 768Mi
+    limits:
+      cpu: 1000m
+      memory: 1536Mi

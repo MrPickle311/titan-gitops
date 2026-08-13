@@ -1,0 +1,16 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: keycloak-db-cluster
+  namespace: databases
+spec:
+  instances: 2
+  monitoring:
+    enablePodMonitor: true
+  storage:
+    size: 10Gi
+    storageClass: "openebs-hostpath"
+  bootstrap:
+    initdb:
+      database: keycloak
+      owner: app
