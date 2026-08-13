@@ -1,0 +1,28 @@
+{{- range $appKey, $app := .Values.apps }}
+{{- range $depName, $dep := $app.deployments }}
+{{- if $dep.hpa }}
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ $depName }}
+  namespace: applications
+  labels:
+    app: {{ $appKey }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ $depName }}
+  minReplicas: {{ $dep.hpa.minReplicas }}
+  maxReplicas: {{ $dep.hpa.maxReplicas }}
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: {{ $dep.hpa.targetCPUUtilizationPercentage }}
+{{- end }}
+{{- end }}
+{{- end }}
