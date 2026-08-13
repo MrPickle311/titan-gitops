@@ -18,7 +18,9 @@ spec:
   http:
     httpEnabled: true
   hostname:
-    hostname: keycloak.homelab
+    hostname: https://keycloak.homelab
+  proxy:
+    headers: xforwarded
   ingress:
     enabled: false
   resources:
