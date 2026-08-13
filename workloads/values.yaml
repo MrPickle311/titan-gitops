@@ -2,6 +2,8 @@ apps:
   sanctions-service:
     telemetry: true
     prometheusScrape: true
+    pdb:
+      minAvailable: 1
     authz:
       allowedCallers:
       - payment-service
@@ -37,6 +39,8 @@ apps:
   fx-service:
     telemetry: true
     prometheusScrape: true
+    pdb:
+      minAvailable: 1
     authz:
       allowedCallers:
       - payment-service
@@ -90,6 +94,8 @@ apps:
   fee-service:
     telemetry: true
     prometheusScrape: true
+    pdb:
+      minAvailable: 1
     authz:
       allowedCallers:
       - payment-service
@@ -249,12 +255,14 @@ apps:
   limits-service:
     telemetry: true
     prometheusScrape: true
+    pdb:
+      minAvailable: 1
     authz:
       allowedCallers:
       - payment-service
     deployments:
       limits-service:
-        replicas: 1
+        replicas: 2
         image: registry.homelab/limits-service:latest
         port: 9091
         podLabels:
@@ -296,13 +304,15 @@ apps:
   wallet-service:
     telemetry: true
     prometheusScrape: true
+    pdb:
+      minAvailable: 1
     authz:
       allowedCallers:
       - payment-service
       - istio-ingressgateway
     deployments:
       wallet-service:
-        replicas: 1
+        replicas: 2
         image: registry.homelab/wallet-service:latest
         port: 8081
         podLabels:
@@ -348,6 +358,8 @@ apps:
   ledger-service:
     telemetry: true
     prometheusScrape: true
+    pdb:
+      minAvailable: 1
     authz:
       allowedCallers:
       - istio-ingressgateway
@@ -398,11 +410,13 @@ apps:
   outbox-relay-service:
     telemetry: true
     prometheusScrape: true
+    pdb:
+      minAvailable: 1
     authz:
       allowedCallers: []
     deployments:
       outbox-relay-service:
-        replicas: 1
+        replicas: 2
         image: registry.homelab/outbox-relay-service:latest
         port: 8089
         podLabels:
@@ -477,6 +491,8 @@ apps:
   authorization-service:
     telemetry: true
     prometheusScrape: true
+    pdb:
+      minAvailable: 1
     authz:
       allowedCallers:
       - payment-service
@@ -512,6 +528,8 @@ apps:
   fraud-service:
     telemetry: true
     prometheusScrape: true
+    pdb:
+      minAvailable: 1
     authz:
       allowedCallers:
       - payment-service
@@ -547,13 +565,15 @@ apps:
   payment-service:
     telemetry: true
     prometheusScrape: true
+    pdb:
+      minAvailable: 1
     authz:
       allowedCallers:
       - istio-ingressgateway
       - test-runner
     deployments:
       payment-service:
-        replicas: 1
+        replicas: 2
         image: registry.homelab/payment-service:latest
         resources:
           requests:
@@ -640,6 +660,8 @@ apps:
   webhooks-service:
     telemetry: true
     prometheusScrape: true
+    pdb:
+      minAvailable: 1
     authz:
       allowedCallers: []
     deployments:
