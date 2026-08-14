@@ -23,6 +23,9 @@ spec:
     headers: xforwarded
   ingress:
     enabled: false
+  features:
+    enabled:
+      - client-admin-api:v2
   resources:
     requests:
       cpu: 250m
