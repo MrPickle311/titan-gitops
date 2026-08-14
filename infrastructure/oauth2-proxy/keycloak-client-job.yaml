@@ -47,12 +47,12 @@ data:
     EOF
     )
 
-    SCOPE_UUID=$($KCADM get client-scopes -r master --fields id,name --format csv --noquotes | awk -F, '$2=="groups"{print $1}')
+    SCOPE_UUID=$($KCADM get client-scopes -r master --fields id,name --format csv --noquotes | grep ',groups$' | cut -d, -f1)
 
     if [ -z "$SCOPE_UUID" ]; then
       echo "Creating client scope 'groups'"
       echo "$SCOPE_JSON" | $KCADM create client-scopes -r master -f -
-      SCOPE_UUID=$($KCADM get client-scopes -r master --fields id,name --format csv --noquotes | awk -F, '$2=="groups"{print $1}')
+      SCOPE_UUID=$($KCADM get client-scopes -r master --fields id,name --format csv --noquotes | grep ',groups$' | cut -d, -f1)
     else
       echo "Client scope 'groups' already exists ($SCOPE_UUID)"
     fi
