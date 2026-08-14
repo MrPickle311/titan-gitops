@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: edp-keycloak-operator
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://epam.github.io/edp-helm-charts/stable
+    targetRevision: 1.35.0
+    chart: keycloak-operator
+    helm:
+      valuesObject:
+        name: keycloak-operator
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: security
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
