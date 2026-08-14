@@ -26,6 +26,14 @@ spec:
   gateways:
   - main-gateway
   http:
+  - match:
+    - uri:
+        prefix: /oauth2/
+    route:
+    - destination:
+        host: oauth2-proxy.security.svc.cluster.local
+        port:
+          number: 4180
   - route:
     - destination:
         host: chaos-dashboard.chaos-mesh.svc.cluster.local
@@ -43,6 +51,14 @@ spec:
   gateways:
   - main-gateway
   http:
+  - match:
+    - uri:
+        prefix: /oauth2/
+    route:
+    - destination:
+        host: oauth2-proxy.security.svc.cluster.local
+        port:
+          number: 4180
   - route:
     - destination:
         host: argo-workflows-server.argo.svc.cluster.local
@@ -77,6 +93,14 @@ spec:
   gateways:
   - main-gateway
   http:
+  - match:
+    - uri:
+        prefix: /oauth2/
+    route:
+    - destination:
+        host: oauth2-proxy.security.svc.cluster.local
+        port:
+          number: 4180
   - route:
     - destination:
         host: kube-prometheus-stack-grafana.monitoring.svc.cluster.local
@@ -94,6 +118,14 @@ spec:
   gateways:
   - main-gateway
   http:
+  - match:
+    - uri:
+        prefix: /oauth2/
+    route:
+    - destination:
+        host: oauth2-proxy.security.svc.cluster.local
+        port:
+          number: 4180
   - route:
     - destination:
         host: vault-ui.security.svc.cluster.local
@@ -111,6 +143,14 @@ spec:
   gateways:
   - main-gateway
   http:
+  - match:
+    - uri:
+        prefix: /oauth2/
+    route:
+    - destination:
+        host: oauth2-proxy.security.svc.cluster.local
+        port:
+          number: 4180
   - route:
     - destination:
         host: kiali.istio-system.svc.cluster.local

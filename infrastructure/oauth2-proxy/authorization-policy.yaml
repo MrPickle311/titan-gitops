@@ -1,0 +1,25 @@
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: admin-ui-oauth2-gate
+  namespace: istio-system
+spec:
+  selector:
+    matchLabels:
+      istio: ingressgateway
+  action: CUSTOM
+  provider:
+    name: oauth2-proxy
+  rules:
+    - to:
+        - operation:
+            hosts:
+              - grafana.homelab
+              - kiali.homelab
+              - vault.homelab
+              - workflows.homelab
+              - chaos.homelab
+              - registry-ui.homelab
+              - homepage.homelab
+            notPaths:
+              - /oauth2/*

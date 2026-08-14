@@ -215,6 +215,14 @@ spec:
   gateways:
     - istio-system/main-gateway
   http:
+    - match:
+        - uri:
+            prefix: /oauth2/
+      route:
+        - destination:
+            host: oauth2-proxy.security.svc.cluster.local
+            port:
+              number: 4180
     - route:
         - destination:
             host: homepage
