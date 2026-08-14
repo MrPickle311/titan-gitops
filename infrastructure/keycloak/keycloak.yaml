@@ -30,3 +30,8 @@ spec:
     limits:
       cpu: 1000m
       memory: 1536Mi
+  unsupported:
+    podTemplate:
+      metadata:
+        labels:
+          sidecar.istio.io/inject: "true"

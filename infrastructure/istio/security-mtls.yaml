@@ -1,0 +1,8 @@
+apiVersion: security.istio.io/v1
+kind: PeerAuthentication
+metadata:
+  name: security-mtls
+  namespace: security
+spec:
+  mtls:
+    mode: PERMISSIVE
