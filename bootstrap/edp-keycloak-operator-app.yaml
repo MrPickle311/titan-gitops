@@ -13,7 +13,7 @@ spec:
     chart: keycloak-operator
     helm:
       valuesObject:
-        name: keycloak-operator
+        name: edp-keycloak-operator
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: security
