@@ -15,6 +15,7 @@ spec:
   optionalClientScopes:
     - groups
   redirectUris:
+    - "https://argocd.homelab/oauth2/callback"
     - "https://grafana.homelab/oauth2/callback"
     - "https://kiali.homelab/oauth2/callback"
     - "https://workflows.homelab/oauth2/callback"
