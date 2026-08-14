@@ -628,6 +628,11 @@ spec:
       - |
         kubectl exec -n applications deploy/payment-service -- env -u JAVA_TOOL_OPTIONS /opt/byteman/bin/bmsubmit.sh -p 9288 -u /tmp/mock-comp.btm || true
   - name: get-titan-token
+    metadata:
+      labels:
+        sidecar.istio.io/inject: "true"
+      annotations:
+        workflows.argoproj.io/kill-cmd-istio-proxy: '["pilot-agent", "request", "POST", "quitquitquit"]'
     container:
       image: alpine:latest
       command: [/bin/sh, -c]
