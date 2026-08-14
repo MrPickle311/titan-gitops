@@ -1,0 +1,32 @@
+apiVersion: k8s.keycloak.org/v2alpha1
+kind: KeycloakOIDCClient
+metadata:
+  name: oauth2-proxy
+  namespace: security
+spec:
+  keycloakCRName: titan-keycloak
+  realm: master
+  client:
+    displayName: oauth2-proxy
+    enabled: true
+    loginFlows:
+      - STANDARD
+    auth:
+      method: client-secret
+      secretRef:
+        name: oauth2-proxy-client
+        key: client-secret
+    redirectUris:
+      - "https://grafana.homelab/oauth2/callback"
+      - "https://kiali.homelab/oauth2/callback"
+      - "https://workflows.homelab/oauth2/callback"
+      - "https://chaos.homelab/oauth2/callback"
+      - "https://registry-ui.homelab/oauth2/callback"
+      - "https://homepage.homelab/oauth2/callback"
+    webOrigins:
+      - "https://grafana.homelab"
+      - "https://kiali.homelab"
+      - "https://workflows.homelab"
+      - "https://chaos.homelab"
+      - "https://registry-ui.homelab"
+      - "https://homepage.homelab"
