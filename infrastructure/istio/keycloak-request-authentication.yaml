@@ -22,27 +22,23 @@ spec:
   selector:
     matchLabels:
       istio: ingressgateway
-  action: ALLOW
+  action: DENY
   rules:
-    # USER: any valid token issued by the titan realm, no role required
-    - from:
-        - source:
-            requestPrincipals: ["*"]
-      to:
+    # Deny anything without a valid token issued by titan or master realm
+    - to:
         - operation:
             hosts: ["payment.homelab"]
       when:
         - key: request.auth.claims[iss]
-          values: ["https://keycloak.homelab/realms/titan"]
-    # ADMIN: valid token from master realm, must carry the admin role in its groups claim
-    - from:
-        - source:
-            requestPrincipals: ["*"]
-      to:
+          notValues:
+            - "https://keycloak.homelab/realms/titan"
+            - "https://keycloak.homelab/realms/master"
+    # Deny master-realm tokens that don't carry the admin group (ADMIN requirement)
+    - to:
         - operation:
             hosts: ["payment.homelab"]
       when:
         - key: request.auth.claims[iss]
           values: ["https://keycloak.homelab/realms/master"]
         - key: request.auth.claims[groups]
-          values: ["admin"]
+          notValues: ["admin"]
