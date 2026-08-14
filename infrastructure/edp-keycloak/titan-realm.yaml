@@ -1,0 +1,10 @@
+apiVersion: v1.edp.epam.com/v1
+kind: KeycloakRealm
+metadata:
+  name: titan
+  namespace: security
+spec:
+  realmName: titan
+  keycloakRef:
+    name: titan-keycloak
+    kind: Keycloak
