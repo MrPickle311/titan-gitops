@@ -30,8 +30,6 @@ spec:
             - --http-address=0.0.0.0:4180
             - --upstream=static://200
             - --email-domain=*
-            - --cookie-domain=.homelab
-            - --whitelist-domain=.homelab
             - --reverse-proxy=true
             - --set-xauthrequest=true
             - --pass-access-token=true
