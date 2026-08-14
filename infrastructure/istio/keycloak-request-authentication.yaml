@@ -10,8 +10,10 @@ spec:
   jwtRules:
     - issuer: "https://keycloak.homelab/realms/master"
       jwksUri: "http://titan-keycloak-service.security.svc.cluster.local:8080/realms/master/protocol/openid-connect/certs"
+      forwardOriginalToken: true
     - issuer: "https://keycloak.homelab/realms/titan"
       jwksUri: "http://titan-keycloak-service.security.svc.cluster.local:8080/realms/titan/protocol/openid-connect/certs"
+      forwardOriginalToken: true
 ---
 apiVersion: security.istio.io/v1
 kind: AuthorizationPolicy
