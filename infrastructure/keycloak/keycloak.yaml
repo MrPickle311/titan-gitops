@@ -26,6 +26,9 @@ spec:
   features:
     enabled:
       - client-admin-api:v2
+  bootstrapAdmin:
+    service:
+      secret: titan-keycloak-admin
   resources:
     requests:
       cpu: 250m
