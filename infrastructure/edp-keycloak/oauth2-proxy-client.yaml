@@ -1,0 +1,23 @@
+apiVersion: v1.edp.epam.com/v1
+kind: KeycloakClient
+metadata:
+  name: oauth2-proxy
+  namespace: security
+spec:
+  realmRef:
+    name: master
+    kind: KeycloakRealm
+  clientId: oauth2-proxy
+  public: false
+  secret: $oauth2-proxy-client:client-secret
+  directAccess: false
+  webUrl: https://grafana.homelab
+  optionalClientScopes:
+    - groups
+  redirectUris:
+    - "https://grafana.homelab/oauth2/callback"
+    - "https://kiali.homelab/oauth2/callback"
+    - "https://workflows.homelab/oauth2/callback"
+    - "https://chaos.homelab/oauth2/callback"
+    - "https://registry-ui.homelab/oauth2/callback"
+    - "https://homepage.homelab/oauth2/callback"
