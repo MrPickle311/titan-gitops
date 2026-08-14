@@ -100,9 +100,9 @@ spec:
 
             echo "Error: Not completed within timeout"
             exit 1
-      env:
-        - name: TOKEN
-          value: '{{inputs.parameters.token}}'
+        env:
+          - name: TOKEN
+            value: '{{inputs.parameters.token}}'
       outputs:
         parameters:
           - name: payment-id
