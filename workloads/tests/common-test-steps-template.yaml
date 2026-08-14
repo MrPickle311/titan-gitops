@@ -627,6 +627,42 @@ spec:
       args:
       - |
         kubectl exec -n applications deploy/payment-service -- env -u JAVA_TOOL_OPTIONS /opt/byteman/bin/bmsubmit.sh -p 9288 -u /tmp/mock-comp.btm || true
+  - name: get-titan-token
+    container:
+      image: alpine:latest
+      command: [/bin/sh, -c]
+      args:
+        - |
+          apk add --no-cache curl jq >/dev/null
+          RES=$(curl -s -X POST "http://titan-keycloak-service.security.svc.cluster.local:8080/realms/titan/protocol/openid-connect/token" \
+            -H "Content-Type: application/x-www-form-urlencoded" \
+            -d "grant_type=password" \
+            -d "client_id=payment-service-client" \
+            -d "client_secret=$CLIENT_SECRET" \
+            -d "username=test-user" \
+            -d "password=$TEST_USER_PASSWORD")
+          TOKEN=$(echo "$RES" | jq -r '.access_token')
+          if [ -z "$TOKEN" ] || [ "$TOKEN" = "null" ]; then
+            echo "Failed to acquire titan realm token: $RES"
+            exit 1
+          fi
+          echo -n "$TOKEN" > /tmp/token.txt
+      env:
+        - name: CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              key: client-secret
+              name: keycloak-payment-service-client
+        - name: TEST_USER_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: password
+              name: titan-test-user
+    outputs:
+      parameters:
+        - name: token
+          valueFrom:
+            path: /tmp/token.txt
   - name: validate-webhook
     inputs:
       parameters:

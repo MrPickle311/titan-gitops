@@ -10,8 +10,16 @@ spec:
   templates:
     - name: main
       steps:
+        - - name: get-token
+            templateRef:
+              name: common-test-steps
+              template: get-titan-token
         - - name: run-test
             template: test-payment
+            arguments:
+              parameters:
+                - name: token
+                  value: '{{steps.get-token.outputs.parameters.token}}'
         - - name: validate-db
             templateRef:
               name: common-test-steps
@@ -47,6 +55,9 @@ spec:
           sidecar.istio.io/inject: "true"
         annotations:
           workflows.argoproj.io/kill-cmd-istio-proxy: '["pilot-agent", "request", "POST", "quitquitquit"]'
+      inputs:
+        parameters:
+          - name: token
       container:
         image: alpine:latest
         command:
@@ -55,11 +66,15 @@ spec:
         args:
           - |
             apk add --no-cache curl jq
+            BASE="https://istio-ingressgateway.istio-system.svc.cluster.local"
+            AUTH="Authorization: Bearer $TOKEN"
             TX_ID="tx-$RANDOM"
             SRC_USER="1$RANDOM$RANDOM"
             TGT_USER="2$RANDOM$RANDOM"
             echo "1. Create payment..."
-            RES=$(curl -s -X POST http://payment-service:8080/api/payments \
+            RES=$(curl -sk -X POST "$BASE/api/payments" \
+              -H "Host: payment.homelab" \
+              -H "$AUTH" \
               -H "Content-Type: application/json" \
               -d "{\"transactionId\": \"$TX_ID\", \"amount\": \"150.00\", \"currency\": \"USD\", \"sourceUserId\": $SRC_USER, \"targetUserId\": $TGT_USER, \"sourceCurrency\": \"USD\", \"targetCurrency\": \"EUR\"}")
 
@@ -68,11 +83,11 @@ spec:
             echo "$ID" > /tmp/payment_id.txt
 
             echo "2. Execute payment..."
-            curl -s -X POST http://payment-service:8080/api/payments/$ID/execute
+            curl -sk -X POST "$BASE/api/payments/$ID/execute" -H "Host: payment.homelab" -H "$AUTH"
 
             echo "3. Wait up to 60s for COMPLETED state..."
             for i in $(seq 1 30); do
-              STATE=$(curl -s http://payment-service:8080/api/payments/$ID | jq -r '.state')
+              STATE=$(curl -sk "$BASE/api/payments/$ID" -H "Host: payment.homelab" -H "$AUTH" | jq -r '.state')
               echo "State: $STATE"
               if [ "$STATE" = "COMPLETED" ]; then
                 echo "OK"
@@ -80,9 +95,12 @@ spec:
               fi
               sleep 2
             done
-            
+
             echo "Error: Not completed within timeout"
             exit 1
+      env:
+        - name: TOKEN
+          value: '{{inputs.parameters.token}}'
       outputs:
         parameters:
           - name: payment-id
