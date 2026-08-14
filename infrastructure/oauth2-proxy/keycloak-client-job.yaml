@@ -20,6 +20,43 @@ data:
       sleep 5
     done
 
+    # Keycloak has no built-in scope named "groups", but oauth2-proxy auto-requests
+    # it whenever --oidc-groups-claim is set. Without this scope existing and being
+    # attached to the client, the whole auth request is rejected with invalid_scope.
+    SCOPE_JSON=$(cat <<'EOF'
+    {
+      "name": "groups",
+      "protocol": "openid-connect",
+      "protocolMappers": [
+        {
+          "name": "groups",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-realm-role-mapper",
+          "consentRequired": false,
+          "config": {
+            "claim.name": "groups",
+            "jsonType.label": "String",
+            "multivalued": "true",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true"
+          }
+        }
+      ]
+    }
+    EOF
+    )
+
+    SCOPE_UUID=$($KCADM get client-scopes -r master --fields id,name --format csv --noquotes | awk -F, '$2=="groups"{print $1}')
+
+    if [ -z "$SCOPE_UUID" ]; then
+      echo "Creating client scope 'groups'"
+      echo "$SCOPE_JSON" | $KCADM create client-scopes -r master -f -
+      SCOPE_UUID=$($KCADM get client-scopes -r master --fields id,name --format csv --noquotes | awk -F, '$2=="groups"{print $1}')
+    else
+      echo "Client scope 'groups' already exists ($SCOPE_UUID)"
+    fi
+
     CLIENT_JSON=$(cat <<EOF
     {
       "clientId": "oauth2-proxy",
@@ -43,22 +80,6 @@ data:
         "https://chaos.homelab",
         "https://registry-ui.homelab",
         "https://homepage.homelab"
-      ],
-      "protocolMappers": [
-        {
-          "name": "groups",
-          "protocol": "openid-connect",
-          "protocolMapper": "oidc-usermodel-realm-role-mapper",
-          "consentRequired": false,
-          "config": {
-            "claim.name": "groups",
-            "jsonType.label": "String",
-            "multivalued": "true",
-            "id.token.claim": "true",
-            "access.token.claim": "true",
-            "userinfo.token.claim": "true"
-          }
-        }
       ]
     }
     EOF
@@ -69,10 +90,14 @@ data:
     if [ -z "$CLIENT_UUID" ]; then
       echo "Creating client oauth2-proxy"
       echo "$CLIENT_JSON" | $KCADM create clients -r master -f -
+      CLIENT_UUID=$($KCADM get clients -r master -q clientId=oauth2-proxy --fields id --format csv --noquotes | tail -n1)
     else
       echo "Updating client oauth2-proxy ($CLIENT_UUID)"
       echo "$CLIENT_JSON" | $KCADM update "clients/$CLIENT_UUID" -r master -f -
     fi
+
+    echo "Attaching 'groups' scope to client as optional"
+    $KCADM update "clients/$CLIENT_UUID/optional-client-scopes/$SCOPE_UUID" -r master
 
     echo "Done"
 ---
