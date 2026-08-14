@@ -21,6 +21,11 @@ spec:
           args:
             - --provider=oidc
             - --oidc-issuer-url=https://keycloak.homelab/realms/master
+            - --skip-oidc-discovery=true
+            - --login-url=https://keycloak.homelab/realms/master/protocol/openid-connect/auth
+            - --redeem-url=http://titan-keycloak-service.security.svc.cluster.local:8080/realms/master/protocol/openid-connect/token
+            - --oidc-jwks-url=http://titan-keycloak-service.security.svc.cluster.local:8080/realms/master/protocol/openid-connect/certs
+            - --profile-url=http://titan-keycloak-service.security.svc.cluster.local:8080/realms/master/protocol/openid-connect/userinfo
             - --client-id=oauth2-proxy
             - --http-address=0.0.0.0:4180
             - --upstream=static://200
