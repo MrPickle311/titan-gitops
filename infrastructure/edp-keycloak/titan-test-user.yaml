@@ -11,6 +11,8 @@ spec:
   enabled: true
   email: test-user@homelab
   emailVerified: true
+  firstName: Test
+  lastName: User
   keepResource: true
   passwordSecret:
     name: titan-test-user

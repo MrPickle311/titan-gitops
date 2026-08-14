@@ -5,27 +5,9 @@ metadata:
   namespace: security
 spec:
   keycloakCRName: titan-keycloak
-  placeholders:
-    PAYMENT_CLIENT_SECRET:
-      secret:
-        name: keycloak-payment-service-client
-        key: client-secret
   realm:
     id: titan
     realm: titan
     displayName: Titan Payments
     enabled: true
     sslRequired: none
-    clients:
-      - clientId: payment-service-client
-        name: payment-service
-        enabled: true
-        publicClient: false
-        protocol: openid-connect
-        secret: $(PAYMENT_CLIENT_SECRET)
-        standardFlowEnabled: true
-        directAccessGrantsEnabled: true
-        redirectUris:
-          - "https://payment.homelab/*"
-        webOrigins:
-          - "https://payment.homelab"
