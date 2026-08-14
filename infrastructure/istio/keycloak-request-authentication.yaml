@@ -8,9 +8,6 @@ spec:
     matchLabels:
       istio: ingressgateway
   jwtRules:
-    - issuer: "https://keycloak.homelab/realms/master"
-      jwksUri: "http://titan-keycloak-service.security.svc.cluster.local:8080/realms/master/protocol/openid-connect/certs"
-      forwardOriginalToken: true
     - issuer: "https://keycloak.homelab/realms/titan"
       jwksUri: "http://titan-keycloak-service.security.svc.cluster.local:8080/realms/titan/protocol/openid-connect/certs"
       forwardOriginalToken: true
@@ -26,7 +23,7 @@ spec:
       istio: ingressgateway
   action: DENY
   rules:
-    # Deny anything without a valid token issued by titan or master realm
+    # Deny anything without a valid token issued by the titan realm
     - to:
         - operation:
             hosts: ["payment.homelab"]
@@ -34,13 +31,3 @@ spec:
         - key: request.auth.claims[iss]
           notValues:
             - "https://keycloak.homelab/realms/titan"
-            - "https://keycloak.homelab/realms/master"
-    # Deny master-realm tokens that don't carry the admin group (ADMIN requirement)
-    - to:
-        - operation:
-            hosts: ["payment.homelab"]
-      when:
-        - key: request.auth.claims[iss]
-          values: ["https://keycloak.homelab/realms/master"]
-        - key: request.auth.claims[groups]
-          notValues: ["admin"]
