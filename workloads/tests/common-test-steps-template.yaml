@@ -639,6 +639,7 @@ spec:
       args:
         - |
           apk add --no-cache curl jq >/dev/null
+          until curl -sf http://localhost:15021/healthz/ready >/dev/null 2>&1; do sleep 1; done
           RES=$(curl -s -X POST "http://titan-keycloak-service.security.svc.cluster.local:8080/realms/titan/protocol/openid-connect/token" \
             -H "Content-Type: application/x-www-form-urlencoded" \
             -d "grant_type=password" \

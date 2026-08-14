@@ -66,6 +66,8 @@ spec:
         args:
           - |
             apk add --no-cache curl jq
+            echo "Waiting for Istio sidecar to be ready..."
+            until curl -sf http://localhost:15021/healthz/ready >/dev/null 2>&1; do sleep 1; done
             BASE="https://istio-ingressgateway.istio-system.svc.cluster.local"
             AUTH="Authorization: Bearer $TOKEN"
             TX_ID="tx-$RANDOM"
