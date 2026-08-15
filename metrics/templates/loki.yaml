@@ -34,6 +34,22 @@ spec:
 
         promtail:
           enabled: true
+          containerSecurityContext:
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+              add:
+                - DAC_READ_SEARCH
+          extraVolumes:
+            - name: kube-audit-log
+              hostPath:
+                path: /var/log/audit/kube
+                type: DirectoryOrCreate
+          extraVolumeMounts:
+            - name: kube-audit-log
+              mountPath: /var/log/audit/kube
+              readOnly: true
           config:
             snippets:
               pipelineStages:
@@ -42,6 +58,14 @@ spec:
                     expression: "(?i)(?P<level>INFO|WARN|ERROR|DEBUG|TRACE)"
                 - labels:
                     level:
+              extraScrapeConfigs: |
+                - job_name: kube-audit
+                  static_configs:
+                    - targets:
+                        - localhost
+                      labels:
+                        job: kube-audit
+                        __path__: /var/log/audit/kube/*.log
 
   destination:
     server: 'https://kubernetes.default.svc'
