@@ -98,6 +98,11 @@ spec:
           tcpSocket:
             port: {{ $dep.port }}
           periodSeconds: 10
+        livenessProbe:
+          tcpSocket:
+            port: {{ $dep.port }}
+          initialDelaySeconds: 15
+          periodSeconds: 20
         volumeMounts:
           - name: byteman-volume
             mountPath: /opt/byteman
