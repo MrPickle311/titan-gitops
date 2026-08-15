@@ -260,7 +260,11 @@ cluster:
         cni:
             name: flannel # Name of CNI to use.
             flannel:
-                kubeNetworkPoliciesEnabled: true # Enable NetworkPolicy enforcement in Flannel (requires Talos 1.13+).
+                # Tried and reverted (PMT-007): the bundled kube-network-policies
+                # sidecar conflicts with Istio's own iptables traffic redirect on
+                # meshed pods - broke Keycloak's outbound DB connection. Policy
+                # enforcement is handled by Calico (policy-only mode) instead.
+                kubeNetworkPoliciesEnabled: false
     token: wbyxr9.1pbiglg9pn04tsl8 # The [bootstrap token](https://kubernetes.io/docs/reference/access-authn-authz/bootstrap-tokens/) used to join the cluster.
     secretboxEncryptionSecret: lGuNHkA3Svymh4S5DIbcXs9gMmBKMJGC1PuXSUX5W6c= # A key used for the [encryption of secret data at rest](https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/).
     # The base64 encoded root certificate authority used by Kubernetes.
