@@ -161,7 +161,7 @@ apps:
             memory: 1280Mi
         env:
         - name: SPRING_DATASOURCE_URL
-          value: jdbc:postgresql://export-db-cluster-rw.databases:5432/payment_batch_db
+          value: jdbc:postgresql://export-db-cluster-rw.databases:5432/payment_batch_db?sslmode=verify-full&sslrootcert=/etc/ssl/homelab-ca/ca.crt
         - name: SPRING_DATASOURCE_USERNAME
           valueFrom:
             secretKeyRef:
@@ -175,7 +175,13 @@ apps:
               name: export-db-cluster-app
               key: password
         - name: KAFKA_BOOTSTRAP_SERVERS
-          value: kafka-kafka-bootstrap.messaging.svc.cluster.local:9092
+          value: kafka-kafka-bootstrap.messaging.svc.cluster.local:9093
+        - name: SPRING_KAFKA_SECURITY_PROTOCOL
+          value: SSL
+        - name: SPRING_KAFKA_SSL_TRUST_STORE_TYPE
+          value: PEM
+        - name: SPRING_KAFKA_SSL_TRUST_STORE_LOCATION
+          value: /etc/ssl/homelab-ca/ca.crt
         - name: EXPORT_REGULATORY_URL
           value: http://mock-regulatory-service:8084/api/v1/regulatory/report
         - name: EXPORT_MAX_RETRY_COUNT
@@ -197,7 +203,7 @@ apps:
             memory: 1280Mi
         env:
         - name: SPRING_DATASOURCE_URL
-          value: jdbc:postgresql://export-db-cluster-rw.databases:5432/payment_batch_db
+          value: jdbc:postgresql://export-db-cluster-rw.databases:5432/payment_batch_db?sslmode=verify-full&sslrootcert=/etc/ssl/homelab-ca/ca.crt
         - name: SPRING_DATASOURCE_USERNAME
           valueFrom:
             secretKeyRef:
@@ -211,7 +217,13 @@ apps:
               name: export-db-cluster-app
               key: password
         - name: KAFKA_BOOTSTRAP_SERVERS
-          value: kafka-kafka-bootstrap.messaging.svc.cluster.local:9092
+          value: kafka-kafka-bootstrap.messaging.svc.cluster.local:9093
+        - name: SPRING_KAFKA_SECURITY_PROTOCOL
+          value: SSL
+        - name: SPRING_KAFKA_SSL_TRUST_STORE_TYPE
+          value: PEM
+        - name: SPRING_KAFKA_SSL_TRUST_STORE_LOCATION
+          value: /etc/ssl/homelab-ca/ca.crt
         - name: EXPORT_REGULATORY_URL
           value: http://mock-regulatory-service:8084/api/v1/regulatory/report
         - name: EXPORT_MAX_RETRY_COUNT
@@ -233,7 +245,7 @@ apps:
             memory: 1280Mi
         env:
         - name: SPRING_DATASOURCE_URL
-          value: jdbc:postgresql://export-db-cluster-rw.databases:5432/payment_batch_db
+          value: jdbc:postgresql://export-db-cluster-rw.databases:5432/payment_batch_db?sslmode=verify-full&sslrootcert=/etc/ssl/homelab-ca/ca.crt
         - name: SPRING_DATASOURCE_USERNAME
           valueFrom:
             secretKeyRef:
@@ -247,7 +259,13 @@ apps:
               name: export-db-cluster-app
               key: password
         - name: KAFKA_BOOTSTRAP_SERVERS
-          value: kafka-kafka-bootstrap.messaging.svc.cluster.local:9092
+          value: kafka-kafka-bootstrap.messaging.svc.cluster.local:9093
+        - name: SPRING_KAFKA_SECURITY_PROTOCOL
+          value: SSL
+        - name: SPRING_KAFKA_SSL_TRUST_STORE_TYPE
+          value: PEM
+        - name: SPRING_KAFKA_SSL_TRUST_STORE_LOCATION
+          value: /etc/ssl/homelab-ca/ca.crt
         - name: EXPORT_REGULATORY_URL
           value: http://mock-regulatory-service:8084/api/v1/regulatory/report
         - name: EXPORT_MAX_RETRY_COUNT
@@ -290,7 +308,7 @@ apps:
         - name: SERVER_PORT
           value: '8080'
         - name: SPRING_DATASOURCE_URL
-          value: jdbc:postgresql://limits-db-cluster-rw.databases:5432/limits_db
+          value: jdbc:postgresql://limits-db-cluster-rw.databases:5432/limits_db?sslmode=verify-full&sslrootcert=/etc/ssl/homelab-ca/ca.crt
         - name: SPRING_DATASOURCE_USERNAME
           valueFrom:
             secretKeyRef:
@@ -347,7 +365,7 @@ apps:
         - name: SPRING_KAFKA_TEMPLATE_OBSERVATION_ENABLED
           value: 'true'
         - name: SPRING_DATASOURCE_URL
-          value: jdbc:postgresql://wallet-db-cluster-rw.databases:5432/wallet_db
+          value: jdbc:postgresql://wallet-db-cluster-rw.databases:5432/wallet_db?sslmode=verify-full&sslrootcert=/etc/ssl/homelab-ca/ca.crt
         - name: SPRING_DATASOURCE_USERNAME
           valueFrom:
             secretKeyRef:
@@ -400,7 +418,7 @@ apps:
         - name: SPRING_KAFKA_TEMPLATE_OBSERVATION_ENABLED
           value: 'true'
         - name: SPRING_DATASOURCE_URL
-          value: jdbc:postgresql://ledger-db-cluster-rw.databases:5432/ledger_db
+          value: jdbc:postgresql://ledger-db-cluster-rw.databases:5432/ledger_db?sslmode=verify-full&sslrootcert=/etc/ssl/homelab-ca/ca.crt
         - name: SPRING_DATASOURCE_USERNAME
           valueFrom:
             secretKeyRef:
@@ -412,7 +430,13 @@ apps:
               name: ledger-db-cluster-app
               key: password
         - name: KAFKA_BOOTSTRAP_SERVERS
-          value: kafka-kafka-bootstrap.messaging.svc.cluster.local:9092
+          value: kafka-kafka-bootstrap.messaging.svc.cluster.local:9093
+        - name: SPRING_KAFKA_SECURITY_PROTOCOL
+          value: SSL
+        - name: SPRING_KAFKA_SSL_TRUST_STORE_TYPE
+          value: PEM
+        - name: SPRING_KAFKA_SSL_TRUST_STORE_LOCATION
+          value: /etc/ssl/homelab-ca/ca.crt
     service:
       ports:
       - name: http
@@ -623,7 +647,7 @@ apps:
         - name: SPRING_KAFKA_TEMPLATE_OBSERVATION_ENABLED
           value: 'true'
         - name: SPRING_DATASOURCE_URL
-          value: jdbc:postgresql://payment-db-cluster-rw.databases:5432/titan_db
+          value: jdbc:postgresql://payment-db-cluster-rw.databases:5432/titan_db?sslmode=verify-full&sslrootcert=/etc/ssl/homelab-ca/ca.crt
         - name: SPRING_DATASOURCE_USERNAME
           valueFrom:
             secretKeyRef:
@@ -649,7 +673,13 @@ apps:
         - name: WALLET_SERVICE_URL
           value: http://wallet-service:8081
         - name: KAFKA_BOOTSTRAP_SERVERS
-          value: kafka-kafka-bootstrap.messaging.svc.cluster.local:9092
+          value: kafka-kafka-bootstrap.messaging.svc.cluster.local:9093
+        - name: SPRING_KAFKA_SECURITY_PROTOCOL
+          value: SSL
+        - name: SPRING_KAFKA_SSL_TRUST_STORE_TYPE
+          value: PEM
+        - name: SPRING_KAFKA_SSL_TRUST_STORE_LOCATION
+          value: /etc/ssl/homelab-ca/ca.crt
         - name: GRPC_AUTHORIZATION_SERVICE_ADDRESS
           value: static://authorization-service:9091
         - name: GRPC_AUTHORIZATION_SERVICE_NEGOTIATION_TYPE
@@ -710,7 +740,7 @@ apps:
             memory: 1024Mi
         env:
         - name: SPRING_DATASOURCE_URL
-          value: jdbc:postgresql://payment-db-cluster-rw.databases:5432/titan_db
+          value: jdbc:postgresql://payment-db-cluster-rw.databases:5432/titan_db?sslmode=verify-full&sslrootcert=/etc/ssl/homelab-ca/ca.crt
         - name: SPRING_DATASOURCE_USERNAME
           valueFrom:
             secretKeyRef:
@@ -722,7 +752,13 @@ apps:
               name: payment-db-cluster-app
               key: password
         - name: KAFKA_BOOTSTRAP_SERVERS
-          value: kafka-kafka-bootstrap.messaging.svc.cluster.local:9092
+          value: kafka-kafka-bootstrap.messaging.svc.cluster.local:9093
+        - name: SPRING_KAFKA_SECURITY_PROTOCOL
+          value: SSL
+        - name: SPRING_KAFKA_SSL_TRUST_STORE_TYPE
+          value: PEM
+        - name: SPRING_KAFKA_SSL_TRUST_STORE_LOCATION
+          value: /etc/ssl/homelab-ca/ca.crt
     service:
       ports:
       - name: http
