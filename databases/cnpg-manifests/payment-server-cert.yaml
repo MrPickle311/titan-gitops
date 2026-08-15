@@ -5,6 +5,8 @@ metadata:
   namespace: databases
 spec:
   secretName: payment-db-cluster-server-tls
+  privateKey:
+    encoding: PKCS8
   usages:
     - server auth
   dnsNames:

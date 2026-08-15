@@ -5,6 +5,8 @@ metadata:
   namespace: messaging
 spec:
   secretName: kafka-broker-tls
+  privateKey:
+    encoding: PKCS8
   usages:
     - server auth
   dnsNames:
