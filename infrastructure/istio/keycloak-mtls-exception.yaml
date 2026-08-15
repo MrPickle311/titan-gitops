@@ -1,3 +1,8 @@
+# istiod has no sidecar of its own, so its plain HTTP fetch of Keycloak's
+# JWKS gets hard-rejected by STRICT mTLS on this namespace - without this
+# exception istiod falls back to a fake JWKS and every real JWT fails
+# signature verification at the gateway. JWKS is public (just signing
+# keys, no session data), so loosening only this port is safe.
 apiVersion: security.istio.io/v1
 kind: PeerAuthentication
 metadata:
