@@ -17,9 +17,10 @@ spec:
   minReplicas: {{ $dep.hpa.minReplicas }}
   maxReplicas: {{ $dep.hpa.maxReplicas }}
   metrics:
-  - type: Resource
-    resource:
+  - type: ContainerResource
+    containerResource:
       name: cpu
+      container: {{ $depName }}
       target:
         type: Utilization
         averageUtilization: {{ $dep.hpa.targetCPUUtilizationPercentage }}
