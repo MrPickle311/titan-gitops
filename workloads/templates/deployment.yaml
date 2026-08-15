@@ -91,9 +91,9 @@ spec:
         startupProbe:
           tcpSocket:
             port: {{ $dep.port }}
-          initialDelaySeconds: 10
+          initialDelaySeconds: 30
           periodSeconds: 5
-          failureThreshold: 30
+          failureThreshold: 50
         readinessProbe:
           tcpSocket:
             port: {{ $dep.port }}
