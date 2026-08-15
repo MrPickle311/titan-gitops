@@ -1,0 +1,19 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: kafka-broker-tls
+  namespace: messaging
+spec:
+  secretName: kafka-broker-tls
+  usages:
+    - server auth
+  dnsNames:
+    - kafka-kafka-bootstrap
+    - kafka-kafka-bootstrap.messaging.svc
+    - kafka-kafka-bootstrap.messaging.svc.cluster.local
+    - "*.kafka-kafka-brokers.messaging.svc"
+    - "*.kafka-kafka-brokers.messaging.svc.cluster.local"
+  issuerRef:
+    name: homelab-ca-issuer
+    kind: ClusterIssuer
+    group: cert-manager.io

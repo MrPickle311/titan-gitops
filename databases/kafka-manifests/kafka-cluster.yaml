@@ -51,6 +51,11 @@ spec:
         port: 9093
         type: internal
         tls: true
+        configuration:
+          brokerCertChainAndKey:
+            secretName: kafka-broker-tls
+            certificate: tls.crt
+            key: tls.key
       - name: external
         port: 9094
         type: loadbalancer

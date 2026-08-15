@@ -1,0 +1,26 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: limits-db-cluster-server-tls
+  namespace: databases
+spec:
+  secretName: limits-db-cluster-server-tls
+  usages:
+    - server auth
+  dnsNames:
+    - limits-db-cluster-rw
+    - limits-db-cluster-rw.databases.svc
+    - limits-db-cluster-rw.databases.svc.cluster.local
+    - limits-db-cluster-ro
+    - limits-db-cluster-ro.databases.svc
+    - limits-db-cluster-ro.databases.svc.cluster.local
+    - limits-db-cluster-r
+    - limits-db-cluster-r.databases.svc
+    - limits-db-cluster-r.databases.svc.cluster.local
+    - limits-db-cluster-rw-lb
+    - limits-db-cluster-rw-lb.databases.svc
+    - limits-db-cluster-rw-lb.databases.svc.cluster.local
+  issuerRef:
+    name: homelab-ca-issuer
+    kind: ClusterIssuer
+    group: cert-manager.io

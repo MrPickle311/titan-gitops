@@ -10,3 +10,5 @@ spec:
   target:
     configMap:
       key: ca.crt
+    secret:
+      key: ca.crt

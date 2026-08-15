@@ -1,0 +1,23 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: keycloak-db-cluster-server-tls
+  namespace: databases
+spec:
+  secretName: keycloak-db-cluster-server-tls
+  usages:
+    - server auth
+  dnsNames:
+    - keycloak-db-cluster-rw
+    - keycloak-db-cluster-rw.databases.svc
+    - keycloak-db-cluster-rw.databases.svc.cluster.local
+    - keycloak-db-cluster-ro
+    - keycloak-db-cluster-ro.databases.svc
+    - keycloak-db-cluster-ro.databases.svc.cluster.local
+    - keycloak-db-cluster-r
+    - keycloak-db-cluster-r.databases.svc
+    - keycloak-db-cluster-r.databases.svc.cluster.local
+  issuerRef:
+    name: homelab-ca-issuer
+    kind: ClusterIssuer
+    group: cert-manager.io

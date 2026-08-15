@@ -1,0 +1,26 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: ledger-db-cluster-server-tls
+  namespace: databases
+spec:
+  secretName: ledger-db-cluster-server-tls
+  usages:
+    - server auth
+  dnsNames:
+    - ledger-db-cluster-rw
+    - ledger-db-cluster-rw.databases.svc
+    - ledger-db-cluster-rw.databases.svc.cluster.local
+    - ledger-db-cluster-ro
+    - ledger-db-cluster-ro.databases.svc
+    - ledger-db-cluster-ro.databases.svc.cluster.local
+    - ledger-db-cluster-r
+    - ledger-db-cluster-r.databases.svc
+    - ledger-db-cluster-r.databases.svc.cluster.local
+    - ledger-db-cluster-rw-lb
+    - ledger-db-cluster-rw-lb.databases.svc
+    - ledger-db-cluster-rw-lb.databases.svc.cluster.local
+  issuerRef:
+    name: homelab-ca-issuer
+    kind: ClusterIssuer
+    group: cert-manager.io

@@ -1,0 +1,26 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: payment-db-cluster-server-tls
+  namespace: databases
+spec:
+  secretName: payment-db-cluster-server-tls
+  usages:
+    - server auth
+  dnsNames:
+    - payment-db-cluster-rw
+    - payment-db-cluster-rw.databases.svc
+    - payment-db-cluster-rw.databases.svc.cluster.local
+    - payment-db-cluster-ro
+    - payment-db-cluster-ro.databases.svc
+    - payment-db-cluster-ro.databases.svc.cluster.local
+    - payment-db-cluster-r
+    - payment-db-cluster-r.databases.svc
+    - payment-db-cluster-r.databases.svc.cluster.local
+    - payment-db-cluster-rw-lb
+    - payment-db-cluster-rw-lb.databases.svc
+    - payment-db-cluster-rw-lb.databases.svc.cluster.local
+  issuerRef:
+    name: homelab-ca-issuer
+    kind: ClusterIssuer
+    group: cert-manager.io

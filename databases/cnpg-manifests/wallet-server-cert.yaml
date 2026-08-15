@@ -1,0 +1,26 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wallet-db-cluster-server-tls
+  namespace: databases
+spec:
+  secretName: wallet-db-cluster-server-tls
+  usages:
+    - server auth
+  dnsNames:
+    - wallet-db-cluster-rw
+    - wallet-db-cluster-rw.databases.svc
+    - wallet-db-cluster-rw.databases.svc.cluster.local
+    - wallet-db-cluster-ro
+    - wallet-db-cluster-ro.databases.svc
+    - wallet-db-cluster-ro.databases.svc.cluster.local
+    - wallet-db-cluster-r
+    - wallet-db-cluster-r.databases.svc
+    - wallet-db-cluster-r.databases.svc.cluster.local
+    - wallet-db-cluster-rw-lb
+    - wallet-db-cluster-rw-lb.databases.svc
+    - wallet-db-cluster-rw-lb.databases.svc.cluster.local
+  issuerRef:
+    name: homelab-ca-issuer
+    kind: ClusterIssuer
+    group: cert-manager.io

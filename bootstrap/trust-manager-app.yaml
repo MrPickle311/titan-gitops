@@ -11,6 +11,12 @@ spec:
     repoURL: oci://quay.io/jetstack/charts/trust-manager
     targetRevision: 0.22.1
     chart: trust-manager
+    helm:
+      values: |
+        secretTargets:
+          enabled: true
+          authorizedSecrets:
+            - homelab-ca-bundle
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: cert-manager

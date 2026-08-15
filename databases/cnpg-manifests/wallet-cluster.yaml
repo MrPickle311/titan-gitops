@@ -5,6 +5,9 @@ metadata:
   namespace: databases
 spec:
   instances: 2
+  certificates:
+    serverCASecret: homelab-ca-bundle
+    serverTLSSecret: wallet-db-cluster-server-tls
   monitoring:
     enablePodMonitor: true
   managed:

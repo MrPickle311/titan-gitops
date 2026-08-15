@@ -1,0 +1,26 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: export-db-cluster-server-tls
+  namespace: databases
+spec:
+  secretName: export-db-cluster-server-tls
+  usages:
+    - server auth
+  dnsNames:
+    - export-db-cluster-rw
+    - export-db-cluster-rw.databases.svc
+    - export-db-cluster-rw.databases.svc.cluster.local
+    - export-db-cluster-ro
+    - export-db-cluster-ro.databases.svc
+    - export-db-cluster-ro.databases.svc.cluster.local
+    - export-db-cluster-r
+    - export-db-cluster-r.databases.svc
+    - export-db-cluster-r.databases.svc.cluster.local
+    - export-db-cluster-rw-lb
+    - export-db-cluster-rw-lb.databases.svc
+    - export-db-cluster-rw-lb.databases.svc.cluster.local
+  issuerRef:
+    name: homelab-ca-issuer
+    kind: ClusterIssuer
+    group: cert-manager.io
