@@ -5,6 +5,15 @@ metadata:
   namespace: messaging
 spec:
   secretName: kafka-broker-tls
+  # PKCS8 required: cert-manager defaults RSA keys to PKCS1 ("BEGIN RSA
+  # PRIVATE KEY"), which Java's PEM/PKCS8 loader can't parse - crashed
+  # every broker with "algid parse error, not a sequence" until this was
+  # set. Any other JVM-based consumer of a cert-manager Certificate needs
+  # this too (CNPG/Postgres tolerates either encoding, so it's not a hard
+  # requirement there, but set for consistency across the CNPG certs too).
+  # Note: changing this on an ALREADY-ISSUED Certificate does not trigger
+  # reissuance by itself - cert-manager only applies encoding at issuance
+  # time. Force it by deleting the target Secret if you hit this again.
   privateKey:
     encoding: PKCS8
   usages:
