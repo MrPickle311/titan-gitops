@@ -52,6 +52,9 @@ spec:
       volumes:
         - name: byteman-volume
           emptyDir: {}
+        - name: homelab-ca
+          secret:
+            secretName: homelab-ca-bundle
       {{- if $app.telemetry }}
         - name: otel-agent
           emptyDir: {}
@@ -88,6 +91,9 @@ spec:
         volumeMounts:
           - name: byteman-volume
             mountPath: /opt/byteman
+          - name: homelab-ca
+            mountPath: /etc/ssl/homelab-ca
+            readOnly: true
         {{- if $app.telemetry }}
           - name: otel-agent
             mountPath: /agent

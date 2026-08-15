@@ -445,7 +445,7 @@ apps:
             memory: 1024Mi
         env:
         - name: SPRING_DATASOURCE_URL
-          value: jdbc:postgresql://payment-db-cluster-rw.databases:5432/titan_db
+          value: jdbc:postgresql://payment-db-cluster-rw.databases:5432/titan_db?sslmode=verify-full&sslrootcert=/etc/ssl/homelab-ca/ca.crt
         - name: SPRING_DATASOURCE_USERNAME
           valueFrom:
             secretKeyRef:
@@ -457,9 +457,15 @@ apps:
               name: payment-db-cluster-app
               key: password
         - name: KAFKA_BOOTSTRAP_SERVERS
-          value: kafka-kafka-bootstrap.messaging.svc.cluster.local:9092
+          value: kafka-kafka-bootstrap.messaging.svc.cluster.local:9093
         - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
-          value: kafka-kafka-bootstrap.messaging.svc.cluster.local:9092
+          value: kafka-kafka-bootstrap.messaging.svc.cluster.local:9093
+        - name: SPRING_KAFKA_SECURITY_PROTOCOL
+          value: SSL
+        - name: SPRING_KAFKA_SSL_TRUST_STORE_TYPE
+          value: PEM
+        - name: SPRING_KAFKA_SSL_TRUST_STORE_LOCATION
+          value: /etc/ssl/homelab-ca/ca.crt
     service:
       ports:
       - name: http
