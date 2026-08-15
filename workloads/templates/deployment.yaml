@@ -88,6 +88,16 @@ spec:
 {{ toYaml (default $.Values.global.resources $dep.resources) | indent 10 }}
         ports:
         - containerPort: {{ $dep.port }}
+        startupProbe:
+          tcpSocket:
+            port: {{ $dep.port }}
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          failureThreshold: 30
+        readinessProbe:
+          tcpSocket:
+            port: {{ $dep.port }}
+          periodSeconds: 10
         volumeMounts:
           - name: byteman-volume
             mountPath: /opt/byteman
