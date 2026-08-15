@@ -19,6 +19,9 @@ spec:
     - keycloak-db-cluster-r
     - keycloak-db-cluster-r.databases.svc
     - keycloak-db-cluster-r.databases.svc.cluster.local
+    - keycloak-db-cluster-rw.databases
+    - keycloak-db-cluster-ro.databases
+    - keycloak-db-cluster-r.databases
   issuerRef:
     name: homelab-ca-issuer
     kind: ClusterIssuer

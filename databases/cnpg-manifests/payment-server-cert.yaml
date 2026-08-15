@@ -19,6 +19,9 @@ spec:
     - payment-db-cluster-r
     - payment-db-cluster-r.databases.svc
     - payment-db-cluster-r.databases.svc.cluster.local
+    - payment-db-cluster-rw.databases
+    - payment-db-cluster-ro.databases
+    - payment-db-cluster-r.databases
     - payment-db-cluster-rw-lb
     - payment-db-cluster-rw-lb.databases.svc
     - payment-db-cluster-rw-lb.databases.svc.cluster.local

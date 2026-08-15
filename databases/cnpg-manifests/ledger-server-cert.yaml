@@ -19,6 +19,9 @@ spec:
     - ledger-db-cluster-r
     - ledger-db-cluster-r.databases.svc
     - ledger-db-cluster-r.databases.svc.cluster.local
+    - ledger-db-cluster-rw.databases
+    - ledger-db-cluster-ro.databases
+    - ledger-db-cluster-r.databases
     - ledger-db-cluster-rw-lb
     - ledger-db-cluster-rw-lb.databases.svc
     - ledger-db-cluster-rw-lb.databases.svc.cluster.local

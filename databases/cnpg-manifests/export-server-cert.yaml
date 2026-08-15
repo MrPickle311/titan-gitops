@@ -19,6 +19,9 @@ spec:
     - export-db-cluster-r
     - export-db-cluster-r.databases.svc
     - export-db-cluster-r.databases.svc.cluster.local
+    - export-db-cluster-rw.databases
+    - export-db-cluster-ro.databases
+    - export-db-cluster-r.databases
     - export-db-cluster-rw-lb
     - export-db-cluster-rw-lb.databases.svc
     - export-db-cluster-rw-lb.databases.svc.cluster.local

@@ -19,6 +19,9 @@ spec:
     - wallet-db-cluster-r
     - wallet-db-cluster-r.databases.svc
     - wallet-db-cluster-r.databases.svc.cluster.local
+    - wallet-db-cluster-rw.databases
+    - wallet-db-cluster-ro.databases
+    - wallet-db-cluster-r.databases
     - wallet-db-cluster-rw-lb
     - wallet-db-cluster-rw-lb.databases.svc
     - wallet-db-cluster-rw-lb.databases.svc.cluster.local

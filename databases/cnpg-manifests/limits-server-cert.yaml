@@ -19,6 +19,9 @@ spec:
     - limits-db-cluster-r
     - limits-db-cluster-r.databases.svc
     - limits-db-cluster-r.databases.svc.cluster.local
+    - limits-db-cluster-rw.databases
+    - limits-db-cluster-ro.databases
+    - limits-db-cluster-r.databases
     - limits-db-cluster-rw-lb
     - limits-db-cluster-rw-lb.databases.svc
     - limits-db-cluster-rw-lb.databases.svc.cluster.local
