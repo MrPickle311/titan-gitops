@@ -149,7 +149,7 @@ apps:
           component: manager
         replicas: 1
         image: registry.homelab/export-batch-service:latest
-        port: 8083
+        port: 8085
         podLabels:
           sidecar.istio.io/inject: "true"
         resources:
@@ -221,7 +221,7 @@ apps:
           component: retry-manager
         replicas: 1
         image: registry.homelab/export-batch-service:latest
-        port: 8083
+        port: 8076
         podLabels:
           sidecar.istio.io/inject: "true"
         resources:
@@ -325,7 +325,7 @@ apps:
     deployments:
       wallet-service:
         image: registry.homelab/wallet-service:latest
-        port: 8081
+        port: 9090
         podLabels:
           sidecar.istio.io/inject: "true"
         resources:
