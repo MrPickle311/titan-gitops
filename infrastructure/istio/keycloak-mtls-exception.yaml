@@ -1,0 +1,16 @@
+apiVersion: security.istio.io/v1
+kind: PeerAuthentication
+metadata:
+  name: keycloak-jwks-port-exception
+  namespace: security
+spec:
+  selector:
+    matchLabels:
+      app: keycloak
+      app.kubernetes.io/instance: titan-keycloak
+      app.kubernetes.io/managed-by: keycloak-operator
+  mtls:
+    mode: STRICT
+  portLevelMtls:
+    "8080":
+      mode: PERMISSIVE
