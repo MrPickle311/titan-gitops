@@ -439,10 +439,10 @@ apps:
         resources:
           requests:
             cpu: 200m
-            memory: 384Mi
+            memory: 640Mi
           limits:
             cpu: 1000m
-            memory: 1024Mi
+            memory: 1280Mi
         env:
         - name: SPRING_DATASOURCE_URL
           value: jdbc:postgresql://payment-db-cluster-rw.databases:5432/titan_db?sslmode=verify-full&sslrootcert=/etc/ssl/homelab-ca/ca.crt
