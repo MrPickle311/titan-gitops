@@ -6,4 +6,5 @@ resources:
   - cluster-config.yaml
   - argo-workflows-rbac.yaml
   - workflow-rbac.yaml
+  - network-policies/registry-ui-ingress.yaml
 
