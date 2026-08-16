@@ -8,6 +8,10 @@ spec:
   certificates:
     serverCASecret: homelab-ca-bundle
     serverTLSSecret: ledger-db-cluster-server-tls
+  postgresql:
+    pg_hba:
+      - hostssl all all all scram-sha-256
+      - host all all all reject
   monitoring:
     enablePodMonitor: true
   managed:
