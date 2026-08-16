@@ -30,6 +30,14 @@ spec:
         existingSecret: "redis-cluster-credentials"
         existingSecretPasswordKey: "redis-password"
 
+        tls:
+          enabled: true
+          authClients: true
+          existingSecret: "redis-cluster-tls"
+          certFilename: "tls.crt"
+          certKeyFilename: "tls.key"
+          certCAFilename: "ca.crt"
+
         persistence:
           enabled: true
           storageClass: "openebs-hostpath"

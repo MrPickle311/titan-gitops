@@ -85,6 +85,12 @@ apps:
               optional: false
         - name: SPRING_DATA_REDIS_USERNAME
           value: default
+        - name: SPRING_DATA_REDIS_SSL_ENABLED
+          value: 'true'
+        - name: SPRING_DATA_REDIS_SSL_BUNDLE
+          value: redis
+        - name: SPRING_SSL_BUNDLE_PEM_REDIS_TRUSTSTORE_CERTIFICATE
+          value: file:/etc/ssl/homelab-ca/ca.crt
     service:
       ports:
       - name: grpc
@@ -715,6 +721,12 @@ apps:
               optional: true
         - name: SPRING_DATA_REDIS_USERNAME
           value: default
+        - name: SPRING_DATA_REDIS_SSL_ENABLED
+          value: 'true'
+        - name: SPRING_DATA_REDIS_SSL_BUNDLE
+          value: redis
+        - name: SPRING_SSL_BUNDLE_PEM_REDIS_TRUSTSTORE_CERTIFICATE
+          value: file:/etc/ssl/homelab-ca/ca.crt
         - name: WALLET_SERVICE_URL
           value: http://wallet-service:8081
         - name: KAFKA_BOOTSTRAP_SERVERS
