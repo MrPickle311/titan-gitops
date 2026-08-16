@@ -181,7 +181,7 @@ apps:
         - name: SPRING_KAFKA_SSL_TRUST_STORE_TYPE
           value: PEM
         - name: SPRING_KAFKA_SSL_TRUST_STORE_LOCATION
-          value: /etc/ssl/homelab-ca/ca.crt
+          value: file:/etc/ssl/homelab-ca/ca.crt
         - name: EXPORT_REGULATORY_URL
           value: http://mock-regulatory-service:8084/api/v1/regulatory/report
         - name: EXPORT_MAX_RETRY_COUNT
@@ -223,7 +223,7 @@ apps:
         - name: SPRING_KAFKA_SSL_TRUST_STORE_TYPE
           value: PEM
         - name: SPRING_KAFKA_SSL_TRUST_STORE_LOCATION
-          value: /etc/ssl/homelab-ca/ca.crt
+          value: file:/etc/ssl/homelab-ca/ca.crt
         - name: EXPORT_REGULATORY_URL
           value: http://mock-regulatory-service:8084/api/v1/regulatory/report
         - name: EXPORT_MAX_RETRY_COUNT
@@ -265,7 +265,7 @@ apps:
         - name: SPRING_KAFKA_SSL_TRUST_STORE_TYPE
           value: PEM
         - name: SPRING_KAFKA_SSL_TRUST_STORE_LOCATION
-          value: /etc/ssl/homelab-ca/ca.crt
+          value: file:/etc/ssl/homelab-ca/ca.crt
         - name: EXPORT_REGULATORY_URL
           value: http://mock-regulatory-service:8084/api/v1/regulatory/report
         - name: EXPORT_MAX_RETRY_COUNT
@@ -436,7 +436,7 @@ apps:
         - name: SPRING_KAFKA_SSL_TRUST_STORE_TYPE
           value: PEM
         - name: SPRING_KAFKA_SSL_TRUST_STORE_LOCATION
-          value: /etc/ssl/homelab-ca/ca.crt
+          value: file:/etc/ssl/homelab-ca/ca.crt
     service:
       ports:
       - name: http
@@ -679,7 +679,7 @@ apps:
         - name: SPRING_KAFKA_SSL_TRUST_STORE_TYPE
           value: PEM
         - name: SPRING_KAFKA_SSL_TRUST_STORE_LOCATION
-          value: /etc/ssl/homelab-ca/ca.crt
+          value: file:/etc/ssl/homelab-ca/ca.crt
         - name: GRPC_AUTHORIZATION_SERVICE_ADDRESS
           value: static://authorization-service:9091
         - name: GRPC_AUTHORIZATION_SERVICE_NEGOTIATION_TYPE
@@ -758,7 +758,7 @@ apps:
         - name: SPRING_KAFKA_SSL_TRUST_STORE_TYPE
           value: PEM
         - name: SPRING_KAFKA_SSL_TRUST_STORE_LOCATION
-          value: /etc/ssl/homelab-ca/ca.crt
+          value: file:/etc/ssl/homelab-ca/ca.crt
     service:
       ports:
       - name: http
