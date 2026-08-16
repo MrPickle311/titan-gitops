@@ -97,6 +97,12 @@ spec:
       transaction.state.log.min.isr: 2
       default.replication.factor: 3
       min.insync.replicas: 2
+    # Temporary - diagnosing "Runtime failure during token validation" on
+    # the new oauth listener. Revert once resolved.
+    logging:
+      type: inline
+      loggers:
+        log4j.logger.io.strimzi.kafka.oauth: DEBUG
   entityOperator:
     topicOperator: {}
     userOperator: {}
