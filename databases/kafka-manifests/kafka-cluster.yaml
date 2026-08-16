@@ -97,18 +97,6 @@ spec:
       transaction.state.log.min.isr: 2
       default.replication.factor: 3
       min.insync.replicas: 2
-    # Temporary - diagnosing "Runtime failure during token validation" on
-    # the new oauth listener. Revert once resolved. This broker image uses
-    # Log4j2, not Log4j1 - the logger key format is logger.<id>.name/.level,
-    # not log4j.logger.<fqcn>=<level>.
-    logging:
-      type: inline
-      loggers:
-        logger.strimziOauth.name: io.strimzi.kafka.oauth
-        logger.strimziOauth.level: DEBUG
-        logger.strimziOauth.appenderRefs: console
-        logger.strimziOauth.appenderRef.console.ref: STDOUT
-        logger.strimziOauth.additivity: "false"
   entityOperator:
     topicOperator: {}
     userOperator: {}

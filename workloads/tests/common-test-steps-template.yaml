@@ -163,7 +163,7 @@ spec:
       - name: payment-id
       - name: expected-state
     container:
-      image: edenhill/kcat:1.7.1
+      image: quay.io/strimzi/kafka:0.51.0-kafka-4.2.0
       command:
       - /bin/sh
       - -c
@@ -174,7 +174,16 @@ spec:
         echo "Consuming Kafka topic payment-webhooks to find message for payment $PID..."
         sleep 3
 
-        MSG=$(kcat -C -b kafka-kafka-bootstrap.messaging.svc.cluster.local:9093 -X security.protocol=SSL -X ssl.ca.location=/etc/ssl/homelab-ca/ca.crt -t payment-webhooks -o -100 -e -q -X auto.offset.reset=earliest | grep "\"paymentId\":$PID" || true)
+        cat > /tmp/consumer.properties <<PROPS
+        security.protocol=SASL_SSL
+        sasl.mechanism=OAUTHBEARER
+        sasl.login.callback.handler.class=io.strimzi.kafka.oauth.client.JaasClientOauthLoginCallbackHandler
+        sasl.jaas.config=org.apache.kafka.common.security.oauthbearer.OAuthBearerLoginModule required oauth.client.id="kafka-internal-clients" oauth.client.secret="$KAFKA_OAUTH_CLIENT_SECRET" oauth.token.endpoint.uri="http://titan-keycloak-service.security.svc.cluster.local:8080/realms/titan/protocol/openid-connect/token";
+        ssl.truststore.type=PEM
+        ssl.truststore.location=/etc/ssl/homelab-ca/ca.crt
+        PROPS
+
+        MSG=$(bin/kafka-console-consumer.sh --bootstrap-server kafka-kafka-bootstrap.messaging.svc.cluster.local:9095 --topic payment-webhooks --consumer.config /tmp/consumer.properties --from-beginning --timeout-ms 15000 2>/dev/null | grep "\"paymentId\":$PID" || true)
 
         if [ -z "$MSG" ]; then
            echo "Error: Could not find Kafka message for payment $PID in payment-webhooks topic!"
@@ -187,6 +196,12 @@ spec:
            exit 1
         fi
         echo "Kafka message successfully validated!"
+      env:
+      - name: KAFKA_OAUTH_CLIENT_SECRET
+        valueFrom:
+          secretKeyRef:
+            name: keycloak-kafka-internal-clients
+            key: client-secret
       volumeMounts:
       - name: homelab-ca
         mountPath: /etc/ssl/homelab-ca
@@ -564,7 +579,7 @@ spec:
       parameters:
       - name: payment-id
     container:
-      image: edenhill/kcat:1.7.1
+      image: quay.io/strimzi/kafka:0.51.0-kafka-4.2.0
       command:
       - /bin/sh
       - -c
@@ -573,14 +588,30 @@ spec:
         PID={{inputs.parameters.payment-id}}
         echo "Consuming Kafka topic payment-compensations to find messages for payment $PID..."
         sleep 5
+
+        cat > /tmp/consumer.properties <<PROPS
+        security.protocol=SASL_SSL
+        sasl.mechanism=OAUTHBEARER
+        sasl.login.callback.handler.class=io.strimzi.kafka.oauth.client.JaasClientOauthLoginCallbackHandler
+        sasl.jaas.config=org.apache.kafka.common.security.oauthbearer.OAuthBearerLoginModule required oauth.client.id="kafka-internal-clients" oauth.client.secret="$KAFKA_OAUTH_CLIENT_SECRET" oauth.token.endpoint.uri="http://titan-keycloak-service.security.svc.cluster.local:8080/realms/titan/protocol/openid-connect/token";
+        ssl.truststore.type=PEM
+        ssl.truststore.location=/etc/ssl/homelab-ca/ca.crt
+        PROPS
+
         # The eventType or payload should contain the payment ID
-        MSG=$(kcat -C -b kafka-kafka-bootstrap.messaging.svc.cluster.local:9093 -X security.protocol=SSL -X ssl.ca.location=/etc/ssl/homelab-ca/ca.crt -t payment-compensations -o -100 -e -q -X auto.offset.reset=earliest | grep "\"paymentId\":$PID" || true)
+        MSG=$(bin/kafka-console-consumer.sh --bootstrap-server kafka-kafka-bootstrap.messaging.svc.cluster.local:9095 --topic payment-compensations --consumer.config /tmp/consumer.properties --from-beginning --timeout-ms 15000 2>/dev/null | grep "\"paymentId\":$PID" || true)
         if [ -z "$MSG" ]; then
            echo "Error: Could not find Kafka message for payment $PID in payment-compensations topic!"
            exit 1
         fi
         echo "Found Kafka message for compensation: $MSG"
         echo "Kafka compensation message successfully validated!"
+      env:
+      - name: KAFKA_OAUTH_CLIENT_SECRET
+        valueFrom:
+          secretKeyRef:
+            name: keycloak-kafka-internal-clients
+            key: client-secret
       volumeMounts:
       - name: homelab-ca
         mountPath: /etc/ssl/homelab-ca
