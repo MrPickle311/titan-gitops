@@ -20,7 +20,7 @@ spec:
   hostname:
     hostname: keycloak.homelab
   proxy:
-    headers: xforwarded
+    headers: forwarded
   ingress:
     enabled: false
   resources:
