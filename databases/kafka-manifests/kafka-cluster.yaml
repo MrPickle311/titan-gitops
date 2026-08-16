@@ -41,22 +41,8 @@ spec:
     authorization:
       type: simple
       superUsers:
-        - ANONYMOUS
         - kafka-internal-clients
     listeners:
-      - name: tls
-        port: 9093
-        type: internal
-        tls: true
-        configuration:
-          brokerCertChainAndKey:
-            secretName: kafka-broker-tls
-            certificate: tls.crt
-            key: tls.key
-      # OAuth-authenticated listener, staged alongside the still-anonymous
-      # `tls` listener above so nothing breaks while services migrate one
-      # at a time. Once every internal service is confirmed working here,
-      # the plain `tls` listener and ANONYMOUS superuser get removed.
       - name: oauth
         port: 9095
         type: internal
