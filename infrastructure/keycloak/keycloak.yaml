@@ -18,7 +18,7 @@ spec:
   http:
     httpEnabled: true
   hostname:
-    hostname: https://keycloak.homelab
+    hostname: keycloak.homelab
   proxy:
     headers: xforwarded
   ingress:
@@ -30,8 +30,3 @@ spec:
     limits:
       cpu: 1000m
       memory: 1536Mi
-  unsupported:
-    podTemplate:
-      metadata:
-        labels:
-          sidecar.istio.io/inject: "true"
