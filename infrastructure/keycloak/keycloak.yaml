@@ -34,4 +34,4 @@ spec:
   # message" / cookie_not_found issue. Revert once resolved.
   additionalOptions:
     - name: log-level
-      value: "INFO,org.keycloak.events:debug,org.keycloak.services:debug,org.keycloak.authentication:debug,org.keycloak.protocol.oidc:debug,org.keycloak.sessions:debug,org.keycloak.cookie:debug"
+      value: "INFO,org.keycloak.events:debug,org.keycloak.services:debug,org.keycloak.authentication:debug,org.keycloak.protocol.oidc:debug,org.keycloak.sessions:debug,org.keycloak.cookie:debug,org.keycloak.models:debug"
