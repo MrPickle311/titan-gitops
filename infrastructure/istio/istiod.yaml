@@ -16,6 +16,7 @@ spec:
         global:
           nativeNftables: true
         pilot:
+          autoscaleMin: 3
           cni:
             enabled: true
           env:
