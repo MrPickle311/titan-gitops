@@ -51,32 +51,6 @@ spec:
             limits:
               cpu: 500m
               memory: 512Mi
-          extraEnvVars:
-            - name: REDIS_ACL_FX_SERVICE_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: redis-acl-users
-                  key: fx-service
-            - name: REDIS_ACL_PAYMENT_SERVICE_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: redis-acl-users
-                  key: payment-service
-          lifecycleHooks:
-            postStart:
-              exec:
-                command:
-                  - /bin/bash
-                  - -c
-                  - |
-                    for i in $(seq 1 30); do
-                      redis-cli --tls --cacert /opt/bitnami/redis/certs/ca.crt -h localhost -p $REDIS_TLS_PORT_NUMBER -a "$(cat $REDIS_PASSWORD_FILE)" --no-auth-warning PING && break
-                      sleep 2
-                    done
-                    redis-cli --tls --cacert /opt/bitnami/redis/certs/ca.crt -h localhost -p $REDIS_TLS_PORT_NUMBER -a "$(cat $REDIS_PASSWORD_FILE)" --no-auth-warning \
-                      ACL SETUSER fx-service on ">$REDIS_ACL_FX_SERVICE_PASSWORD" resetchannels "~fx-conversion-rates" +@all -@admin -@dangerous
-                    redis-cli --tls --cacert /opt/bitnami/redis/certs/ca.crt -h localhost -p $REDIS_TLS_PORT_NUMBER -a "$(cat $REDIS_PASSWORD_FILE)" --no-auth-warning \
-                      ACL SETUSER payment-service on ">$REDIS_ACL_PAYMENT_SERVICE_PASSWORD" resetchannels "~fx-conversion-rates" "~sanctioned-user-ids::all" +@all -@admin -@dangerous
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: databases
