@@ -38,6 +38,7 @@ spec:
             - --allowed-group=admin
             - --skip-provider-button=true
             - --silence-ping-logging=true
+            - --cookie-expire=24h
           ports:
             - containerPort: 4180
           env:
