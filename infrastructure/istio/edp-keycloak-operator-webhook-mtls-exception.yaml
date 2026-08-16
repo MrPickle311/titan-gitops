@@ -1,0 +1,21 @@
+# The Kubernetes API server calls admission webhooks directly and is never
+# part of the Istio mesh, so it can't present an mTLS client cert. Under
+# STRICT mTLS the sidecar intercepts the connection and presents its own
+# SPIFFE cert instead of the operator's real webhook cert, so the API
+# server's cert validation fails and every KeycloakClient/KeycloakRealm
+# apply gets rejected. Same bug class as keycloak-mtls-exception.yaml -
+# loosen only the webhook's own port (9443), not the whole pod.
+apiVersion: security.istio.io/v1
+kind: PeerAuthentication
+metadata:
+  name: edp-keycloak-operator-webhook-port-exception
+  namespace: security
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: edp-keycloak-operator
+  mtls:
+    mode: STRICT
+  portLevelMtls:
+    "9443":
+      mode: PERMISSIVE
