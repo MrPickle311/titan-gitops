@@ -13,7 +13,6 @@ spec:
     metadata:
       labels:
         app: oauth2-proxy
-        sidecar.istio.io/inject: "true"
     spec:
       containers:
         - name: oauth2-proxy
