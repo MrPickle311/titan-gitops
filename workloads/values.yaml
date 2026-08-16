@@ -175,13 +175,22 @@ apps:
               name: export-db-cluster-app
               key: password
         - name: KAFKA_BOOTSTRAP_SERVERS
-          value: kafka-kafka-bootstrap.messaging.svc.cluster.local:9093
+          value: kafka-kafka-bootstrap.messaging.svc.cluster.local:9095
         - name: SPRING_KAFKA_SECURITY_PROTOCOL
-          value: SSL
+          value: SASL_SSL
         - name: SPRING_KAFKA_SSL_TRUST_STORE_TYPE
           value: PEM
         - name: SPRING_KAFKA_SSL_TRUST_STORE_LOCATION
           value: file:/etc/ssl/homelab-ca/ca.crt
+        - name: KAFKA_OAUTH_CLIENT_ID
+          value: kafka-internal-clients
+        - name: KAFKA_OAUTH_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: keycloak-kafka-internal-clients
+              key: client-secret
+        - name: KAFKA_OAUTH_TOKEN_ENDPOINT
+          value: http://titan-keycloak-service.security.svc.cluster.local:8080/realms/titan/protocol/openid-connect/token
         - name: EXPORT_REGULATORY_URL
           value: http://mock-regulatory-service:8084/api/v1/regulatory/report
         - name: EXPORT_MAX_RETRY_COUNT
@@ -217,13 +226,22 @@ apps:
               name: export-db-cluster-app
               key: password
         - name: KAFKA_BOOTSTRAP_SERVERS
-          value: kafka-kafka-bootstrap.messaging.svc.cluster.local:9093
+          value: kafka-kafka-bootstrap.messaging.svc.cluster.local:9095
         - name: SPRING_KAFKA_SECURITY_PROTOCOL
-          value: SSL
+          value: SASL_SSL
         - name: SPRING_KAFKA_SSL_TRUST_STORE_TYPE
           value: PEM
         - name: SPRING_KAFKA_SSL_TRUST_STORE_LOCATION
           value: file:/etc/ssl/homelab-ca/ca.crt
+        - name: KAFKA_OAUTH_CLIENT_ID
+          value: kafka-internal-clients
+        - name: KAFKA_OAUTH_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: keycloak-kafka-internal-clients
+              key: client-secret
+        - name: KAFKA_OAUTH_TOKEN_ENDPOINT
+          value: http://titan-keycloak-service.security.svc.cluster.local:8080/realms/titan/protocol/openid-connect/token
         - name: EXPORT_REGULATORY_URL
           value: http://mock-regulatory-service:8084/api/v1/regulatory/report
         - name: EXPORT_MAX_RETRY_COUNT
@@ -259,13 +277,22 @@ apps:
               name: export-db-cluster-app
               key: password
         - name: KAFKA_BOOTSTRAP_SERVERS
-          value: kafka-kafka-bootstrap.messaging.svc.cluster.local:9093
+          value: kafka-kafka-bootstrap.messaging.svc.cluster.local:9095
         - name: SPRING_KAFKA_SECURITY_PROTOCOL
-          value: SSL
+          value: SASL_SSL
         - name: SPRING_KAFKA_SSL_TRUST_STORE_TYPE
           value: PEM
         - name: SPRING_KAFKA_SSL_TRUST_STORE_LOCATION
           value: file:/etc/ssl/homelab-ca/ca.crt
+        - name: KAFKA_OAUTH_CLIENT_ID
+          value: kafka-internal-clients
+        - name: KAFKA_OAUTH_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: keycloak-kafka-internal-clients
+              key: client-secret
+        - name: KAFKA_OAUTH_TOKEN_ENDPOINT
+          value: http://titan-keycloak-service.security.svc.cluster.local:8080/realms/titan/protocol/openid-connect/token
         - name: EXPORT_REGULATORY_URL
           value: http://mock-regulatory-service:8084/api/v1/regulatory/report
         - name: EXPORT_MAX_RETRY_COUNT
@@ -430,13 +457,22 @@ apps:
               name: ledger-db-cluster-app
               key: password
         - name: KAFKA_BOOTSTRAP_SERVERS
-          value: kafka-kafka-bootstrap.messaging.svc.cluster.local:9093
+          value: kafka-kafka-bootstrap.messaging.svc.cluster.local:9095
         - name: SPRING_KAFKA_SECURITY_PROTOCOL
-          value: SSL
+          value: SASL_SSL
         - name: SPRING_KAFKA_SSL_TRUST_STORE_TYPE
           value: PEM
         - name: SPRING_KAFKA_SSL_TRUST_STORE_LOCATION
           value: file:/etc/ssl/homelab-ca/ca.crt
+        - name: KAFKA_OAUTH_CLIENT_ID
+          value: kafka-internal-clients
+        - name: KAFKA_OAUTH_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: keycloak-kafka-internal-clients
+              key: client-secret
+        - name: KAFKA_OAUTH_TOKEN_ENDPOINT
+          value: http://titan-keycloak-service.security.svc.cluster.local:8080/realms/titan/protocol/openid-connect/token
     service:
       ports:
       - name: http
@@ -682,13 +718,22 @@ apps:
         - name: WALLET_SERVICE_URL
           value: http://wallet-service:8081
         - name: KAFKA_BOOTSTRAP_SERVERS
-          value: kafka-kafka-bootstrap.messaging.svc.cluster.local:9093
+          value: kafka-kafka-bootstrap.messaging.svc.cluster.local:9095
         - name: SPRING_KAFKA_SECURITY_PROTOCOL
-          value: SSL
+          value: SASL_SSL
         - name: SPRING_KAFKA_SSL_TRUST_STORE_TYPE
           value: PEM
         - name: SPRING_KAFKA_SSL_TRUST_STORE_LOCATION
           value: file:/etc/ssl/homelab-ca/ca.crt
+        - name: KAFKA_OAUTH_CLIENT_ID
+          value: kafka-internal-clients
+        - name: KAFKA_OAUTH_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: keycloak-kafka-internal-clients
+              key: client-secret
+        - name: KAFKA_OAUTH_TOKEN_ENDPOINT
+          value: http://titan-keycloak-service.security.svc.cluster.local:8080/realms/titan/protocol/openid-connect/token
         - name: GRPC_AUTHORIZATION_SERVICE_ADDRESS
           value: static://authorization-service:9091
         - name: GRPC_AUTHORIZATION_SERVICE_NEGOTIATION_TYPE
@@ -761,13 +806,22 @@ apps:
               name: payment-db-cluster-app
               key: password
         - name: KAFKA_BOOTSTRAP_SERVERS
-          value: kafka-kafka-bootstrap.messaging.svc.cluster.local:9093
+          value: kafka-kafka-bootstrap.messaging.svc.cluster.local:9095
         - name: SPRING_KAFKA_SECURITY_PROTOCOL
-          value: SSL
+          value: SASL_SSL
         - name: SPRING_KAFKA_SSL_TRUST_STORE_TYPE
           value: PEM
         - name: SPRING_KAFKA_SSL_TRUST_STORE_LOCATION
           value: file:/etc/ssl/homelab-ca/ca.crt
+        - name: KAFKA_OAUTH_CLIENT_ID
+          value: kafka-internal-clients
+        - name: KAFKA_OAUTH_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: keycloak-kafka-internal-clients
+              key: client-secret
+        - name: KAFKA_OAUTH_TOKEN_ENDPOINT
+          value: http://titan-keycloak-service.security.svc.cluster.local:8080/realms/titan/protocol/openid-connect/token
     service:
       ports:
       - name: http
