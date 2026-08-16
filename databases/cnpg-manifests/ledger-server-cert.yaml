@@ -25,6 +25,8 @@ spec:
     - ledger-db-cluster-rw-lb
     - ledger-db-cluster-rw-lb.databases.svc
     - ledger-db-cluster-rw-lb.databases.svc.cluster.local
+  ipAddresses:
+    - 10.0.0.155
   issuerRef:
     name: homelab-ca-issuer
     kind: ClusterIssuer

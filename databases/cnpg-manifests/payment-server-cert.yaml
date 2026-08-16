@@ -25,6 +25,8 @@ spec:
     - payment-db-cluster-rw-lb
     - payment-db-cluster-rw-lb.databases.svc
     - payment-db-cluster-rw-lb.databases.svc.cluster.local
+  ipAddresses:
+    - 10.0.0.151
   issuerRef:
     name: homelab-ca-issuer
     kind: ClusterIssuer

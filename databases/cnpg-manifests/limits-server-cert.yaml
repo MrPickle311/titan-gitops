@@ -25,6 +25,8 @@ spec:
     - limits-db-cluster-rw-lb
     - limits-db-cluster-rw-lb.databases.svc
     - limits-db-cluster-rw-lb.databases.svc.cluster.local
+  ipAddresses:
+    - 10.0.0.153
   issuerRef:
     name: homelab-ca-issuer
     kind: ClusterIssuer

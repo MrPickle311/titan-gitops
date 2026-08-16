@@ -1,0 +1,24 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: kafka-external-tls
+  namespace: messaging
+spec:
+  secretName: kafka-external-tls
+  privateKey:
+    encoding: PKCS8
+  usages:
+    - server auth
+  dnsNames:
+    - kafka-kafka-external-bootstrap
+    - kafka-kafka-external-bootstrap.messaging.svc
+    - kafka-kafka-external-bootstrap.messaging.svc.cluster.local
+  ipAddresses:
+    - 10.0.0.160
+    - 10.0.0.203
+    - 10.0.0.204
+    - 10.0.0.205
+  issuerRef:
+    name: homelab-ca-issuer
+    kind: ClusterIssuer
+    group: cert-manager.io

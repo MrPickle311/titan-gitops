@@ -25,6 +25,8 @@ spec:
     - export-db-cluster-rw-lb
     - export-db-cluster-rw-lb.databases.svc
     - export-db-cluster-rw-lb.databases.svc.cluster.local
+  ipAddresses:
+    - 10.0.0.157
   issuerRef:
     name: homelab-ca-issuer
     kind: ClusterIssuer
