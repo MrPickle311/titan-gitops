@@ -636,10 +636,10 @@ apps:
         image: registry.homelab/payment-service:latest
         resources:
           requests:
-            cpu: 500m
+            cpu: 1000m
             memory: 768Mi
           limits:
-            cpu: 1000m
+            cpu: 1500m
             memory: 1500Mi
         port: 8080
         podLabels:
