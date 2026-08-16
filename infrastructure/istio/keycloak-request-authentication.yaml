@@ -11,13 +11,6 @@ spec:
     - issuer: "https://keycloak.homelab/realms/titan"
       jwksUri: "http://titan-keycloak-service.security.svc.cluster.local:8080/realms/titan/protocol/openid-connect/certs"
       forwardOriginalToken: true
-    # RequestAuthentication has no host-level scoping - it applies to every
-    # request through the gateway workload, including Keycloak's own admin
-    # console (issued by the master realm, not titan). Without this rule,
-    # any Bearer token the admin console sends gets rejected as an invalid
-    # issuer before it ever reaches Keycloak. The payment.homelab gate
-    # itself is unaffected - that's enforced separately by
-    # require-keycloak-jwt-payment's own claims[iss] check below.
     - issuer: "https://keycloak.homelab/realms/master"
       jwksUri: "http://titan-keycloak-service.security.svc.cluster.local:8080/realms/master/protocol/openid-connect/certs"
       forwardOriginalToken: true
