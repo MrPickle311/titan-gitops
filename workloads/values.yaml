@@ -80,11 +80,11 @@ apps:
         - name: REDIS_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: redis-cluster-credentials
-              key: redis-password
+              name: redis-acl-users
+              key: fx-service
               optional: false
         - name: SPRING_DATA_REDIS_USERNAME
-          value: default
+          value: fx-service
         - name: SPRING_DATA_REDIS_SSL_ENABLED
           value: 'true'
         - name: SPRING_DATA_REDIS_SSL_BUNDLE
@@ -716,11 +716,11 @@ apps:
         - name: REDIS_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: redis-cluster-credentials
-              key: redis-password
+              name: redis-acl-users
+              key: payment-service
               optional: true
         - name: SPRING_DATA_REDIS_USERNAME
-          value: default
+          value: payment-service
         - name: SPRING_DATA_REDIS_SSL_ENABLED
           value: 'true'
         - name: SPRING_DATA_REDIS_SSL_BUNDLE
