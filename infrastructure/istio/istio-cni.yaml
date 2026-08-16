@@ -15,8 +15,18 @@ spec:
       valuesObject:
         global:
           nativeNftables: true
-        repair:
-          deletePods: true
+        # Repair config MUST live under cni.repair, not top-level repair -
+        # the latter is silently ignored (unknown key) and the chart falls
+        # back to its default repairPods:true mode, which patches a broken
+        # pod's networking in place instead of deleting it. That's why pods
+        # stuck on istio-validation after a cluster reboot took minutes of
+        # crash-looping to self-heal instead of being rescheduled in seconds.
+        # deletePods:true + repairPods:false makes recovery fast; the chart
+        # only supports one of the three repair modes active at a time.
+        cni:
+          repair:
+            deletePods: true
+            repairPods: false
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: kube-system
