@@ -21,10 +21,7 @@ spec:
           nodes: 6
           replicas: 1
           externalAccess:
-            enabled: true
-            service:
-              type: LoadBalancer
-              loadBalancerIP: ["10.0.0.161", "10.0.0.162", "10.0.0.163", "10.0.0.164", "10.0.0.165", "10.0.0.166"]
+            enabled: false
 
         usePassword: true
         existingSecret: "redis-cluster-credentials"
