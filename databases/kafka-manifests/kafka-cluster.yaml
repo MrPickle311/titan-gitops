@@ -70,7 +70,7 @@ spec:
           type: oauth
           validIssuerUri: https://keycloak.homelab/realms/titan
           jwksEndpointUri: http://titan-keycloak-service.security.svc.cluster.local:8080/realms/titan/protocol/openid-connect/certs
-          userNameClaim: clientId
+          userNameClaim: client_id
       - name: external
         port: 9094
         type: loadbalancer
