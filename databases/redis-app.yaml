@@ -32,7 +32,7 @@ spec:
 
         tls:
           enabled: true
-          authClients: true
+          authClients: false
           existingSecret: "redis-cluster-tls"
           certFilename: "tls.crt"
           certKeyFilename: "tls.key"

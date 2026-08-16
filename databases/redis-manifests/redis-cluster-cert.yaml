@@ -9,7 +9,6 @@ spec:
     encoding: PKCS8
   usages:
     - server auth
-    - client auth
   dnsNames:
     - redis-redis-cluster
     - redis-redis-cluster.databases.svc
