@@ -183,7 +183,7 @@ spec:
         ssl.truststore.location=/etc/ssl/homelab-ca/ca.crt
         PROPS
 
-        MSG=$(bin/kafka-console-consumer.sh --bootstrap-server kafka-kafka-bootstrap.messaging.svc.cluster.local:9095 --topic payment-webhooks --consumer.config /tmp/consumer.properties --from-beginning --timeout-ms 15000 2>/dev/null | grep "\"paymentId\":$PID" || true)
+        MSG=$(bin/kafka-console-consumer.sh --bootstrap-server kafka-kafka-bootstrap.messaging.svc.cluster.local:9095 --topic payment-webhooks --group test-validation-consumer --consumer.config /tmp/consumer.properties --from-beginning --timeout-ms 15000 2>/dev/null | grep "\"paymentId\":$PID" || true)
 
         if [ -z "$MSG" ]; then
            echo "Error: Could not find Kafka message for payment $PID in payment-webhooks topic!"
@@ -599,7 +599,7 @@ spec:
         PROPS
 
         # The eventType or payload should contain the payment ID
-        MSG=$(bin/kafka-console-consumer.sh --bootstrap-server kafka-kafka-bootstrap.messaging.svc.cluster.local:9095 --topic payment-compensations --consumer.config /tmp/consumer.properties --from-beginning --timeout-ms 15000 2>/dev/null | grep "\"paymentId\":$PID" || true)
+        MSG=$(bin/kafka-console-consumer.sh --bootstrap-server kafka-kafka-bootstrap.messaging.svc.cluster.local:9095 --topic payment-compensations --group test-validation-consumer --consumer.config /tmp/consumer.properties --from-beginning --timeout-ms 15000 2>/dev/null | grep "\"paymentId\":$PID" || true)
         if [ -z "$MSG" ]; then
            echo "Error: Could not find Kafka message for payment $PID in payment-compensations topic!"
            exit 1

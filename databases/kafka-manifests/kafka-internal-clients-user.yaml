@@ -49,6 +49,13 @@ spec:
       - resource: {type: group, name: payment-service-compensation, patternType: literal}
         operations: [Read]
         type: allow
+      # Argo Workflow test steps (validate-kafka/validate-kafka-compensation
+      # in workloads/tests/common-test-steps-template.yaml) authenticate as
+      # this same client and consume payment-webhooks/payment-compensations
+      # with a fixed group name to validate real payment flows end-to-end.
+      - resource: {type: group, name: test-validation-consumer, patternType: literal}
+        operations: [Read]
+        type: allow
       - resource: {type: cluster}
         operations: [Describe]
         type: allow
