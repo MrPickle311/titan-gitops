@@ -1,0 +1,25 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaUser
+metadata:
+  name: kafka-external-clients
+  namespace: messaging
+  labels:
+    strimzi.io/cluster: kafka
+spec:
+  # No `authentication` block: OAuth-authenticated via the external/9094
+  # listener, not Strimzi-managed. Broad but bounded access for ad hoc
+  # external dev tooling (e.g. IntelliJ) - every consumer/producer topic
+  # via the payment- prefix, describe on the cluster, no cluster-admin
+  # or ability to touch non-application topics.
+  authorization:
+    type: simple
+    acls:
+      - resource: {type: topic, name: payment-, patternType: prefix}
+        operations: [Read, Write, Describe, Create]
+        type: allow
+      - resource: {type: group, name: "", patternType: prefix}
+        operations: [Read]
+        type: allow
+      - resource: {type: cluster}
+        operations: [Describe]
+        type: allow

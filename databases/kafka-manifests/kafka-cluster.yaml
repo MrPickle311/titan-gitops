@@ -40,8 +40,6 @@ spec:
     metadataVersion: 3.8-IV0
     authorization:
       type: simple
-      superUsers:
-        - kafka-internal-clients
     listeners:
       - name: oauth
         port: 9095
@@ -62,7 +60,10 @@ spec:
         type: loadbalancer
         tls: true
         authentication:
-          type: scram-sha-512
+          type: oauth
+          validIssuerUri: https://keycloak.homelab/realms/titan
+          jwksEndpointUri: http://titan-keycloak-service.security.svc.cluster.local:8080/realms/titan/protocol/openid-connect/certs
+          userNameClaim: client_id
         configuration:
           bootstrap:
             loadBalancerIP: 10.0.0.160

@@ -1,0 +1,54 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaUser
+metadata:
+  name: kafka-internal-clients
+  namespace: messaging
+  labels:
+    strimzi.io/cluster: kafka
+spec:
+  # No `authentication` block: this principal authenticates via the
+  # oauth/9095 listener (Keycloak), not Strimzi-managed SCRAM/TLS.
+  # Strimzi's UserOperator applies just the ACLs below to the OAuth
+  # principal name (from userNameClaim: client_id), matching how
+  # Strimzi documents ACL-only KafkaUser configs for OAuth users.
+  #
+  # Union of everything the 5 services sharing this client actually
+  # use (outbox-relay-service produces on payment-service's behalf via
+  # the transactional outbox; each consumer needs its own group plus
+  # its Spring-Kafka default dead-letter topic, <topic>.DLT).
+  authorization:
+    type: simple
+    acls:
+      - resource: {type: topic, name: payment-webhooks, patternType: literal}
+        operations: [Read, Write, Describe]
+        type: allow
+      - resource: {type: topic, name: payment-webhooks.DLT, patternType: literal}
+        operations: [Read, Write, Describe, Create]
+        type: allow
+      - resource: {type: topic, name: payment-ledger-events, patternType: literal}
+        operations: [Read, Write, Describe, Create]
+        type: allow
+      - resource: {type: topic, name: payment-ledger-events.DLT, patternType: literal}
+        operations: [Read, Write, Describe, Create]
+        type: allow
+      - resource: {type: topic, name: payment-compensations, patternType: literal}
+        operations: [Read, Write, Describe]
+        type: allow
+      - resource: {type: topic, name: payment-compensations.DLT, patternType: literal}
+        operations: [Read, Write, Describe, Create]
+        type: allow
+      - resource: {type: group, name: webhooks-group, patternType: literal}
+        operations: [Read]
+        type: allow
+      - resource: {type: group, name: ledger-service-group, patternType: literal}
+        operations: [Read]
+        type: allow
+      - resource: {type: group, name: export-staging-consumer, patternType: literal}
+        operations: [Read]
+        type: allow
+      - resource: {type: group, name: payment-service-compensation, patternType: literal}
+        operations: [Read]
+        type: allow
+      - resource: {type: cluster}
+        operations: [Describe]
+        type: allow
