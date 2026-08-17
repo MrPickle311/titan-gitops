@@ -9,4 +9,5 @@ resources:
   - network-policies/registry-ui-ingress.yaml
   - storage/lvm-storageclass.yaml
   - storage/lvm-alerts.yaml
+  - storage/lvm-servicemonitor.yaml
 

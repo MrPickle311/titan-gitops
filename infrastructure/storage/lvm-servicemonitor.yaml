@@ -1,0 +1,20 @@
+# lvm-localpv v1.9.1's own bundled ServiceMonitor template is broken (see
+# bootstrap/lvm-localpv-app.yaml) - this replaces it, targeting the metrics
+# Service (lvm-node-service.yaml in the chart) the same way openebs/monitoring's
+# own ServiceMonitor does: by the Service's `name: openebs-lvm-node` label.
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: lvm-localpv-node
+  namespace: openebs
+spec:
+  selector:
+    matchLabels:
+      name: openebs-lvm-node
+  namespaceSelector:
+    matchNames:
+      - openebs
+  endpoints:
+    - port: metrics
+      path: /metrics
+      interval: 30s

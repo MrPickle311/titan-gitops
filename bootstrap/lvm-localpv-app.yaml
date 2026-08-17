@@ -15,9 +15,13 @@ spec:
       values: |
         analytics:
           enabled: false
-        lvmNode:
-          serviceMonitor:
-            enabled: true
+        # lvmNode.serviceMonitor.enabled left false (chart default): v1.9.1's
+        # own templates/lvm-node-servicemonitor.yaml has `namespace: {{- .Release.Namespace }}`
+        # which chomps the space and renders `namespace:openebs` - invalid
+        # YAML, breaks ArgoCD manifest generation entirely (ComparisonError).
+        # lvmPlugin.metricsPort (9500, default-on regardless) still creates
+        # the metrics Service - infrastructure/storage/lvm-servicemonitor.yaml
+        # scrapes it with our own working ServiceMonitor instead.
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: openebs
