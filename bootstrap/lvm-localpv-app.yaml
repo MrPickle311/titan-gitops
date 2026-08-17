@@ -1,0 +1,29 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: lvm-localpv
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: 'https://openebs.github.io/lvm-localpv'
+    targetRevision: 1.9.1
+    chart: lvm-localpv
+    helm:
+      values: |
+        analytics:
+          enabled: false
+        lvmNode:
+          serviceMonitor:
+            enabled: true
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: openebs
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

@@ -7,4 +7,6 @@ resources:
   - argo-workflows-rbac.yaml
   - workflow-rbac.yaml
   - network-policies/registry-ui-ingress.yaml
+  - storage/lvm-storageclass.yaml
+  - storage/lvm-alerts.yaml
 

@@ -1,0 +1,50 @@
+# Vendored from openebs/monitoring's lvmlocalpv-rules.json
+# (https://github.com/openebs/monitoring/blob/develop/deploy/charts/rules/lvmLocalPV/lvmlocalpv-rules.json)
+# - picked up automatically, no ruleSelector override in
+# metrics/templates/prometheus-stack.yaml.
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: lvmlocalpv-rules
+  namespace: monitoring
+  labels:
+    role: alert-rules
+spec:
+  groups:
+    - name: lvm-pool
+      rules:
+        - alert: LVMVolumeGroupMissingPhysicalVolume
+          expr: lvm_vg_missing_pv_count > 0
+          for: 5m
+          labels:
+            severity: critical
+            product: openebs
+            engine: localpv-lvm
+          annotations:
+            summary: "LVM volume group '{{ $labels.name }}' is missing the underlying physical volume."
+            description: "LVM volume group '{{ $labels.name }}' on node '{{ $labels.instance }}' is missing {{ $value }} underlying physical volume(s)."
+            componentType: volume group
+            vgName: "{{ $labels.name }}"
+        - alert: LVMVolumeGroupCapacityLow
+          expr: ((lvm_vg_total_size_bytes - lvm_vg_free_size_bytes)/lvm_vg_total_size_bytes)*100 > 90
+          for: 5m
+          labels:
+            severity: critical
+            product: openebs
+            engine: localpv-lvm
+          annotations:
+            summary: "LVM volume group '{{ $labels.name }}' is running low on capacity. Already {{ $value }}% of total capacity is consumed."
+            description: "LVM volume group '{{ $labels.name }}' on node '{{ $labels.instance }}' has {{ with printf \"lvm_vg_free_size_bytes{instance='%s',name='%s'}\" $labels.instance $labels.name | query }} {{ . | first | value }} {{ end }}bytes of space remaining"
+            componentType: volume group
+            vgName: "{{ $labels.name }}"
+        - alert: LVMThinPoolCapacityLow
+          expr: lvm_lv_used_percent{segtype="thin-pool"} > 90
+          for: 5m
+          labels:
+            severity: critical
+            product: openebs
+            engine: localpv-lvm
+          annotations:
+            summary: "LVM thin pool '{{ $labels.name }}' is running low on capacity. Already {{ $value }}% of total capacity is consumed."
+            description: "LVM thin pool '{{ $labels.name }}' on node '{{ $labels.instance }}' has {{ with printf \"lvm_lv_total_size_bytes{instance='%s',name='%s',segtype='%s'}-((lvm_lv_used_percent{instance='%s',name='%s',segtype='%s'}*lvm_lv_total_size_bytes{instance='%s',name='%s',segtype='%s'})/100)\" $labels.instance $labels.name $labels.segtype $labels.instance $labels.name $labels.segtype $labels.instance $labels.name $labels.segtype | query }} {{ . | first | value }} {{ end }}bytes of space remaining"
+            lvName: "{{ $labels.name }}"

@@ -1,0 +1,138 @@
+{
+  "title": "Storage Overview (PVCs / PVs)",
+  "timezone": "browser",
+  "refresh": "30s",
+  "schemaVersion": 36,
+  "version": 1,
+  "panels": [
+    {
+      "type": "table",
+      "title": "PVCs: bound volume, storage class, capacity, used, free",
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "kubelet_volume_stats_capacity_bytes",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "capacity",
+          "refId": "A"
+        },
+        {
+          "expr": "kubelet_volume_stats_used_bytes",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "used",
+          "refId": "B"
+        },
+        {
+          "expr": "kubelet_volume_stats_available_bytes",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "available",
+          "refId": "C"
+        },
+        {
+          "expr": "kube_persistentvolumeclaim_info",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "info",
+          "refId": "D"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "__name__": true,
+              "job": true,
+              "endpoint": true,
+              "instance": true,
+              "service": true,
+              "container": true,
+              "pod": true,
+              "uid": true
+            },
+            "renameByName": {
+              "namespace": "Namespace",
+              "persistentvolumeclaim": "PVC",
+              "volumename": "PV",
+              "storageclass": "StorageClass",
+              "Value #A": "Capacity (bytes)",
+              "Value #B": "Used (bytes)",
+              "Value #C": "Available (bytes)"
+            }
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": { "unit": "bytes" },
+        "overrides": []
+      }
+    },
+    {
+      "type": "bargauge",
+      "title": "PVC usage (% used of capacity)",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 10 },
+      "targets": [
+        {
+          "expr": "100 * kubelet_volume_stats_used_bytes / kubelet_volume_stats_capacity_bytes",
+          "legendFormat": "{{namespace}}/{{persistentvolumeclaim}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 70 },
+              { "color": "red", "value": 90 }
+            ]
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "PV capacity by storage class (sum)",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 18 },
+      "targets": [
+        {
+          "expr": "sum by (storageclass) (kube_persistentvolume_capacity_bytes * on (persistentvolume) group_left(storageclass) kube_persistentvolume_info)",
+          "legendFormat": "{{storageclass}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes",
+          "custom": { "drawStyle": "line", "fillOpacity": 10 }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "type": "stat",
+      "title": "PVs by phase",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 18 },
+      "targets": [
+        {
+          "expr": "sum by (phase) (kube_persistentvolume_status_phase == 1)",
+          "legendFormat": "{{phase}}",
+          "refId": "A"
+        }
+      ]
+    }
+  ]
+}
