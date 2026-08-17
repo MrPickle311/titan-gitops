@@ -26,9 +26,10 @@ spec:
               type: LoadBalancer
               loadBalancerIP: ["10.0.0.161", "10.0.0.162", "10.0.0.163", "10.0.0.164", "10.0.0.165", "10.0.0.166"]
 
-        usePassword: true
-        existingSecret: "redis-cluster-credentials"
-        existingSecretPasswordKey: "redis-password"
+        # Auth is handled entirely by the ACL file below (default user's
+        # password lives inside it too) - usePassword/requirepass is
+        # mutually exclusive with aclfile at the Redis config level.
+        usePassword: false
 
         tls:
           enabled: true
@@ -51,6 +52,72 @@ spec:
             limits:
               cpu: 500m
               memory: 512Mi
+          configmap: |
+            aclfile /acl-shared/users.acl
+          extraEnvVars:
+            # Without usePassword, the chart won't set --protected-mode no
+            # for us; real auth comes from the ACL file's default user.
+            - name: ALLOW_EMPTY_PASSWORD
+              value: "yes"
+            # redis-cli reads this natively for auto-auth. The bootstrap
+            # script's own internal `redis-cli --cluster create`/ping
+            # calls never pass -a, so without this they'd get NOAUTH
+            # once the ACL file's default user requires a password.
+            - name: REDISCLI_AUTH
+              valueFrom:
+                secretKeyRef:
+                  name: redis-cluster-credentials
+                  key: redis-password
+            # Liveness/readiness probe scripts read this file themselves
+            # (export REDISCLI_AUTH=$(cat $REDIS_PASSWORD_FILE)) - normally
+            # wired up by usePassword, reintroduced manually here.
+            - name: REDIS_PASSWORD_FILE
+              value: /opt/bitnami/redis/mounted-secrets/redis-password
+          extraVolumes:
+            - name: redis-password-file
+              secret:
+                secretName: redis-cluster-credentials
+                items:
+                  - key: redis-password
+                    path: redis-password
+            - name: acl-shared
+              emptyDir: {}
+          extraVolumeMounts:
+            - name: redis-password-file
+              mountPath: /opt/bitnami/redis/mounted-secrets
+              readOnly: true
+            - name: acl-shared
+              mountPath: /acl-shared
+          initContainers:
+            - name: build-aclfile
+              image: bitnamilegacy/redis-cluster:8.2.1-debian-12-r0
+              command: ["/bin/sh", "-c"]
+              args:
+                - |
+                  cat > /acl-shared/users.acl <<EOF
+                  user default on >${ADMIN_PASSWORD} ~* &* +@all
+                  user fx-service on >${FX_PASSWORD} resetchannels ~fx-conversion-rates +@all -@admin -@dangerous
+                  user payment-service on >${PAYMENT_PASSWORD} resetchannels ~fx-conversion-rates ~sanctioned-user-ids::all +@all -@admin -@dangerous
+                  EOF
+              env:
+                - name: ADMIN_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: redis-cluster-credentials
+                      key: redis-password
+                - name: FX_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: redis-acl-users
+                      key: fx-service
+                - name: PAYMENT_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: redis-acl-users
+                      key: payment-service
+              volumeMounts:
+                - name: acl-shared
+                  mountPath: /acl-shared
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: databases
