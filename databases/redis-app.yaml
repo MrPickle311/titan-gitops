@@ -21,7 +21,10 @@ spec:
           nodes: 6
           replicas: 1
           externalAccess:
-            enabled: false
+            enabled: true
+            service:
+              type: LoadBalancer
+              loadBalancerIP: ["10.0.0.161", "10.0.0.162", "10.0.0.163", "10.0.0.164", "10.0.0.165", "10.0.0.166"]
 
         usePassword: true
         existingSecret: "redis-cluster-credentials"
@@ -48,15 +51,6 @@ spec:
             limits:
               cpu: 500m
               memory: 512Mi
-          extraEnvVars:
-            - name: MY_POD_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.name
-            - name: REDIS_CLUSTER_ANNOUNCE_HOSTNAME
-              value: "$(MY_POD_NAME).redis-redis-cluster-headless.databases.svc.cluster.local"
-            - name: REDIS_CLUSTER_PREFERRED_ENDPOINT_TYPE
-              value: "hostname"
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: databases
