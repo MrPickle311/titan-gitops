@@ -7,8 +7,14 @@ spec:
   secretName: redis-cluster-tls
   privateKey:
     encoding: PKCS8
+  # Cluster bus (port 16379) is always mutual TLS between nodes,
+  # independent of the client-facing authClients setting - each node
+  # presents this same cert acting as both server AND client to its
+  # peers, so it needs both EKUs or bus handshakes fail with
+  # "sslv3 alert unsupported certificate".
   usages:
     - server auth
+    - client auth
   dnsNames:
     - redis-redis-cluster
     - redis-redis-cluster.databases.svc
