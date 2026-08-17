@@ -17,7 +17,7 @@ spec:
       - resource: {type: topic, name: payment-, patternType: prefix}
         operations: [Read, Write, Describe, Create]
         type: allow
-      - resource: {type: group, name: "", patternType: prefix}
+      - resource: {type: group, name: "*", patternType: literal}
         operations: [Read]
         type: allow
       - resource: {type: cluster}
