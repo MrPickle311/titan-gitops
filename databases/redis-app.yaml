@@ -48,6 +48,15 @@ spec:
             limits:
               cpu: 500m
               memory: 512Mi
+          extraEnvVars:
+            - name: MY_POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: REDIS_CLUSTER_ANNOUNCE_HOSTNAME
+              value: "$(MY_POD_NAME).redis-redis-cluster-headless.databases.svc.cluster.local"
+            - name: REDIS_CLUSTER_PREFERRED_ENDPOINT_TYPE
+              value: "hostname"
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: databases
