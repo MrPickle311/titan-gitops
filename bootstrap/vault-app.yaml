@@ -37,12 +37,17 @@ spec:
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: security
+  # syncPolicy.automated fully removed (not just selfHeal:false) for the
+  # openebs-hostpath -> longhorn PVC migration (PMT-048). selfHeal:false alone
+  # wasn't enough - ArgoCD auto-syncs on ANY new commit regardless of
+  # selfHeal (that flag only covers drift-without-a-commit), so even pushing
+  # this exact change would've re-triggered a sync and put the StatefulSet's
+  # replica count back to 1 over `kubectl scale --replicas=0`. Manual sync
+  # only until the migration's done, then restore:
+  #   syncPolicy:
+  #     automated:
+  #       prune: true
+  #       selfHeal: true
   syncPolicy:
-    automated:
-      prune: true
-      # selfHeal temporarily off for the openebs-hostpath -> longhorn PVC
-      # migration (PMT-048) - otherwise it fights `kubectl scale --replicas=0`
-      # on the vault StatefulSet during the copy. Re-enable once done.
-      selfHeal: false
     syncOptions:
       - CreateNamespace=true
