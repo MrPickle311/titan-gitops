@@ -13,24 +13,27 @@ spec:
       jqPathExpressions:
         - '.webhooks[].clientConfig.caBundle'
   project: default
-  source:
-    repoURL: 'https://helm.releases.hashicorp.com'
-    targetRevision: 0.28.1
-    chart: vault
-    helm:
-      values: |
-        server:
-          dataStorage:
+  sources:
+    - repoURL: 'https://helm.releases.hashicorp.com'
+      targetRevision: 0.28.1
+      chart: vault
+      helm:
+        values: |
+          server:
+            dataStorage:
+              enabled: true
+              size: 2Gi
+              storageClass: openebs-hostpath
+            standalone:
+              enabled: true
+            ingress:
+              enabled: false
+          ui:
             enabled: true
-            size: 2Gi
-            storageClass: openebs-hostpath
-          standalone:
-            enabled: true
-          ingress:
-            enabled: false
-        ui:
-          enabled: true
-          serviceType: ClusterIP
+            serviceType: ClusterIP
+    - repoURL: 'https://github.com/MrPickle311/titan-gitops.git'
+      targetRevision: HEAD
+      path: infrastructure/vault
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: security
