@@ -11,7 +11,12 @@ metadata:
 spec:
   accessModes:
     - ReadWriteOnce
-  storageClassName: openebs-hostpath
+  storageClassName: longhorn
+  # Pinned to the exact PV from the openebs-hostpath -> longhorn migration
+  # (PMT-048, PV retain+rebind) - storageClassName/volumeName are both
+  # immutable post-bind, so this must match the live PVC exactly or every
+  # future sync errors trying to patch an immutable field.
+  volumeName: pvc-096f8368-82b9-47d5-aa3b-569a7bbce093
   resources:
     requests:
       storage: 50Gi

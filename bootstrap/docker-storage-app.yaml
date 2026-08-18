@@ -14,15 +14,9 @@ spec:
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: default
-  # automated fully removed (not just selfHeal:false) for the
-  # openebs-hostpath -> longhorn registry-pvc migration (PMT-048) - selfHeal
-  # alone still auto-heals drift-without-a-commit, reverting a manual
-  # `kubectl scale --replicas=0` on docker-registry. Manual sync only until
-  # done, then restore:
-  #   syncPolicy:
-  #     automated:
-  #       prune: true
-  #       selfHeal: true
   syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
     syncOptions:
       - CreateNamespace=true
