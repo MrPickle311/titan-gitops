@@ -31,6 +31,9 @@ spec:
           ui:
             enabled: true
             serviceType: ClusterIP
+    - repoURL: 'https://github.com/MrPickle311/titan-gitops.git'
+      targetRevision: HEAD
+      path: infrastructure/vault
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: security

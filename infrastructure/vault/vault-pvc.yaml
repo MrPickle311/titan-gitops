@@ -1,0 +1,19 @@
+# data-vault-0 declared standalone (not via the vault chart's
+# server.dataStorage.* values) - the StatefulSet's volumeClaimTemplates is
+# immutable post-creation, and wouldn't retroactively touch an
+# already-existing PVC anyway. Matches the PVC's exact live spec today so
+# this sync is a no-op adoption, not a recreate. Add
+# recurring-job.longhorn.io/* labels here later once a backup target +
+# RecurringJob exist (PMT-048 addendum) - that becomes a normal git diff.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: data-vault-0
+  namespace: security
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 2Gi
+  storageClassName: longhorn
+  volumeName: pvc-1456cb18-5166-41e1-80cf-3f3a09f1fd82
