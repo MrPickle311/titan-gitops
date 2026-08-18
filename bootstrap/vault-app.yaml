@@ -12,6 +12,17 @@ spec:
       name: vault-agent-injector-cfg
       jqPathExpressions:
         - '.webhooks[].clientConfig.caBundle'
+    # volumeClaimTemplates is immutable post-creation on an existing
+    # StatefulSet - changing the Helm value's storageClass alone would make
+    # every sync try (and fail) to patch it. The actual data-vault-0 PVC is
+    # already manually on longhorn (PMT-048, PV retain+rebind) - ignoring
+    # the diff here lets the Helm value keep declaring the real intent
+    # without ArgoCD ever attempting the forbidden patch.
+    - group: apps
+      kind: StatefulSet
+      name: vault
+      jqPathExpressions:
+        - '.spec.volumeClaimTemplates'
   project: default
   sources:
     - repoURL: 'https://helm.releases.hashicorp.com'
