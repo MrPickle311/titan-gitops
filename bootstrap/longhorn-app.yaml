@@ -1,0 +1,41 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: longhorn
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: 'https://charts.longhorn.io'
+    targetRevision: 1.12.1
+    chart: longhorn
+    helm:
+      values: |
+        persistence:
+          # No replication - node A's data doesn't need to be copied to node
+          # B for a pod on B to use it; Longhorn's iSCSI-attach already gives
+          # cross-node access without it. Backups (once wired up) are the
+          # durability story instead, not replica count.
+          defaultClass: true
+          defaultClassReplicaCount: 1
+          defaultFsType: xfs
+
+        defaultSettings:
+          defaultReplicaCount: 1
+          # backupTarget intentionally left unset - no MinIO/S3 target
+          # wired up yet. Revisit before relying on this for real data.
+
+        metrics:
+          serviceMonitor:
+            enabled: true
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: longhorn-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
