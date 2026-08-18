@@ -40,6 +40,9 @@ spec:
   syncPolicy:
     automated:
       prune: true
-      selfHeal: true
+      # selfHeal temporarily off for the openebs-hostpath -> longhorn PVC
+      # migration (PMT-048) - otherwise it fights `kubectl scale --replicas=0`
+      # on the vault StatefulSet during the copy. Re-enable once done.
+      selfHeal: false
     syncOptions:
       - CreateNamespace=true
