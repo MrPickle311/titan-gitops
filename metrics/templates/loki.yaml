@@ -74,14 +74,9 @@ spec:
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: monitoring
-  # automated fully removed (not just selfHeal:false) for the
-  # openebs-hostpath -> longhorn loki PVC migration (PMT-048) - selfHeal
-  # alone still auto-heals drift-without-a-commit, reverting a manual
-  # scale-down. Manual sync only until done, then restore:
-  #   syncPolicy:
-  #     automated:
-  #       prune: true
-  #       selfHeal: true
   syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
     syncOptions:
       - CreateNamespace=true
