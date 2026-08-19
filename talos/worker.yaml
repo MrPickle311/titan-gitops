@@ -88,7 +88,12 @@ machine:
     # Used to provide instructions for installations.
     install:
         disk: /dev/nvme0n1 # The disk used for installations.
-        image: ghcr.io/siderolabs/installer:v1.13.8 # Allows for supplying the image used to perform the installation.
+        # Image Factory installer with siderolabs/iscsi-tools + siderolabs/util-linux-tools
+        # baked in (schematic generated via `curl -X POST https://factory.talos.dev/schematics`
+        # with customization.systemExtensions.officialExtensions:
+        # [siderolabs/iscsi-tools, siderolabs/util-linux-tools]). Required for
+        # Longhorn - see talos/README.md "Longhorn" section.
+        image: factory.talos.dev/installer/613e1592b2da41ae5e265e8789429f22e121aab91cb4deb6bc3c0b6262961245:v1.13.8 # Allows for supplying the image used to perform the installation.
         wipe: false # Indicates if the installation disk should be wiped at installation time.
         grubUseUKICmdline: true # Indicates if legacy GRUB bootloader should use kernel cmdline from the UKI instead of building it on the host.
         
@@ -453,3 +458,19 @@ auto: stable # A method to automatically generate a hostname for the machine.
 # # A static hostname to set for the machine.
 # hostname: controlplane1
 # hostname: controlplane1.example.org
+---
+# The node's second disk, for Longhorn. `!system_disk` generically excludes
+# whichever disk Talos is installed on (/dev/nvme0n1 here) - safe to share
+# this file across nodes with different second-disk models/sizes. Assumes
+# exactly 2 disks per node (confirmed via NDM). Apply only after the disk has
+# been wiped (`talosctl wipe disk` or equivalent) - it must have no existing
+# partition table for provisioning to succeed.
+apiVersion: v1alpha1
+kind: UserVolumeConfig
+name: longhorn-data
+provisioning:
+  diskSelector:
+    match: '!system_disk'
+  minSize: 10GB
+filesystem:
+  type: xfs
