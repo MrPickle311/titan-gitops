@@ -128,9 +128,9 @@ data:
         - Prometheus:
             icon: prometheus
             href: https://prometheus.homelab
-        - Docker Registry:
-            icon: docker
-            href: https://registry.homelab
+        - Nexus Repository:
+            icon: sonatype-nexus
+            href: https://nexus.homelab
             podSelector: app=docker-registry
             namespace: container-registry
         - Kafka Control Center:

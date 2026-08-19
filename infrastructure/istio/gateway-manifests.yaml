@@ -27,7 +27,6 @@ spec:
     - "outbox-relay.homelab"
     - "payment.homelab"
     - "registry.homelab"
-    - "registry-ui.homelab"
     - "regulatory.homelab"
     - "sanctions.homelab"
     - "vault.homelab"

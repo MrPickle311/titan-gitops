@@ -33,9 +33,9 @@
         icon: prometheus
         href: https://prometheus.homelab
         description: Metrics collection
-    - Docker Registry:
+    - Nexus Repository:
         icon: docker
-        href: https://registry.homelab
+        href: https://nexus.homelab
         description: Local container registry
     - Kafka Control Center:
         icon: apachekafka
