@@ -1,37 +1,13 @@
-apiVersion: kafka.strimzi.io/v1beta2
-kind: KafkaNodePool
-metadata:
-  name: dual-role
-  namespace: messaging
-  labels:
-    strimzi.io/cluster: kafka
-spec:
-  replicas: 3
-  roles:
-    - controller
-    - broker
-  storage:
-    type: jbod
-    volumes:
-      - id: 0
-        type: persistent-claim
-        size: 10Gi
-        class: longhorn
-        deleteClaim: false
-  resources:
-    requests:
-      cpu: 250m
-      memory: 1024Mi
-    limits:
-      cpu: 1000m
-      memory: 2048Mi
----
-# New pool, replaces `dual-role` (PMT-048: openebs-hostpath -> longhorn).
-# Strimzi permanently rejects storage-class edits on an existing
-# KafkaNodePool, so migration = new pool + partition reassignment,
-# not an in-place field change. This IS the final node pool name -
-# no post-migration rename planned. Node IDs 3-5 (0-2 taken by dual-role,
-# freed once dual-role is deleted at the end of migration).
+# `dual-role` decommissioned (PMT-048: openebs-hostpath -> longhorn).
+# Replaced by `kafka-cluster` pool below via a proper Strimzi migration:
+# partition reassignment (all 58 partitions incl. __consumer_offsets moved
+# broker-side) + KRaft controller quorum voter removal (kraft.version
+# upgraded 0->1 to allow remove-controller; this cluster started static -
+# scaling an existing pool's controller replicas to 0 WITHOUT first
+# removing its voters from the quorum breaks controller majority, even
+# though it looks harmless - learned this the hard way mid-migration).
+# Old PVCs (data-0-kafka-dual-role-0/1/2, openebs-hostpath) deleted after
+# confirming quorum={kafka-cluster-3,4,5} and all KafkaTopics Ready.
 apiVersion: kafka.strimzi.io/v1beta2
 kind: KafkaNodePool
 metadata:
