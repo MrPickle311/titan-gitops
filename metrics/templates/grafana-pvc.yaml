@@ -1,0 +1,17 @@
+# Externalized from kube-prometheus-stack's grafana.persistence.* values
+# (see prometheus-stack.yaml) - storageClassName/volumeName are immutable
+# post-bind, so a chart-managed PVC fights any future storage-class change
+# the same way vault-app.yaml's did before this pattern (PMT-048). Update
+# this file when migrating to longhorn, not the Helm values.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: kube-prometheus-stack-grafana
+  namespace: monitoring
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: openebs-hostpath
+  volumeName: pvc-2c97a25c-4d08-44ee-9817-c443854900b5

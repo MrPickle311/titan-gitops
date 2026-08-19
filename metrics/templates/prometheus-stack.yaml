@@ -30,8 +30,12 @@ spec:
           
           persistence:
             enabled: true
-            storageClassName: "openebs-hostpath"
-            size: 5Gi
+            # Externalized - PVC declared standalone in grafana-pvc.yaml,
+            # not chart-managed, so its storageClassName/volumeName (both
+            # immutable post-bind) never fight a future Helm value change
+            # the way vault-app.yaml's did (PMT-048). existingClaim also
+            # suppresses the chart's own PVC template.
+            existingClaim: kube-prometheus-stack-grafana
 
           sidecar:
             dashboards:
@@ -166,10 +170,15 @@ spec:
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: monitoring
+  # automated fully removed (not just selfHeal:false) for the
+  # openebs-hostpath -> longhorn grafana/prometheus PVC migration (PMT-048) -
+  # selfHeal alone still auto-heals drift-without-a-commit, reverting a
+  # manual scale-down. Manual sync only until done, then restore:
+  #   syncPolicy:
+  #     automated:
+  #       prune: true
+  #       selfHeal: true
   syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
     syncOptions:
       - CreateNamespace=true
       - ServerSideApply=true
