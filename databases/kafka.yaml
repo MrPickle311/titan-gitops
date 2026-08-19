@@ -14,9 +14,17 @@ spec:
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: messaging
+  # automated fully removed (not just selfHeal:false) for the
+  # openebs-hostpath -> longhorn kafka PVC migration (PMT-048) - selfHeal
+  # alone still auto-heals drift-without-a-commit, reverting manual
+  # per-node PVC/pod replace. Real payment-event data (payment-webhooks,
+  # payment-ledger-events, payment-compensations) - one dual-role node at a
+  # time, verify all `kubectl get kafkatopic` READY:True before the next.
+  # Manual sync only until done, then restore:
+  #   syncPolicy:
+  #     automated:
+  #       prune: true
+  #       selfHeal: true
   syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
     syncOptions:
       - CreateNamespace=true
