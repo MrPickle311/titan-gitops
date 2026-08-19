@@ -26,6 +26,40 @@ spec:
       cpu: 1000m
       memory: 2048Mi
 ---
+# New pool, replaces `dual-role` (PMT-048: openebs-hostpath -> longhorn).
+# Strimzi permanently rejects storage-class edits on an existing
+# KafkaNodePool, so migration = new pool + partition reassignment,
+# not an in-place field change. This IS the final node pool name -
+# no post-migration rename planned. Node IDs 3-5 (0-2 taken by dual-role,
+# freed once dual-role is deleted at the end of migration).
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaNodePool
+metadata:
+  name: kafka-cluster
+  namespace: messaging
+  labels:
+    strimzi.io/cluster: kafka
+spec:
+  replicas: 3
+  roles:
+    - controller
+    - broker
+  storage:
+    type: jbod
+    volumes:
+      - id: 0
+        type: persistent-claim
+        size: 10Gi
+        class: longhorn
+        deleteClaim: false
+  resources:
+    requests:
+      cpu: 250m
+      memory: 1024Mi
+    limits:
+      cpu: 1000m
+      memory: 2048Mi
+---
 apiVersion: kafka.strimzi.io/v1beta2
 kind: Kafka
 metadata:
