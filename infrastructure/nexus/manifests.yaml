@@ -1,0 +1,199 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: nexus
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nexus-data
+  namespace: nexus
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 50Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nexus
+  namespace: nexus
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: nexus
+  template:
+    metadata:
+      labels:
+        app: nexus
+    spec:
+      # PVC starts root-owned; the nexus3 image runs as uid/gid 200 (matches
+      # Sonatype's own reference chart), needs a one-time chown before the
+      # main container can write to /nexus-data.
+      initContainers:
+        - name: init-permissions
+          image: busybox:1.36
+          command: ["sh", "-c", "chown -R 200:200 /nexus-data"]
+          volumeMounts:
+            - name: nexus-data
+              mountPath: /nexus-data
+          securityContext:
+            runAsUser: 0
+      containers:
+        - name: nexus
+          image: sonatype/nexus3:3.95.1
+          ports:
+            - name: http
+              containerPort: 8081
+            - name: docker
+              containerPort: 8082
+          securityContext:
+            runAsUser: 200
+            runAsGroup: 200
+          env:
+            - name: NEXUS_DATASTORE_ENABLED
+              value: "true"
+            - name: NEXUS_DATASTORE_NEXUS_JDBCURL
+              value: "jdbc:postgresql://nexus-db-cluster-rw.databases.svc.cluster.local:5432/nexus?sslmode=require"
+            - name: NEXUS_DATASTORE_NEXUS_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: nexus-db-cluster-app
+                  key: username
+            - name: NEXUS_DATASTORE_NEXUS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: nexus-db-cluster-app
+                  key: password
+            - name: INSTALL4J_ADD_VM_PARAMS
+              value: "-Xms2g -Xmx2g -XX:MaxDirectMemorySize=3g -Djava.util.prefs.userRoot=/nexus-data/javaprefs"
+          volumeMounts:
+            - name: nexus-data
+              mountPath: /nexus-data
+          resources:
+            requests:
+              cpu: 1000m
+              memory: 2Gi
+            limits:
+              cpu: 2000m
+              memory: 5Gi
+          # Nexus can take several minutes to run DB migrations / first-boot
+          # init - generous startup allowance, liveness/readiness only kick
+          # in once startup succeeds.
+          startupProbe:
+            httpGet:
+              path: /
+              port: 8081
+            periodSeconds: 10
+            failureThreshold: 180
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8081
+            periodSeconds: 30
+            failureThreshold: 6
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8081
+            periodSeconds: 30
+            failureThreshold: 6
+      volumes:
+        - name: nexus-data
+          persistentVolumeClaim:
+            claimName: nexus-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nexus
+  namespace: nexus
+spec:
+  selector:
+    app: nexus
+  ports:
+    - name: http
+      port: 8081
+      targetPort: 8081
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nexus-docker
+  namespace: nexus
+spec:
+  # Fixed ClusterIP (matches the old docker-registry's 10.96.100.1 pattern)
+  # so Talos containerd's registries.mirrors config can point at a stable
+  # IP, same as before - Docker's protocol needs its own dedicated
+  # connector port (8082) separate from Nexus's main UI/Maven/npm/go/cargo
+  # port (8081), configured inside Nexus itself post-boot.
+  clusterIP: 10.96.100.2
+  selector:
+    app: nexus
+  ports:
+    - name: docker
+      port: 8082
+      targetPort: 8082
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: nexus
+  namespace: nexus
+spec:
+  hosts:
+    - "nexus.homelab"
+  gateways:
+    - istio-system/main-gateway
+  http:
+    - route:
+        - destination:
+            host: nexus.nexus.svc.cluster.local
+            port:
+              number: 8081
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: nexus-docker
+  namespace: nexus
+spec:
+  hosts:
+    - "registry.homelab"
+  gateways:
+    - istio-system/main-gateway
+  http:
+    - route:
+        - destination:
+            host: nexus-docker.nexus.svc.cluster.local
+            port:
+              number: 8082
+      corsPolicy:
+        allowOrigins:
+          - exact: https://registry-ui.homelab
+        allowMethods:
+          - GET
+          - PUT
+          - POST
+          - DELETE
+          - PATCH
+          - OPTIONS
+        allowHeaders:
+          - DNT
+          - X-CustomHeader
+          - Keep-Alive
+          - User-Agent
+          - X-Requested-With
+          - If-Modified-Since
+          - Cache-Control
+          - Content-Type
+          - Authorization
+          - Accept
+        exposeHeaders:
+          - Docker-Content-Digest

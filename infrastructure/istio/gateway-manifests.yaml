@@ -23,7 +23,7 @@ spec:
     - "kiali.homelab"
     - "ledger.homelab"
     - "limits.homelab"
-    - "localstack.homelab"
+    - "nexus.homelab"
     - "outbox-relay.homelab"
     - "payment.homelab"
     - "registry.homelab"

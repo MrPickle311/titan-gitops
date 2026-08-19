@@ -1,0 +1,23 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: nexus-db-cluster
+  namespace: databases
+spec:
+  instances: 2
+  certificates:
+    serverCASecret: homelab-ca-bundle
+    serverTLSSecret: nexus-db-cluster-server-tls
+  postgresql:
+    pg_hba:
+      - hostssl all all all scram-sha-256
+      - host all all all reject
+  monitoring:
+    enablePodMonitor: true
+  storage:
+    size: 10Gi
+    storageClass: "longhorn"
+  bootstrap:
+    initdb:
+      database: nexus
+      owner: nexus

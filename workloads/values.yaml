@@ -9,7 +9,7 @@ apps:
       - payment-service
     deployments:
       sanctions-service:
-        image: registry.homelab/sanctions-service:latest
+        image: registry.homelab/library/sanctions-service:latest
         port: 9091
         podLabels:
           sidecar.istio.io/inject: "true"
@@ -49,7 +49,7 @@ apps:
       - payment-service
     deployments:
       fx-service:
-        image: registry.homelab/fx-service:latest
+        image: registry.homelab/library/fx-service:latest
         port: 9091
         podLabels:
           sidecar.istio.io/inject: "true"
@@ -113,7 +113,7 @@ apps:
       - payment-service
     deployments:
       fee-service:
-        image: registry.homelab/fee-service:latest
+        image: registry.homelab/library/fee-service:latest
         port: 9091
         podLabels:
           sidecar.istio.io/inject: "true"
@@ -154,7 +154,7 @@ apps:
         labels:
           component: manager
         replicas: 1
-        image: registry.homelab/export-batch-service:latest
+        image: registry.homelab/library/export-batch-service:latest
         port: 8085
         podLabels:
           sidecar.istio.io/inject: "true"
@@ -205,7 +205,7 @@ apps:
         labels:
           component: listener
         replicas: 1
-        image: registry.homelab/export-batch-service:latest
+        image: registry.homelab/library/export-batch-service:latest
         port: 8083
         podLabels:
           sidecar.istio.io/inject: "true"
@@ -256,7 +256,7 @@ apps:
         labels:
           component: retry-manager
         replicas: 1
-        image: registry.homelab/export-batch-service:latest
+        image: registry.homelab/library/export-batch-service:latest
         port: 8076
         podLabels:
           sidecar.istio.io/inject: "true"
@@ -322,7 +322,7 @@ apps:
       - payment-service
     deployments:
       limits-service:
-        image: registry.homelab/limits-service:latest
+        image: registry.homelab/library/limits-service:latest
         port: 9091
         podLabels:
           sidecar.istio.io/inject: "true"
@@ -375,7 +375,7 @@ apps:
       - istio-ingressgateway
     deployments:
       wallet-service:
-        image: registry.homelab/wallet-service:latest
+        image: registry.homelab/library/wallet-service:latest
         port: 9090
         podLabels:
           sidecar.istio.io/inject: "true"
@@ -432,7 +432,7 @@ apps:
     deployments:
       ledger-service:
         replicas: 1
-        image: registry.homelab/ledger-service:latest
+        image: registry.homelab/library/ledger-service:latest
         port: 8082
         resources:
           requests:
@@ -498,7 +498,7 @@ apps:
     deployments:
       outbox-relay-service:
         replicas: 1
-        image: registry.homelab/outbox-relay-service:latest
+        image: registry.homelab/library/outbox-relay-service:latest
         port: 8089
         podLabels:
           sidecar.istio.io/inject: "true"
@@ -559,7 +559,7 @@ apps:
     deployments:
       mock-regulatory-service:
         replicas: 1
-        image: registry.homelab/mock-regulatory-service:latest
+        image: registry.homelab/library/mock-regulatory-service:latest
         port: 8084
         podLabels:
           sidecar.istio.io/inject: "true"
@@ -594,7 +594,7 @@ apps:
       - payment-service
     deployments:
       authorization-service:
-        image: registry.homelab/authorization-service:latest
+        image: registry.homelab/library/authorization-service:latest
         port: 9091
         podLabels:
           sidecar.istio.io/inject: "true"
@@ -634,7 +634,7 @@ apps:
       - payment-service
     deployments:
       fraud-service:
-        image: registry.homelab/fraud-service:latest
+        image: registry.homelab/library/fraud-service:latest
         port: 9091
         podLabels:
           sidecar.istio.io/inject: "true"
@@ -675,7 +675,7 @@ apps:
       - test-runner
     deployments:
       payment-service:
-        image: registry.homelab/payment-service:latest
+        image: registry.homelab/library/payment-service:latest
         resources:
           requests:
             cpu: 1000m
@@ -793,7 +793,7 @@ apps:
     deployments:
       webhooks-service:
         replicas: 1
-        image: registry.homelab/webhooks-service:latest
+        image: registry.homelab/library/webhooks-service:latest
         port: 8085
         podLabels:
           sidecar.istio.io/inject: "true"

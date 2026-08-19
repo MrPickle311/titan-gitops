@@ -1,0 +1,28 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: nexus-db-cluster-server-tls
+  namespace: databases
+spec:
+  secretName: nexus-db-cluster-server-tls
+  privateKey:
+    encoding: PKCS8
+  usages:
+    - server auth
+  dnsNames:
+    - nexus-db-cluster-rw
+    - nexus-db-cluster-rw.databases.svc
+    - nexus-db-cluster-rw.databases.svc.cluster.local
+    - nexus-db-cluster-ro
+    - nexus-db-cluster-ro.databases.svc
+    - nexus-db-cluster-ro.databases.svc.cluster.local
+    - nexus-db-cluster-r
+    - nexus-db-cluster-r.databases.svc
+    - nexus-db-cluster-r.databases.svc.cluster.local
+    - nexus-db-cluster-rw.databases
+    - nexus-db-cluster-ro.databases
+    - nexus-db-cluster-r.databases
+  issuerRef:
+    name: homelab-ca-issuer
+    kind: ClusterIssuer
+    group: cert-manager.io
