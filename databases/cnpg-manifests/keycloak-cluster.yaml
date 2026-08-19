@@ -12,7 +12,7 @@ spec:
     enablePodMonitor: true
   storage:
     size: 10Gi
-    storageClass: "openebs-hostpath"
+    storageClass: "longhorn"
   bootstrap:
     initdb:
       database: keycloak

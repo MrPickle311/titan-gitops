@@ -29,7 +29,7 @@ spec:
                   targetPort: 5432
   storage:
     size: 20Gi
-    storageClass: "openebs-hostpath"
+    storageClass: "longhorn"
   bootstrap:
     initdb:
       database: titan_db

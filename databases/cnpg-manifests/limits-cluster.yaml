@@ -29,7 +29,7 @@ spec:
                   targetPort: 5432
   storage:
     size: 10Gi
-    storageClass: "openebs-hostpath"
+    storageClass: "longhorn"
   bootstrap:
     initdb:
       database: limits_db
