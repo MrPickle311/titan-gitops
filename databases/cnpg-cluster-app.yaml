@@ -14,9 +14,18 @@ spec:
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: databases
+  # automated fully removed (not just selfHeal:false) for the
+  # openebs-hostpath -> longhorn CNPG migration (PMT-048) - selfHeal alone
+  # still auto-heals drift-without-a-commit, reverting the manual
+  # per-replica PVC/pod replace. CNPG's own rolling-replica-replace pattern:
+  # replicas one at a time (never the primary first), verify streaming
+  # replication caught up before the next, planned switchover once all
+  # replicas are on longhorn, old primary migrated last. Manual sync only
+  # until done, then restore:
+  #   syncPolicy:
+  #     automated:
+  #       prune: true
+  #       selfHeal: true
   syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
     syncOptions:
       - CreateNamespace=true
