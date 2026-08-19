@@ -19,8 +19,12 @@ spec:
             tag: 2.9.3
           persistence:
             enabled: true
-            storageClassName: "openebs-hostpath"
-            size: 10Gi
+            storageClassName: "longhorn"
+            # Bumped from 10Gi: openebs-hostpath never actually enforced
+            # the PVC size quota - real usage had crept to 12.2G before
+            # this migration (PMT-048), which Longhorn's real block-device
+            # sizing does enforce. Sized with headroom above that.
+            size: 20Gi
           config:
             limits_config:
               reject_old_samples: true
