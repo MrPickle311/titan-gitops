@@ -13,5 +13,5 @@ spec:
   resources:
     requests:
       storage: 5Gi
-  storageClassName: openebs-hostpath
-  volumeName: pvc-2c97a25c-4d08-44ee-9817-c443854900b5
+  storageClassName: longhorn
+  volumeName: pvc-9f0ef576-5624-4515-b726-073c3fb83fcc
