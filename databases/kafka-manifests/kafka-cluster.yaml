@@ -16,7 +16,7 @@ spec:
       - id: 0
         type: persistent-claim
         size: 10Gi
-        class: openebs-hostpath
+        class: longhorn
         deleteClaim: false
   resources:
     requests:

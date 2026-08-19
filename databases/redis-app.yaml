@@ -121,17 +121,9 @@ spec:
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: databases
-  # automated fully removed (not just selfHeal:false) for the
-  # openebs-hostpath -> longhorn redis PVC migration (PMT-048) - selfHeal
-  # alone still auto-heals drift-without-a-commit, reverting a manual
-  # per-node PVC/pod replace. Data intentionally not preserved (cache-only:
-  # fx-conversion-rates, sanctioned-user-ids::all) - one node at a time,
-  # not all at once, to keep cluster_state:ok throughout. Manual sync only
-  # until done, then restore:
-  #   syncPolicy:
-  #     automated:
-  #       prune: true
-  #       selfHeal: true
   syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
     syncOptions:
       - CreateNamespace=true
