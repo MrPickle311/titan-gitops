@@ -13,12 +13,6 @@ spec:
     chart: trivy-operator
     helm:
       values: |
-        # Scans every namespace's running workload images continuously
-        # (VulnerabilityReport CRs), which naturally covers what
-        # applications/databases/messaging actually pull from Nexus - a
-        # better fit than scanning Nexus's docker catalog directly, since
-        # it reflects what's actually deployed (PMT-048 harbor->nexus
-        # migration follow-up).
         targetNamespaces: ""
         serviceMonitor:
           enabled: true
@@ -26,6 +20,20 @@ spec:
             release: kube-prometheus-stack
         trivy:
           ignoreUnfixed: false
+        # Only scan Nexus's actual image catalog (see the trivy-image-scan
+        # CronJob in infrastructure/nexus), not every running pod's image -
+        # user wants image-repo scanning, not per-workload scanning.
+        # `operator.vulnerabilityScannerEnabled: false` alone does NOT
+        # actually stop this - confirmed live: the operator's periodic
+        # reconcile loop keeps backfilling scan jobs for any pod missing a
+        # VulnerabilityReport regardless of that flag (real chart
+        # limitation in 0.35.0, not a config mistake - verified new scan
+        # pods kept spawning with fresh names minutes after the flag was
+        # set and confirmed live in the ConfigMap). The only reliable stop
+        # is not running the controller at all.
+        operator:
+          vulnerabilityScannerEnabled: false
+          replicas: 0
         resources:
           requests:
             cpu: 100m
