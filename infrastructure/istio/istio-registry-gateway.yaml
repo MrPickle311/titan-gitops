@@ -1,0 +1,30 @@
+# Dedicated ingress gateway for registry.homelab. Its label must not be
+# istio=ingressgateway: keycloak-jwt (gateway-wide RequestAuthentication) rejects
+# any non-JWT Bearer token, which breaks Nexus's docker token auth.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: istio-registry-gateway
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: 'https://istio-release.storage.googleapis.com/charts'
+    targetRevision: 1.23.0
+    chart: gateway
+    helm:
+      skipSchemaValidation: true
+      valuesObject:
+        labels:
+          istio: registry-gateway
+        service:
+          type: LoadBalancer
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: istio-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
