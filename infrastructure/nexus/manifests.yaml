@@ -167,7 +167,7 @@ spec:
   hosts:
     - "registry.homelab"
   gateways:
-    - istio-system/main-gateway
+    - istio-system/registry-gateway
   http:
     - route:
         - destination:

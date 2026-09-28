@@ -103,10 +103,16 @@ machine:
         #     model: WDC* # Disk model `/sys/block/<dev>/device/model`.
         #     busPath: /pci0000:00/0000:00:17.0/ata1/host0/target0:0:0/0:0:0:0 # Disk bus path.
     registries:
+        # Repointed to Nexus's docker connector (PMT-048 harbor->nexus
+        # migration): old registry:2 at 10.96.100.1 decommissioned, images
+        # now live under the /library/ project prefix Nexus requires -
+        # containerd forwards the full image ref path as-is, so
+        # workloads/values.yaml's image refs carry the /library/ prefix,
+        # not this mirror config.
         mirrors:
             registry.homelab:
                 endpoints:
-                    - http://10.96.100.1
+                    - http://10.96.100.2:8082
         config:
             registry.homelab:
                 tls:

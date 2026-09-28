@@ -58,3 +58,22 @@ spec:
       credentialName: wildcard-cert
     hosts:
     - "*"
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: registry-gateway
+  namespace: istio-system
+spec:
+  selector:
+    istio: registry-gateway
+  servers:
+  - port:
+      number: 443
+      name: https
+      protocol: HTTPS
+    tls:
+      mode: SIMPLE
+      credentialName: wildcard-cert
+    hosts:
+    - "registry.homelab"
