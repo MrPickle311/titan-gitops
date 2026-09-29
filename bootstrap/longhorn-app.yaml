@@ -32,6 +32,7 @@ spec:
           # up after a reboot deadlocks: no instance-manager, no volumes.
           # Longhorn only applies a change here while all volumes are detached.
           priorityClass: system-node-critical
+          guaranteedInstanceManagerCPU: '{"v1":"5","v2":"5"}'
 
         longhornManager:
           priorityClass: system-node-critical

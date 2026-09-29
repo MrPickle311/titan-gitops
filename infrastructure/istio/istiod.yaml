@@ -18,6 +18,10 @@ spec:
           priorityClassName: platform-critical
         pilot:
           autoscaleMin: 3
+          resources:
+            requests:
+              cpu: 100m
+              memory: 512Mi
           cni:
             enabled: true
           env:
