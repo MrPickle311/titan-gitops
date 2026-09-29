@@ -3,6 +3,7 @@ kind: Kustomization
 
 resources:
   - applications-namespace.yaml
+  - priority-classes.yaml
   - cluster-config.yaml
   - argo-workflows-rbac.yaml
   - workflow-rbac.yaml

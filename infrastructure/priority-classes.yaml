@@ -1,0 +1,58 @@
+# Scheduling tiers. The scheduler preempts lower tiers to place higher ones.
+# Longhorn uses system-node-critical instead (see bootstrap/longhorn-app.yaml):
+# its instance-manager pods set nodeName directly, bypassing the scheduler, so
+# only kubelet critical-pod admission (priority >= 2e9) can make room for them.
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: platform-critical
+value: 900000000
+preemptionPolicy: PreemptLowerPriority
+description: "Platform services others depend on: registry, secrets, identity, mesh control plane, certificates."
+---
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: apps
+value: 1000
+globalDefault: true
+preemptionPolicy: PreemptLowerPriority
+description: "Default tier for business workloads and anything without an explicit class."
+---
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: best-effort-batch
+value: 0
+preemptionPolicy: Never
+description: "Test workflows and batch jobs: never preempt others, first to be preempted."
+---
+# Caps what the apps tier can reserve so it can't starve the platform tier.
+# Cluster-wide per namespace, not per node. Tune after checking
+# `kubectl describe quota -n applications` in steady state.
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: apps-cpu-cap
+  namespace: applications
+spec:
+  hard:
+    requests.cpu: "12"
+  scopeSelector:
+    matchExpressions:
+      - scopeName: PriorityClass
+        operator: In
+        values: ["apps"]
+---
+# A CPU quota rejects in-scope pods without CPU requests; give them a default.
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: default-requests
+  namespace: applications
+spec:
+  limits:
+    - type: Container
+      defaultRequest:
+        cpu: 50m
+        memory: 64Mi
