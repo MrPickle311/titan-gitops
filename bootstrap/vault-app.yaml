@@ -21,8 +21,16 @@ spec:
         values: |
           injector:
             priorityClassName: platform-critical
+            tolerations:
+              - key: node-role.kubernetes.io/control-plane
+                operator: Exists
+                effect: NoSchedule
           server:
             priorityClassName: platform-critical
+            tolerations:
+              - key: node-role.kubernetes.io/control-plane
+                operator: Exists
+                effect: NoSchedule
             dataStorage:
               enabled: true
               size: 2Gi

@@ -34,6 +34,10 @@ spec:
         app: nexus
     spec:
       priorityClassName: platform-critical
+      tolerations:
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+          effect: NoSchedule
       # PVC starts root-owned; the nexus3 image runs as uid/gid 200 (matches
       # Sonatype's own reference chart), needs a one-time chown before the
       # main container can write to /nexus-data.

@@ -22,6 +22,10 @@ spec:
         service:
           type: LoadBalancer
         priorityClassName: platform-critical
+        tolerations:
+          - key: node-role.kubernetes.io/control-plane
+            operator: Exists
+            effect: NoSchedule
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: istio-system

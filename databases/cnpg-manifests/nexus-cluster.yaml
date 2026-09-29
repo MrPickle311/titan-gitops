@@ -6,6 +6,11 @@ metadata:
 spec:
   instances: 2
   priorityClassName: platform-critical
+  affinity:
+    tolerations:
+      - key: node-role.kubernetes.io/control-plane
+        operator: Exists
+        effect: NoSchedule
   certificates:
     serverCASecret: homelab-ca-bundle
     serverTLSSecret: nexus-db-cluster-server-tls

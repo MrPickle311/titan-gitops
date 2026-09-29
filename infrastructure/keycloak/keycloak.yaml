@@ -37,3 +37,7 @@ spec:
           sidecar.istio.io/inject: "true"
       spec:
         priorityClassName: platform-critical
+        tolerations:
+          - key: node-role.kubernetes.io/control-plane
+            operator: Exists
+            effect: NoSchedule
