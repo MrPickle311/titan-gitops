@@ -19,7 +19,10 @@ spec:
       chart: vault
       helm:
         values: |
+          injector:
+            priorityClassName: platform-critical
           server:
+            priorityClassName: platform-critical
             dataStorage:
               enabled: true
               size: 2Gi

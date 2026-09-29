@@ -5,6 +5,7 @@ metadata:
   namespace: databases
 spec:
   instances: 2
+  priorityClassName: platform-critical
   certificates:
     serverCASecret: homelab-ca-bundle
     serverTLSSecret: keycloak-db-cluster-server-tls

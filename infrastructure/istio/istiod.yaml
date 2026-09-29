@@ -15,6 +15,7 @@ spec:
       valuesObject:
         global:
           nativeNftables: true
+          priorityClassName: platform-critical
         pilot:
           autoscaleMin: 3
           cni:

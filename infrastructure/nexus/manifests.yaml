@@ -33,6 +33,7 @@ spec:
       labels:
         app: nexus
     spec:
+      priorityClassName: platform-critical
       # PVC starts root-owned; the nexus3 image runs as uid/gid 200 (matches
       # Sonatype's own reference chart), needs a one-time chown before the
       # main container can write to /nexus-data.

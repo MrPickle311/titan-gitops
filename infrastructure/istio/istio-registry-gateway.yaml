@@ -21,6 +21,7 @@ spec:
           istio: registry-gateway
         service:
           type: LoadBalancer
+        priorityClassName: platform-critical
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: istio-system

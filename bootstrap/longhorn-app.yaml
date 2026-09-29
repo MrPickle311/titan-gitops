@@ -26,6 +26,18 @@ spec:
           defaultReplicaCount: 1
           # backupTarget intentionally left unset - no MinIO/S3 target
           # wired up yet. Revisit before relying on this for real data.
+          # instance-manager pods bypass the scheduler (nodeName), so only
+          # kubelet critical-pod admission (>= 2e9) can evict pods to admit
+          # them. With longhorn-critical (1e9) a node whose CPU requests fill
+          # up after a reboot deadlocks: no instance-manager, no volumes.
+          # Longhorn only applies a change here while all volumes are detached.
+          priorityClass: system-node-critical
+
+        longhornManager:
+          priorityClass: system-node-critical
+
+        longhornDriver:
+          priorityClass: system-node-critical
 
         metrics:
           serviceMonitor:

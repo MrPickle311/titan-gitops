@@ -11,6 +11,10 @@ spec:
     chart: argo-workflows
     helm:
       values: |
+        controller:
+          workflowDefaults:
+            spec:
+              podPriorityClassName: best-effort-batch
         server:
           secure: false
           authModes:

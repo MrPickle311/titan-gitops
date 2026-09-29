@@ -14,6 +14,8 @@ spec:
     helm:
       values: |
         installCRDs: true
+        global:
+          priorityClassName: platform-critical
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: cert-manager
