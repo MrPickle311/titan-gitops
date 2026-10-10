@@ -33,12 +33,23 @@ spec:
           # Longhorn only applies a change here while all volumes are detached.
           priorityClass: system-node-critical
           guaranteedInstanceManagerCPU: '{"v1":"5","v2":"5"}'
+          # Control-plane node has a Longhorn data disk (talos/controlplane.yaml
+          # UserVolumeConfig) and runs pods with PVCs, so Longhorn must run there.
+          taintToleration: "node-role.kubernetes.io/control-plane:NoSchedule"
 
         longhornManager:
           priorityClass: system-node-critical
+          tolerations:
+            - key: node-role.kubernetes.io/control-plane
+              operator: Exists
+              effect: NoSchedule
 
         longhornDriver:
           priorityClass: system-node-critical
+          tolerations:
+            - key: node-role.kubernetes.io/control-plane
+              operator: Exists
+              effect: NoSchedule
 
         metrics:
           serviceMonitor:
