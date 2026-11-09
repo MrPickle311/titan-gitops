@@ -152,7 +152,7 @@ spec:
                     requests:
                       storage: 20Gi
             
-            retention: 24h
+            retention: 368h
             resources:
               requests:
                 cpu: 200m
