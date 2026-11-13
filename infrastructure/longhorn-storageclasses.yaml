@@ -1,0 +1,70 @@
+# Longhorn StorageClasses, one per speed tier, pinned to disk tags (set per disk on
+# nodes.longhorn.io, not in git - re-apply after adding/replacing a disk).
+# diskSelector needs ALL listed tags. Pod picks a tier via its PVC's storageClassName.
+#
+#   class               selector    disks
+#   longhorn-nvme       nvme        NVMe: /var/lib/longhorn on sad-s24/sie-ons/wdp-fwu (shares system disk),
+#                                   longhorn-fast on u0c-uk3
+#   longhorn-sata-ssd   ssd,sata    SATA SSD extra-disk on sad-s24/sie-ons/wdp-fwu
+#   longhorn-sas-hdd    hdd,sas     u0c-uk3 longhorn-data/-data2 (2x 3TB SAS)
+#   longhorn-sata-hdd   hdd,sata    u0c-uk3 default-disk (1TB SATA, shares system disk)
+# Default class `longhorn` has no selector and lands on any disk.
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: longhorn-nvme
+provisioner: driver.longhorn.io
+allowVolumeExpansion: true
+reclaimPolicy: Delete
+volumeBindingMode: Immediate
+parameters:
+  numberOfReplicas: "1"
+  staleReplicaTimeout: "30"
+  fsType: xfs
+  dataLocality: disabled
+  diskSelector: "nvme"
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: longhorn-sata-ssd
+provisioner: driver.longhorn.io
+allowVolumeExpansion: true
+reclaimPolicy: Delete
+volumeBindingMode: Immediate
+parameters:
+  numberOfReplicas: "1"
+  staleReplicaTimeout: "30"
+  fsType: xfs
+  dataLocality: disabled
+  diskSelector: "ssd,sata"
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: longhorn-sas-hdd
+provisioner: driver.longhorn.io
+allowVolumeExpansion: true
+reclaimPolicy: Delete
+volumeBindingMode: Immediate
+parameters:
+  numberOfReplicas: "1"
+  staleReplicaTimeout: "30"
+  fsType: xfs
+  dataLocality: disabled
+  diskSelector: "hdd,sas"
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: longhorn-sata-hdd
+provisioner: driver.longhorn.io
+allowVolumeExpansion: true
+reclaimPolicy: Delete
+volumeBindingMode: Immediate
+parameters:
+  numberOfReplicas: "1"
+  staleReplicaTimeout: "30"
+  fsType: xfs
+  dataLocality: disabled
+  diskSelector: "hdd,sata"
