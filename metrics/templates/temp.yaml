@@ -17,6 +17,11 @@ spec:
           enabled: true
           storageClassName: longhorn-sas-hdd
           size: 100Gi
+        # Tempo image runs as 10001; fresh xfs PVC is root-owned.
+        securityContext:
+          runAsUser: 10001
+          runAsGroup: 10001
+          fsGroup: 10001
         tempo:
           retention: 360h
           receivers:
