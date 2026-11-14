@@ -146,13 +146,14 @@ spec:
             storageSpec:
               volumeClaimTemplate:
                 spec:
-                  storageClassName: "longhorn"
+                  storageClassName: "longhorn-sas-hdd"
                   accessModes: ["ReadWriteOnce"]
                   resources:
                     requests:
-                      storage: 20Gi
-            
+                      storage: 200Gi
+
             retention: 368h
+            retentionSize: 180GB
             resources:
               requests:
                 cpu: 200m
