@@ -27,6 +27,21 @@ parameters:
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
+  name: longhorn-nvme-local
+provisioner: driver.longhorn.io
+allowVolumeExpansion: true
+reclaimPolicy: Delete
+volumeBindingMode: Immediate
+parameters:
+  numberOfReplicas: "1"
+  staleReplicaTimeout: "30"
+  fsType: xfs
+  dataLocality: best-effort
+  diskSelector: "nvme"
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
   name: longhorn-sata-ssd
 provisioner: driver.longhorn.io
 allowVolumeExpansion: true
