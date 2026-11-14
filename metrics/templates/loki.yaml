@@ -19,7 +19,7 @@ spec:
             tag: 2.9.3
           persistence:
             enabled: true
-            storageClassName: "longhorn"
+            storageClassName: "longhorn-sas-hdd"
             # Bumped from 10Gi: openebs-hostpath never actually enforced
             # the PVC size quota - real usage had crept to 12.2G before
             # this migration (PMT-048), which Longhorn's real block-device
