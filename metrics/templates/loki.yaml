@@ -24,7 +24,7 @@ spec:
             # the PVC size quota - real usage had crept to 12.2G before
             # this migration (PMT-048), which Longhorn's real block-device
             # sizing does enforce. Sized with headroom above that.
-            size: 40Gi
+            size: 200Gi
           config:
             # boltdb-shipper ignores table_manager retention; without this
             # retention_period is never enforced and the PVC fills up.
@@ -35,10 +35,10 @@ spec:
               reject_old_samples_max_age: 720h
               ingestion_rate_mb: 32
               ingestion_burst_size_mb: 64
-              retention_period: 24h
+              retention_period: 360h
             table_manager:
               retention_deletes_enabled: true
-              retention_period: 24h
+              retention_period: 360h
 
         promtail:
           enabled: true
