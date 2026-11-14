@@ -13,8 +13,12 @@ spec:
     chart: tempo
     helm:
       values: |
+        persistence:
+          enabled: true
+          storageClassName: longhorn-sas-hdd
+          size: 100Gi
         tempo:
-          retention: 24h
+          retention: 360h
           receivers:
             otlp:
               protocols:

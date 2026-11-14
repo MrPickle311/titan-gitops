@@ -14,6 +14,10 @@ spec:
     helm:
       values: |
         pyroscope:
+          persistence:
+            enabled: true
+            storageClassName: longhorn-sas-hdd
+            size: 50Gi
           storage:
             backend: filesystem
             filesystem:
