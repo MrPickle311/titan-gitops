@@ -7,4 +7,5 @@ resources:
   - cluster-config.yaml
   - argo-workflows-rbac.yaml
   - workflow-rbac.yaml
+  - longhorn-storageclasses.yaml
 
