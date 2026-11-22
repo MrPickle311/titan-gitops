@@ -22,3 +22,4 @@ spec:
     - "https://chaos.homelab/oauth2/callback"
     - "https://registry-ui.homelab/oauth2/callback"
     - "https://homepage.homelab/oauth2/callback"
+    - "https://dashboard.homelab/oauth2/callback"
