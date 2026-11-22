@@ -63,7 +63,12 @@ allowVolumeExpansion: true
 reclaimPolicy: Delete
 volumeBindingMode: Immediate
 parameters:
-  numberOfReplicas: "1"
+  # 2 replicas on the two SAS disks of one node: survives a single disk failure
+  # (not a node failure). Hard disk anti-affinity forces different disks; node
+  # soft anti-affinity is needed because both disks live on u0c-uk3.
+  numberOfReplicas: "2"
+  replicaSoftAntiAffinity: "enabled"
+  replicaDiskSoftAntiAffinity: "disabled"
   staleReplicaTimeout: "30"
   fsType: xfs
   dataLocality: disabled
