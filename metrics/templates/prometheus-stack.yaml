@@ -152,7 +152,7 @@ spec:
                     requests:
                       storage: 200Gi
 
-            retention: 368h
+            retention: 4380h
             retentionSize: 180GB
             resources:
               requests:

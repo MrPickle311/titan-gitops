@@ -23,7 +23,7 @@ spec:
           runAsGroup: 10001
           fsGroup: 10001
         tempo:
-          retention: 360h
+          retention: 4380h
           receivers:
             otlp:
               protocols:
